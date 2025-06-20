@@ -1,7 +1,7 @@
 import React from 'react';
 import ProductFeatureSection from './FirstProduct';
 import Saffron from '../assets/saffron.png'; // Adjust the path as necessary
-import DriedSaffron from '../assets/driedSaffron.png'; // Adjust the path as necessary
+import DriedSaffron from '../assets/driedsaffron.png'; // Adjust the path as necessary
 import bowlSaffron from '../assets/bowlSaffron.png'; // Adjust the path as necessary
 import image from '../assets/image .png'; // Adjust the path as necessary
 import saffron3 from'../assets/saffron3.png'
