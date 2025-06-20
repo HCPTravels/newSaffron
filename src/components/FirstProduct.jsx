@@ -6,60 +6,62 @@ const ProductFeatureSection = ({
   title = "Default Title",
   description = "Default description",
   features = [],
-  image
+  image,
+  imageClass
 }) => {
   const isEven = id % 2 === 0;
 
   return (
-    <section className="min-h-screen relative z-10 flex items-center overflow-x-hidden">
+    <section className="py-12 relative z-10 flex items-center overflow-x-hidden">
       <div
-        className={`container grid grid-cols-12 gap-8 md:gap-12 lg:gap-16 items-start px-4 sm:px-6 ${
+        className={`container grid grid-cols-12 gap-2 md:gap-12 lg:gap-16 items-start px-4 sm:px-6 ${
           isEven ? 'md:ml-[57px]' : ''
         }`}
       >
         {/* Left/Right Column - Text + Number */}
         <div
-          className={`col-span-12 md:col-span-5 flex flex-col ${
+          className={`col-span-12 md:col-span-5 flex flex-col justify-center ${
             isEven
-              ? 'items-end text-right md:order-2 md:translate-x-8 lg:translate-x-25'
+              ? 'items-end text-right md:order-2 md:translate-x-4 lg:translate-x-10'
               : 'items-start text-left md:order-1'
           }`}
         >
-          <p className="text-[120px] sm:text-[160px] md:text-[200px] lg:text-[250px] text-[#ffc1a7] leading-none font-bold select-none -mt-10 drop-shadow-[0_0_15px_rgba(0,0,0,0.3)]">
+          <p className="text-[80px] sm:text-[100px] md:text-[140px] lg:text-[160px] text-[#ffc1a7] leading-none font-bold select-none drop-shadow-[0_0_10px_rgba(0,0,0,0.3)]">
             {id.toString().padStart(2, '0')}
           </p>
           <img
-            src={image}
-            alt="Saffron"
-            className="w-full max-w-[300px] sm:max-w-[400px] -mt-20 md:max-w-[500px] lg:max-w-[600px] h-auto object-contain"
-          />
+  src={image}
+  alt="Saffron"
+  className={`w-full max-w-[300px] sm:max-w-[400px] md:max-w-[500px] lg:max-w-[600px] h-auto object-contain ${imageClass || ''}`}
+/>
+
         </div>
 
         {/* Right/Left Column - Info */}
         <div
-          className={`col-span-12 md:col-span-7 text-[#ffc1a7] space-y-6 ${
+          className={`col-span-12 md:col-span-7 text-[#ffc1a7] space-y-4 ${
             isEven ? 'md:order-1' : 'md:order-2'
           }`}
         >
-          <h2 className="text-3xl sm:text-4xl md:text-5xl font-bold leading-tight">
+          <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold leading-tight">
             {title}
           </h2>
 
-          <div className="relative text-black font-poppins max-w-[250px] leading-relaxed text-[14px] sm:text-[16px] md:text-[18px]">
-            <div className="absolute top-[50px] left-[50px] w-32 h-32 bg-white/80 rounded-full blur-[80px]" />
+          <div className="relative text-black font-poppins max-w-[280px] leading-relaxed text-sm sm:text-base md:text-[16px]">
+            <div className="absolute top-[40px] left-[40px] w-24 h-24 bg-white/70 rounded-full blur-[70px]" />
             <p className="break-words whitespace-pre-wrap">
               {description.replace(/&/g, '\n&')}
             </p>
           </div>
 
-          <div className="space-y-3">
+          <div className="space-y-2">
             {features.map((feature, index) => (
               <div
                 key={index}
-                className="flex text-black items-center space-x-3"
+                className="flex text-black items-center space-x-2"
               >
-                {feature.icon === 'link' ? <Link size={20} /> : <MoveRight size={20} />}
-                <p className="text-base sm:text-lg font-medium">
+                {feature.icon === 'link' ? <Link size={18} /> : <MoveRight size={18} />}
+                <p className="text-sm sm:text-base font-medium">
                   {feature.text}
                 </p>
               </div>

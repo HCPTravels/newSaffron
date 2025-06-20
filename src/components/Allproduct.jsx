@@ -4,10 +4,11 @@ import Saffron from '../assets/saffron.png'; // Adjust the path as necessary
 import DriedSaffron from '../assets/driedSaffron.png'; // Adjust the path as necessary
 import bowlSaffron from '../assets/bowlSaffron.png'; // Adjust the path as necessary
 import image from '../assets/image .png'; // Adjust the path as necessary
+import saffron3 from'../assets/saffron3.png'
 
 
 
-const data = [
+ const data = [
     {
       id: 1,
       title: 'Farm-Fresh, Straight from Source',
@@ -18,6 +19,7 @@ const data = [
         { icon: 'move', text: 'Know where your saffron comes from.' },
         { icon: 'link', text: 'Explore Our Sourcing' },
       ],
+      topMargin: 'mt-[-20px]',
     },
     {
       id: 2,
@@ -29,6 +31,8 @@ const data = [
         { icon: 'move', text: 'Only the top 1% of saffron makes it to you.' },
         { icon: 'link', text: 'See our Quality Standards' },
       ],
+      topMargin: 'mt-[-20px]',
+
     },
     {
       id: 3,
@@ -40,18 +44,22 @@ const data = [
         { icon: 'move', text: 'Get full strength and natural flavour in every strand.' },
         { icon: 'link', text: 'Why Drying Matters' },
       ],
+      topMargin: 'mt-[-20px]',
+
     },
     {
-      id: 4,
-      title: 'Sealed for Freshness, Packed with Care',
-      description:
-        'Packed in airtight glass jars or vacuum pouches to protect your saffron from light and air — locking in aroma and potency.',
-      image: Saffron,
-      features: [
-        { icon: 'move', text: 'Unbox aroma, freshness, and elegance.' },
-        { icon: 'link', text: 'View Our Packaging' },
-      ],
-    },
+        id: 4,
+        title: 'Sealed for Freshness, Packed with Care',
+        description:
+          'Packed in airtight glass jars or vacuum pouches to protect your saffron from light and air — locking in aroma and potency.',
+        image: saffron3,
+        imageClass: 'aspect-[4/3] max-h-[280px] object-contain', // 👈 Add this line
+        features: [
+          { icon: 'move', text: 'Unbox aroma, freshness, and elegance.' },
+          { icon: 'link', text: 'View Our Packaging' },
+        ],
+        topMargin: 'mt-[-20px]',
+      },
     {
       id: 5,
       title: 'Premium by Nature, Not by Price',
@@ -62,18 +70,22 @@ const data = [
         { icon: 'move', text: 'Saffron this pure is powerful and precious.' },
         { icon: 'link', text: 'Why It’s Worth It' },
       ],
+      topMargin: 'mt-[-20px]',
+
     },
   ];
   
-
-const AllProducts = () => {
-  return (
-    <>
-      {data.map((item) => (
-        <ProductFeatureSection key={item.id} {...item} />
-      ))}
-    </>
-  );
-};
+  const AllProducts = () => {
+    return (
+      <>
+        {data.map((item) => (
+          <div key={item.id} className={item.topMargin}>
+            <ProductFeatureSection {...item} />
+          </div>
+        ))}
+      </>
+    );
+  };
+  
 
 export default AllProducts;
