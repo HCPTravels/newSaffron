@@ -76,11 +76,14 @@ export default function BeeCanvas() {
 
   useEffect(() => {
     let animationFrame;
+    let currentX = renderPosition.x;
+    let currentY = renderPosition.y;
 
     const animate = () => {
       const scroll = scrollYRef.current;
-      let kf1 = keyframes[0], kf2 = keyframes[keyframes.length - 1];
 
+      // Find keyframe segment
+      let kf1 = keyframes[0], kf2 = keyframes[keyframes.length - 1];
       for (let i = 0; i < keyframes.length - 1; i++) {
         if (scroll >= keyframes[i].scroll && scroll <= keyframes[i + 1].scroll) {
           kf1 = keyframes[i];
@@ -96,10 +99,15 @@ export default function BeeCanvas() {
       const [p0, p1, p2, p3] = bezier;
       const easedProgress = cubicBezier(progress, p0, p1, p2, p3);
 
-      const newX = kf1.x + (kf2.x - kf1.x) * easedProgress;
-      const newY = kf1.y + (kf2.y - kf1.y) * easedProgress;
+      const targetX = kf1.x + (kf2.x - kf1.x) * easedProgress;
+      const targetY = kf1.y + (kf2.y - kf1.y) * easedProgress;
 
-      setRenderPosition({ x: newX, y: newY });
+      // Smooth interpolation (lerp with damping)
+      const damping = 0.1;
+      currentX += (targetX - currentX) * damping;
+      currentY += (targetY - currentY) * damping;
+
+      setRenderPosition({ x: currentX, y: currentY });
       animationFrame = requestAnimationFrame(animate);
     };
 

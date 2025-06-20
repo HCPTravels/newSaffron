@@ -3,7 +3,6 @@ import { useFrame } from '@react-three/fiber';
 import { PerspectiveCamera } from '@react-three/drei';
 import { cameraKeyframes } from './CameraController';
 
-// Cubic bezier easing
 function cubicBezier(t, p0, p1, p2, p3) {
   const u = 1 - t;
   return (
@@ -13,38 +12,21 @@ function cubicBezier(t, p0, p1, p2, p3) {
   );
 }
 
-// Easing map for camera
-const cameraEasingMap = [
-  [1, 20, [0.42, 0.00, 0.58, 1.00]],
-  [20, 36, [0.42, 0.00, 0.58, 1.00]],
-  [36, 57, [0.42, 0.00, 0.58, 1.00]],
-  [57, 80, [0.42, 0.00, 0.58, 1.00]],
-  [80, 104, [0.60, -0.28, 0.73, 0.04]],
-  [104, 108, [0.42, 0.00, 0.58, 1.00]],
-  [108, 120, [0.42, 0.00, 0.58, 1.00]],
-  [120, 139, [0.42, 0.00, 0.58, 1.00]],
-  [139, 160, [0.42, 0.00, 0.58, 1.00]],
-  [160, 204, [0.42, 0.00, 0.58, 1.00]],
-  [204, 216, [0.42, 0.00, 0.58, 1.00]],
-  [216, 269, [0.42, 0.00, 0.58, 1.00]],
-  [269, 289, [0.42, 0.00, 0.58, 1.00]],
-  [289, 328, [0.42, 0.00, 0.58, 1.00]],
-  [328, 353, [0.42, 0.00, 0.58, 1.00]],
-  [353, 366, [0.42, 0.00, 0.58, 1.00]],
-  [366, 375, [0.42, 0.00, 0.58, 1.00]],
-  [375, 381, [0.42, 0.00, 0.58, 1.00]],
-];
+const cameraEasingMap = [ /* your existing map */ ];
 
-// Get easing bezier for scroll range
 function getCameraBezier(scroll) {
   for (let [from, to, bezier] of cameraEasingMap) {
     if (scroll >= from && scroll <= to) return bezier;
   }
-  return [0, 0, 1, 1]; // linear fallback
+  return [0, 0, 1, 1]; // linear
 }
 
 function lerp(a, b, t) {
   return a + (b - a) * t;
+}
+
+function damp(current, target, lambda, delta) {
+  return lerp(current, target, 1 - Math.exp(-lambda * delta));
 }
 
 function interpolate(scroll, keyframes, key) {
@@ -63,7 +45,11 @@ function interpolate(scroll, keyframes, key) {
 export default function AnimatedCamera({ scrollY }) {
   const camRef = useRef();
 
-  useFrame(() => {
+  const current = useRef({
+    x: 0, y: 0, z: 0
+  });
+
+  useFrame((state, delta) => {
     const scroll = scrollY.current;
 
     const dist = interpolate(scroll, cameraKeyframes, 'distance');
@@ -73,11 +59,20 @@ export default function AnimatedCamera({ scrollY }) {
     const phi = (90 - elev) * (Math.PI / 180);
     const theta = (azim % 360) * (Math.PI / 180);
 
-    const x = dist * Math.sin(phi) * Math.cos(theta);
-    const y = dist * Math.cos(phi);
-    const z = dist * Math.sin(phi) * Math.sin(theta);
+    const targetX = dist * Math.sin(phi) * Math.cos(theta);
+    const targetY = dist * Math.cos(phi);
+    const targetZ = dist * Math.sin(phi) * Math.sin(theta);
 
-    camRef.current.position.set(x, y, z);
+    // Smoothly interpolate position
+    current.current.x = damp(current.current.x, targetX, 6, delta);
+    current.current.y = damp(current.current.y, targetY, 6, delta);
+    current.current.z = damp(current.current.z, targetZ, 6, delta);
+
+    camRef.current.position.set(
+      current.current.x,
+      current.current.y,
+      current.current.z
+    );
     camRef.current.lookAt(0, 0, 0);
   });
 
