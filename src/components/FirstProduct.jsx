@@ -18,7 +18,8 @@ const ProductFeatureSection = ({
           isEven ? 'md:ml-[57px]' : ''
         }`}
       >
-        {/* Left/Right Column - Image */}
+        {/* Left/Right Column - Image hello */}
+        
         <div
           className={`col-span-12 md:col-span-5 flex flex-col justify-center ${
             isEven
