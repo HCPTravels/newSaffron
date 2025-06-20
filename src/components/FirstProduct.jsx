@@ -18,7 +18,7 @@ const ProductFeatureSection = ({
           isEven ? 'md:ml-[57px]' : ''
         }`}
       >
-        {/* Left/Right Column - Text + Number */}
+        {/* Left/Right Column - Image */}
         <div
           className={`col-span-12 md:col-span-5 flex flex-col justify-center ${
             isEven
@@ -26,15 +26,14 @@ const ProductFeatureSection = ({
               : 'items-start text-left md:order-1'
           }`}
         >
-          <p className="text-[80px] sm:text-[100px] md:text-[140px] lg:text-[160px] text-[#ffc1a7] leading-none font-bold select-none drop-shadow-[0_0_10px_rgba(0,0,0,0.3)]">
-            {id.toString().padStart(2, '0')}
-          </p>
-          <img
-  src={image}
-  alt="Saffron"
-  className={`w-full max-w-[300px] sm:max-w-[400px] md:max-w-[500px] lg:max-w-[600px] h-auto object-contain ${imageClass || ''}`}
-/>
+          {/* Spacer to preserve layout after removing the big ID number */}
+          <div className="h-[160px] hidden md:block" />
 
+          <img
+            src={image}
+            alt="Saffron"
+            className={`w-full max-w-[300px] sm:max-w-[400px] md:max-w-[500px] lg:max-w-[600px] h-auto object-contain ${imageClass || ''}`}
+          />
         </div>
 
         {/* Right/Left Column - Info */}
