@@ -126,7 +126,7 @@ export default function BeeCanvas() {
         width: '918px',
         height: '783px',
         pointerEvents: 'none',
-        zIndex: 2147483647,
+        zIndex: 40, // Changed from 2147483647 to 40 (below navbar z-50)
       }}
     >
       <Canvas gl={{ alpha: true }} style={{ background: 'transparent' }}>
