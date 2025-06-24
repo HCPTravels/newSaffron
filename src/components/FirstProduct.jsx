@@ -23,28 +23,28 @@ const ProductFeatureSection = ({
           className={`w-full space-y-4 text-[#ffc1a7] ${
             isEven
               ? 'order-1 md:order-1 text-left md:text-left items-start'
-              : 'order-2 md:order-1 text-left md:text-left items-start'
+              : 'order-2 md:order-2 text-left md:text-left items-start'
           }`}
         >
-          <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold leading-tight">
+          <h2 className="text-lg sm:text-3xl md:text-4xl font-bold leading-tight">
             {title}
           </h2>
 
-          <div className="relative text-black font-poppins max-w-[280px] leading-relaxed text-sm sm:text-base md:text-[16px]">
+          <div className="relative  text-black font-poppins max-w-[280px] leading-relaxed text-xs sm:text-base md:text-[16px]">
             <div className="absolute top-[40px] left-[40px] w-24 h-24 bg-white/70 rounded-full blur-[70px]" />
             <p className="break-words whitespace-pre-wrap">
               {description.replace(/&/g, '\n&')}
             </p>
           </div>
 
-          <div className="space-y-2">
+          <div className="space-y-2 in hidden md:block">
             {features.map((feature, index) => (
               <div
                 key={index}
                 className="flex text-black items-center space-x-2"
               >
                 {feature.icon === 'link' ? <Link size={18} /> : <MoveRight size={18} />}
-                <p className="text-sm sm:text-base font-medium">
+                <p className="text-xs sm:text-base font-medium">
                   {feature.text}
                 </p>
               </div>
@@ -57,17 +57,32 @@ const ProductFeatureSection = ({
           className={`w-full flex flex-col justify-center ${
             isEven
               ? 'order-2 md:order-2 items-center md:items-end text-center md:text-right'
-              : 'order-1 md:order-2 items-center md:items-start text-center md:text-left'
+              : 'order-1 md:order-1 items-center md:items-start text-center md:text-left'
           }`}
         >
-          <div className="h-[100px] hidden md:h-[100px]" />
+          <div className="h-0 hidden md:h-[100px]" />
           <img
             src={image}
             alt="Saffron"
-            className={`w-full max-w-[300px] sm:max-w-[400px] md:max-w-[500px] lg:max-w-[600px] h-auto object-contain ${imageClass || ''}`}
+            className={`w-full max-w-[300px]  ml-[-30px] sm:max-w-[400px] md:max-w-[500px] lg:max-w-[600px] h-auto object-contain ${imageClass || ''}`}
           />
+          <div className="space-y-2 in block md:hidden">
+            {features.map((feature, index) => (
+              <div
+                key={index}
+                className="flex text-black items-center space-x-2"
+              >
+                {feature.icon === 'link' ? <Link size={18} /> : <MoveRight size={18} />}
+                <p className="text-xs sm:text-base font-medium">
+                  {feature.text}
+                </p>
+              </div>
+            ))}
+          </div>
+          
         </div>
       </div>
+      
     </section>
   );
 };
