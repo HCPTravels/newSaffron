@@ -13,8 +13,8 @@ const keyframes = [
   { scroll: 119, x: 379, y: 1051 },
   { scroll: 160, x: 686, y: 1200 },
   { scroll: 204, x: 36, y: 1600 },
-  { scroll: 216, x: -72, y: 2050 },
-  { scroll: 269, x: -84, y: 2100 },
+  { scroll: 216, x: -44, y: 2050 },
+  { scroll: 269, x: -44, y: 2100 },
   { scroll: 289, x: 600, y: 2450 },
   { scroll: 327, x: 309, y: 2600 },
   { scroll: 381, x: -44, y: 3100 },
@@ -59,10 +59,74 @@ function getBezierForScroll(scroll) {
   return { bezier: [0, 0, 1, 1] };
 }
 
+// Hook to detect screen size and get dimensions
+function useScreenSize() {
+  const [screenSize, setScreenSize] = useState({
+    width: typeof window !== 'undefined' ? window.innerWidth : 0,
+    height: typeof window !== 'undefined' ? window.innerHeight : 0,
+    isMobile: typeof window !== 'undefined' ? window.innerWidth <= 768 : false,
+    isTablet: typeof window !== 'undefined' ? window.innerWidth > 768 && window.innerWidth <= 1024 : false
+  });
+
+  useEffect(() => {
+    const updateScreenSize = () => {
+      const width = window.innerWidth;
+      const height = window.innerHeight;
+      setScreenSize({
+        width,
+        height,
+        isMobile: width <= 768,
+        isTablet: width > 768 && width <= 1024
+      });
+    };
+    
+    updateScreenSize();
+    window.addEventListener('resize', updateScreenSize);
+    return () => window.removeEventListener('resize', updateScreenSize);
+  }, []);
+
+  return screenSize;
+}
+
+// Convert desktop coordinates to mobile/tablet coordinates
+function convertCoordinatesForDevice(x, y, screenSize) {
+  const { width, height, isMobile, isTablet } = screenSize;
+
+  if (isMobile) {
+    const baseWidth = 918; // base design width
+    const baseHeight = 4000; // approx full scroll height
+
+    const scaleX = width / baseWidth;
+    const scaleY = height / baseHeight;
+
+    return {
+      x: x * scaleX,
+      y: y * scaleY
+    };
+  }
+
+  if (isTablet) {
+    const baseWidth = 1200;
+    const baseHeight = 4000;
+
+    const scaleX = width / baseWidth;
+    const scaleY = height / baseHeight;
+
+    return {
+      x: x * scaleX,
+      y: y * scaleY
+    };
+  }
+
+  // Desktop: return original coordinates
+  return { x, y };
+}
+
 export default function BeeCanvas() {
   const scrollYRef = useRef(0);
   const [windowScrollY, setWindowScrollY] = useState(0);
   const [renderPosition, setRenderPosition] = useState({ x: 422, y: -220 });
+  const screenSize = useScreenSize();
 
   useEffect(() => {
     const handleScroll = () => {
@@ -99,8 +163,16 @@ export default function BeeCanvas() {
       const [p0, p1, p2, p3] = bezier;
       const easedProgress = cubicBezier(progress, p0, p1, p2, p3);
 
-      const targetX = kf1.x + (kf2.x - kf1.x) * easedProgress;
-      const targetY = kf1.y + (kf2.y - kf1.y) * easedProgress;
+      // Get desktop target position
+      const desktopTargetX = kf1.x + (kf2.x - kf1.x) * easedProgress;
+      const desktopTargetY = kf1.y + (kf2.y - kf1.y) * easedProgress;
+
+      // Convert coordinates based on device type
+      const { x: targetX, y: targetY } = convertCoordinatesForDevice(
+        desktopTargetX, 
+        desktopTargetY, 
+        screenSize
+      );
 
       // Smooth interpolation (lerp with damping)
       const damping = 0.1;
@@ -113,27 +185,74 @@ export default function BeeCanvas() {
 
     animate();
     return () => cancelAnimationFrame(animationFrame);
-  }, []);
+  }, [screenSize]);
 
-  const viewportY = Math.max(-200, Math.min(window.innerHeight - 200, renderPosition.y - windowScrollY));
+  // Responsive sizing
+  const getCanvasSize = () => {
+    if (screenSize.isMobile) {
+      return {
+        width: Math.min(400, screenSize.width * 0.9), // 90% of screen width, max 400px
+        height: Math.min(350, screenSize.width * 0.75) // Maintain aspect ratio
+      };
+    } else if (screenSize.isTablet) {
+      return {
+        width: Math.min(600, screenSize.width * 0.8),
+        height: Math.min(500, screenSize.width * 0.65)
+      };
+    }
+    return { width: 918, height: 783 }; // Desktop size
+  };
+  const { width: canvasWidth, height: canvasHeight } = getCanvasSize();
+  
+  // Calculate final position ensuring the bee stays in viewport
+  const finalX = Math.max(0, Math.min(screenSize.width - canvasWidth, renderPosition.x));
+  let viewportY = renderPosition.y - windowScrollY;
 
+  if (screenSize.isMobile) {
+    const maxY = screenSize.height - canvasHeight - 30;
+    const minY = 100;
+    viewportY = Math.max(minY, Math.min(maxY, viewportY));
+  }
   return (
     <div
       style={{
         position: 'fixed',
         top: `${viewportY}px`,
-        left: `${renderPosition.x}px`,
-        width: '918px',
-        height: '783px',
+        left: `${finalX}px`,
+        width: `${canvasWidth}px`,
+        height: `${canvasHeight}px`,
         pointerEvents: 'none',
-        zIndex: 40, // Changed from 2147483647 to 40 (below navbar z-50)
+        zIndex: 40,
+        // Debugging - uncomment to see canvas boundaries
+        // border: screenSize.isMobile ? '2px solid red' : '1px solid blue',
       }}
     >
-      <Canvas gl={{ alpha: true }} style={{ background: 'transparent' }}>
+      <Canvas 
+        gl={{ 
+          alpha: true,
+          antialias: true,
+          powerPreference: "high-performance"
+        }} 
+        style={{ 
+          background: 'transparent',
+          width: '100%',
+          height: '100%'
+        }}
+        camera={{ 
+          position: [0, 0, 5],
+          fov: screenSize.isMobile ? 70 : screenSize.isTablet ? 60 : 45
+        }}
+      >
         <AnimatedCamera scrollY={scrollYRef} />
-        <ambientLight intensity={1.2} />
-        <directionalLight position={[3, 5, 2]} />
-        <BeeModel scrollY={scrollYRef} />
+        <ambientLight intensity={screenSize.isMobile ? 1.5 : 1.2} />
+        <directionalLight 
+          position={[3, 5, 2]} 
+          intensity={screenSize.isMobile ? 1.2 : 1} 
+        />
+        <BeeModel 
+          scrollY={scrollYRef} 
+          screenSize={screenSize}
+        />
       </Canvas>
     </div>
   );

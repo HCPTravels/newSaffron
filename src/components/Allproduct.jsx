@@ -53,7 +53,7 @@ import saffron3 from'../assets/saffron3.png'
         description:
           'Packed in airtight glass jars or vacuum pouches to protect your saffron from light and air — locking in aroma and potency.',
         image: saffron3,
-        imageClass: 'aspect-[4/3] max-h-[280px] object-contain', // 👈 Add this line
+        // imageClass: 'aspect-[4/3] max-h-[280px] object-contain', // 👈 Add this line
         features: [
           { icon: 'move', text: 'Unbox aroma, freshness, and elegance.' },
           { icon: 'link', text: 'View Our Packaging' },

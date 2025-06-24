@@ -19,5 +19,6 @@ export const cameraKeyframes = [
     { scroll: 366, distance: 4, elevation: 15.43, azimuthal: 483.71 },
     { scroll: 375, distance: 5, elevation: 17.03, azimuthal: 463.32 },
     { scroll: 381, distance: 8, elevation: 17.03, azimuthal: 463.32 },
-  ];
-  
+];
+
+
