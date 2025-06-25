@@ -259,6 +259,7 @@ export default function BeeCanvas() {
             fontSize: '14px',
             zIndex: 9999,
             fontFamily: 'monospace',
+            
           }}
         >
           <div>📱 Scroll: {debugInfo.scroll}%</div>

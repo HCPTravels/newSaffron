@@ -6,10 +6,13 @@ import Contact from './components/Contact';
 import BeeCanvas from './modal/BeeCanvas';
 import LoginPage from './pages/Login';
 import SignupPage from './pages/Signup';
+import { AuthProvider } from './context/AuthContext';
+import { Toaster } from 'sonner';
 
 function App() {
   return (
     <>
+      <AuthProvider>
       <BeeCanvas />
       <Navbar />
       <Routes>
@@ -26,6 +29,8 @@ function App() {
         <Route path="/login" element={<LoginPage />} />
         <Route path="/signup" element={<SignupPage />} />
       </Routes>
+      <Toaster richColors position="top-center" />
+      </AuthProvider>
     </>
   );
 }
