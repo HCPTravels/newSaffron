@@ -4,8 +4,11 @@ import { LogIn } from "lucide-react";
 import { FcGoogle } from "react-icons/fc";
 import Saffron from "../assets/saffron.png";
 import SaffronIcon from "../assets/icons8-saffron-64 (1).png";
+import { useAuth } from '../context/AuthContext'; // adjust path
+
 
 const LoginPage = () => {
+  const { login , user} = useAuth(); // Use the login function from AuthContext
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [isHovered, setIsHovered] = useState(false);
@@ -13,6 +16,14 @@ const LoginPage = () => {
 
   const handleSubmit = (e) => {
     e.preventDefault();
+    // Call the login function from AuthContext
+    login(email, password)
+      .then(response => {
+        console.log("Login successful:", response, user);
+      })
+      .catch(error => {
+        console.error("Login failed:", error);
+      });
     console.log("Logging in with:", { email, password });
   };
 
@@ -32,7 +43,7 @@ const LoginPage = () => {
       </div>
 
       {/* Login modal */}
-      <div className="w-full mx-auto px-4 flex justify-center items-center h-full py-4">
+      <div className="w-full mx-auto px-4 flex justify-center items-center h-full py-4 z-30 md:z-30">
         <motion.div 
           className="w-full max-w-md mx-2"  // Added mx-2 for better side spacing on mobile
           initial={{ opacity: 0, y: 20 }}

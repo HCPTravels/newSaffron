@@ -6,26 +6,31 @@ import Contact from './components/Contact';
 import BeeCanvas from './modal/BeeCanvas';
 import LoginPage from './pages/Login';
 import SignupPage from './pages/Signup';
+import { AuthProvider } from './context/AuthContext';
 
 function App() {
   return (
     <>
-      <BeeCanvas />
-      <Navbar />
-      <Routes>
-        <Route
-          path="/"
-          element={
-            <>
-              <HeroSection />
-              <AllProducts />
-              <Contact />
-            </>
-          }
-        />
-        <Route path="/login" element={<LoginPage />} />
-        <Route path="/signup" element={<SignupPage />} />
-      </Routes>
+      <AuthProvider>
+
+
+        <BeeCanvas />
+        <Navbar />
+        <Routes>
+          <Route
+            path="/"
+            element={
+              <>
+                <HeroSection />
+                <AllProducts />
+                <Contact />
+              </>
+            }
+          />
+          <Route path="/login" element={<LoginPage />} />
+          <Route path="/signup" element={<SignupPage />} />
+        </Routes>
+      </AuthProvider>
     </>
   );
 }

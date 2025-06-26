@@ -1,18 +1,29 @@
 import React, { useState, useEffect, useRef } from "react";
-import { useNavigate } from "react-router-dom"; // ✅ React Router navigation
+import { useNavigate } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import Subtract from "../assets/Subtract.png";
 import { User, Menu, LogIn, UserPlus, ChevronDown, BookOpen, Users, Handshake, Contact } from "lucide-react";
 
 const Navbar = () => {
-  const navigate = useNavigate(); // ✅ Hook to navigate routes
+  const navigate = useNavigate();
   const [isUserDropdownOpen, setIsUserDropdownOpen] = useState(false);
   const [isNavDropdownOpen, setIsNavDropdownOpen] = useState(false);
+  const [isMobile, setIsMobile] = useState(false);
   const userDropdownRef = useRef(null);
   const navDropdownRef = useRef(null);
 
   const toggleUserDropdown = () => setIsUserDropdownOpen(!isUserDropdownOpen);
   const toggleNavDropdown = () => setIsNavDropdownOpen(!isNavDropdownOpen);
+
+  useEffect(() => {
+    const handleResize = () => {
+      setIsMobile(window.innerWidth < 768);
+    };
+
+    handleResize(); // Set initial value
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
 
   useEffect(() => {
     const handleClickOutside = (event) => {
@@ -72,8 +83,8 @@ const Navbar = () => {
             <div 
               ref={userDropdownRef}
               className="relative group"
-              onMouseEnter={() => window.innerWidth >= 768 && setIsUserDropdownOpen(true)}
-              onMouseLeave={() => window.innerWidth >= 768 && setIsUserDropdownOpen(false)}
+              onMouseEnter={() => !isMobile && setIsUserDropdownOpen(true)}
+              onMouseLeave={() => !isMobile && setIsUserDropdownOpen(false)}
             >
               <motion.button 
                 onClick={toggleUserDropdown}
@@ -92,7 +103,9 @@ const Navbar = () => {
               <AnimatePresence>
                 {isUserDropdownOpen && (
                   <motion.div 
-                    className="absolute mt-2 origin-top-right right-0 w-64 max-[767px]:fixed max-[767px]:top-[70px] max-[767px]:right-4 max-[767px]:w-[calc(100vw-2rem)] max-[767px]:max-w-[320px]"
+                  className={`${isMobile ? 
+                    'fixed left-1/2 transform -translate-x-1/2 w-[92vw] max-w-[400px] px-4 mt-[55px]' : 
+                    'absolute right-0 w-64'}`}
                     variants={dropdownVariants}
                     initial="hidden"
                     animate="visible"
@@ -155,8 +168,8 @@ const Navbar = () => {
             <div 
               ref={navDropdownRef}
               className="relative group"
-              onMouseEnter={() => window.innerWidth >= 768 && setIsNavDropdownOpen(true)}
-              onMouseLeave={() => window.innerWidth >= 768 && setIsNavDropdownOpen(false)}
+              onMouseEnter={() => !isMobile && setIsNavDropdownOpen(true)}
+              onMouseLeave={() => !isMobile && setIsNavDropdownOpen(false)}
             >
               <motion.button 
                 onClick={toggleNavDropdown}
@@ -172,7 +185,9 @@ const Navbar = () => {
               <AnimatePresence>
                 {isNavDropdownOpen && (
                   <motion.div 
-                    className="absolute mt-2 origin-top-right right-0 w-64 max-[767px]:fixed max-[767px]:top-[70px] max-[767px]:right-4 max-[767px]:w-[calc(100vw-2rem)] max-[767px]:max-w-[320px]"
+                  className={`${isMobile ? 
+                    'fixed left-1/2 transform -translate-x-1/2 w-[90vw] max-w-[400px] px-4' : 
+                    'absolute right-0 w-64'}`}
                     variants={dropdownVariants}
                     initial="hidden"
                     animate="visible"
@@ -185,7 +200,6 @@ const Navbar = () => {
                       </div>
 
                       <div className="divide-y divide-gray-100">
-                        {/* Static Nav Links */}
                         {[{
                           icon: <BookOpen className="h-5 w-5 text-[#fe6522]" />,
                           label: "Blog"

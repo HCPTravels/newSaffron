@@ -228,7 +228,7 @@ export default function BeeCanvas() {
           width: `${canvasWidth}px`,
           height: `${canvasHeight}px`,
           pointerEvents: 'none',
-          zIndex: 40,
+          zIndex: 20,
         }}
       >
         <Canvas
