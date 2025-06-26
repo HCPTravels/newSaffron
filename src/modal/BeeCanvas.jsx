@@ -177,13 +177,6 @@ export default function BeeCanvas() {
       setRenderPosition({ x: currentX, y: currentY });
 
       // Show on-screen debug for mobile
-      if (screenSize.isMobile) {
-        setDebugInfo({
-          scroll: scroll.toFixed(1),
-          x: currentX.toFixed(1),
-          y: currentY.toFixed(1),
-        });
-      }
 
       animationFrame = requestAnimationFrame(animate);
     };
