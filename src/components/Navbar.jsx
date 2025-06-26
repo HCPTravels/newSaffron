@@ -9,16 +9,13 @@ import { useAuth } from "../context/AuthContext";
 const Navbar = () => {
   const { user, isLoading } = useAuth();
   const navigate = useNavigate();
-  
-  // Debug: Log user state and loading
-  console.log("Navbar - Current user:", user);
-  console.log("Navbar - Is loading:", isLoading);
-  
-  // Use user directly from context (remove the fallback for now)
+
   const isLoggedIn = user;
   const [isUserDropdownOpen, setIsUserDropdownOpen] = useState(false);
   const [isNavDropdownOpen, setIsNavDropdownOpen] = useState(false);
   const [showAccountModal, setShowAccountModal] = useState(false);
+  const [isMobile, setIsMobile] = useState(window.innerWidth < 768); // ✅ FIXED
+
   const userDropdownRef = useRef(null);
   const navDropdownRef = useRef(null);
   const accountModalRef = useRef(null);
@@ -31,7 +28,7 @@ const Navbar = () => {
       setIsMobile(window.innerWidth < 768);
     };
 
-    handleResize(); // Set initial value
+    handleResize();
     window.addEventListener('resize', handleResize);
     return () => window.removeEventListener('resize', handleResize);
   }, []);
@@ -41,7 +38,6 @@ const Navbar = () => {
     setIsUserDropdownOpen(false);
   };
 
-  // Handle clicks outside dropdowns and modals
   useEffect(() => {
     const handleClickOutside = (event) => {
       if (userDropdownRef.current && !userDropdownRef.current.contains(event.target)) {
@@ -56,9 +52,7 @@ const Navbar = () => {
     };
 
     document.addEventListener('mousedown', handleClickOutside);
-    return () => {
-      document.removeEventListener('mousedown', handleClickOutside);
-    };
+    return () => document.removeEventListener('mousedown', handleClickOutside);
   }, []);
 
   const dropdownVariants = {
@@ -117,11 +111,9 @@ const Navbar = () => {
             >
               {isLoggedIn ? (
                 <>
-                  {/* Logged-in User Icon */}
                   <motion.div
                     onClick={() => {
-                      // On mobile (below 768px), toggle on click
-                      if (window.innerWidth < 768) {
+                      if (isMobile) {
                         setShowAccountModal((prev) => !prev);
                       }
                     }}
@@ -134,7 +126,6 @@ const Navbar = () => {
                     </motion.div>
                   </motion.div>
 
-                  {/* Account Modal */}
                   {showAccountModal && (
                     <div className="absolute top-full left-1/2 -translate-x-1/2 mt-2 z-[60]">
                       <Account isVisible={true} />
@@ -143,7 +134,6 @@ const Navbar = () => {
                 </>
               ) : (
                 <>
-                  {/* Not Logged-in User Dropdown */}
                   <div ref={userDropdownRef}>
                     <motion.button
                       onClick={toggleUserDropdown}
@@ -169,7 +159,6 @@ const Navbar = () => {
                           animate="visible"
                           exit="exit"
                         >
-                          {/* Login/Signup Dropdown Content */}
                           <div className="bg-white rounded-xl shadow-2xl overflow-hidden border border-gray-100 z-[60]">
                             <div className="p-4 bg-gradient-to-r from-[#fe6522] to-[#e55a1d]">
                               <h3 className="text-white font-medium text-lg">Welcome</h3>
