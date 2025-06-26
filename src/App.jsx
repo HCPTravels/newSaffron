@@ -7,8 +7,6 @@ import BeeCanvas from './modal/BeeCanvas';
 import LoginPage from './pages/Login';
 import SignupPage from './pages/Signup';
 import { AuthProvider } from './context/AuthContext';
-import { AuthProvider } from './context/AuthContext';
-import { Toaster } from 'sonner';
 
 function App() {
   return (
