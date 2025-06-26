@@ -7,29 +7,31 @@ import BeeCanvas from './modal/BeeCanvas';
 import LoginPage from './pages/Login';
 import SignupPage from './pages/Signup';
 import { AuthProvider } from './context/AuthContext';
+import { AuthProvider } from './context/AuthContext';
 import { Toaster } from 'sonner';
 
 function App() {
   return (
     <>
       <AuthProvider>
-      <BeeCanvas />
-      <Navbar />
-      <Routes>
-        <Route
-          path="/"
-          element={
-            <>
-              <HeroSection />
-              <AllProducts />
-              <Contact />
-            </>
-          }
-        />
-        <Route path="/login" element={<LoginPage />} />
-        <Route path="/signup" element={<SignupPage />} />
-      </Routes>
-      <Toaster richColors position="top-center" />
+
+
+        <BeeCanvas />
+        <Navbar />
+        <Routes>
+          <Route
+            path="/"
+            element={
+              <>
+                <HeroSection />
+                <AllProducts />
+                <Contact />
+              </>
+            }
+          />
+          <Route path="/login" element={<LoginPage />} />
+          <Route path="/signup" element={<SignupPage />} />
+        </Routes>
       </AuthProvider>
     </>
   );

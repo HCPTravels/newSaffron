@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import Subtract from "../assets/Subtract.png";
 import { User, Menu, LogIn, UserPlus, ChevronDown, BookOpen, Users, Handshake, Contact } from "lucide-react";
@@ -25,6 +26,16 @@ const Navbar = () => {
 
   const toggleUserDropdown = () => setIsUserDropdownOpen(!isUserDropdownOpen);
   const toggleNavDropdown = () => setIsNavDropdownOpen(!isNavDropdownOpen);
+
+  useEffect(() => {
+    const handleResize = () => {
+      setIsMobile(window.innerWidth < 768);
+    };
+
+    handleResize(); // Set initial value
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
 
   const handleNavigation = (path) => {
     navigate(path);
@@ -220,8 +231,8 @@ const Navbar = () => {
             <div
               ref={navDropdownRef}
               className="relative group"
-              onMouseEnter={() => window.innerWidth >= 768 && setIsNavDropdownOpen(true)}
-              onMouseLeave={() => window.innerWidth >= 768 && setIsNavDropdownOpen(false)}
+              onMouseEnter={() => !isMobile && setIsNavDropdownOpen(true)}
+              onMouseLeave={() => !isMobile && setIsNavDropdownOpen(false)}
             >
               <motion.button
                 onClick={toggleNavDropdown}
