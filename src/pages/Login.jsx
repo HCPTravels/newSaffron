@@ -10,7 +10,7 @@ import { useAuth } from '../context/AuthContext'; // adjust path
 
 
 const LoginPage = () => {
-  const { login , user} = useAuth(); // Use the login function from AuthContext
+  const { logIn , user} = useAuth(); // Use the login function from AuthContext
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [isHovered, setIsHovered] = useState(false);
@@ -18,17 +18,16 @@ const LoginPage = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    // Call the login function from AuthContext
-    login(email, password)
-      .then(response => {
-        console.log("Login successful:", response, user);
-      })
-      .catch(error => {
-        console.error("Login failed:", error);
-      });
+  
+    try {
+      const response = await logIn({ email, password }); // ✅ pass as object
+      console.log("Login successful:", response, user);
+    } catch (error) {
+      console.error("Login failed:", error);
+    }
+  
     console.log("Logging in with:", { email, password });
   };
-
   const handleGoogleLogin = () => {
     toast.info("Google login coming soon", {
       description: "This feature will be available soon!",

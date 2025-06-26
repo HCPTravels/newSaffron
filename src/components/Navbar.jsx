@@ -119,7 +119,12 @@ const Navbar = () => {
 
                       <div className="divide-y divide-gray-100">
                         <motion.div
-                          onClick={() => navigate('/login')}
+                        
+                        onClick={() => {
+                          setIsUserDropdownOpen(false);
+                          navigate('/login');
+                        }}
+                         
                           className="flex items-center px-4 py-3 text-gray-800 transition-all duration-200 group/item cursor-pointer"
                           variants={itemVariants}
                           initial="hidden"
@@ -139,7 +144,10 @@ const Navbar = () => {
                         </motion.div>
 
                         <motion.div
-                          onClick={() => navigate('/signup')}
+                         onClick={() => {
+                          setIsUserDropdownOpen(false);
+                          navigate('/signup');
+                        }}
                           className="flex items-center px-4 py-3 text-gray-800 transition-all duration-200 group/item cursor-pointer"
                           variants={itemVariants}
                           initial="hidden"
@@ -193,7 +201,7 @@ const Navbar = () => {
                     animate="visible"
                     exit="exit"
                   >
-                    <div className="bg-white rounded-xl shadow-2xl overflow-hidden border border-gray-100 z-[60]">
+                    <div className="bg-white rounded-xl shadow-2xl overflow-hidden border border-gray-100 mt-[55px] z-[60]">
                       <div className="p-4 bg-gradient-to-r from-[#fe6522] to-[#e55a1d]">
                         <h3 className="text-white font-medium text-lg">Explore</h3>
                         <p className="text-white/90 text-sm">Navigate our site</p>

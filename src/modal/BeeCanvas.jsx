@@ -124,7 +124,6 @@ export default function BeeCanvas() {
   const scrollYRef = useRef(0);
   const [windowScrollY, setWindowScrollY] = useState(0);
   const screenSize = useScreenSize();
-  const [debugInfo, setDebugInfo] = useState({ scroll: 0, x: 0, y: 0 });
 
   const keyframes = screenSize.isMobile ? mobileKeyframes : desktopKeyframes;
   const initialKeyframe = keyframes[0];
@@ -262,9 +261,7 @@ export default function BeeCanvas() {
             
           }}
         >
-          <div>📱 Scroll: {debugInfo.scroll}%</div>
-          <div>🐝 X: {debugInfo.x}px</div>
-          <div>🐝 Y: {debugInfo.y}px</div>
+         
         </div>
       )}
     </>
