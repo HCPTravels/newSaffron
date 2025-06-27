@@ -4,8 +4,9 @@ import { UserPlus } from "lucide-react";
 import SaffronIcon from "../assets/icons8-saffron-64 (1).png";
 import Saffron from "../assets/saffron.png";
 import { useAuth } from '../context/AuthContext';
-
+import { useNavigate } from "react-router-dom";
 const SignupPage = () => {
+  const navigate = useNavigate();
   const { signUp, user } = useAuth();
   const [formData, setFormData] = useState({
     firstName: "",
@@ -243,7 +244,7 @@ const SignupPage = () => {
             <div className="px-4 sm:px-6 py-4 bg-gray-50/80 text-center border-t border-gray-200/50">
               <p className="text-xs sm:text-sm text-gray-600">
                 Already have an account?{' '}
-                <a href="#login" className="font-medium text-[#fe6522] hover:text-[#e55a1d] transition-colors">
+                <a href="#login" className="font-medium text-[#fe6522] hover:text-[#e55a1d] transition-colors" onClick={() => navigate('/login')}>
                   Log in
                 </a>
               </p>

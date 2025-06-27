@@ -21,6 +21,7 @@ const desktopKeyframes = [
   { scroll: 410, x: 223, y: 3300 },
   { scroll: 423, x: 587, y: 3600 },
 ];
+
 const mobileKeyframes = [
   // ZIG-ZAG: LEFT -> RIGHT -> LEFT
   { scroll: 1, x: 70, y: 0 },
@@ -74,10 +75,8 @@ const mobileKeyframes = [
   { scroll: 320, x: 20, y: 950 },
   { scroll: 325, x: 10, y: 980 },
   { scroll: 330, x: -20, y: 1000 },
-  // { scroll: 310, x: 30, y: 900 },
-  // // RIGHT
-  // { scroll: 275, x: 140, y: 790 },
 ];
+
 const easingMap = [[1, 423, [0.42, 0.0, 0.58, 1.0]]];
 
 function cubicBezier(t, p0, p1, p2, p3) {
@@ -123,6 +122,8 @@ function useScreenSize() {
 export default function BeeCanvas() {
   const scrollYRef = useRef(0);
   const [windowScrollY, setWindowScrollY] = useState(0);
+  const [isLoaded, setIsLoaded] = useState(false);
+  const [canvasReady, setCanvasReady] = useState(false);
   const screenSize = useScreenSize();
 
   const keyframes = screenSize.isMobile ? mobileKeyframes : desktopKeyframes;
@@ -132,6 +133,18 @@ export default function BeeCanvas() {
     x: initialKeyframe.x,
     y: initialKeyframe.y,
   });
+
+  // Wait for screen size and canvas to be ready
+  useEffect(() => {
+    if (screenSize.width > 0 && screenSize.height > 0) {
+      const timer = setTimeout(() => {
+        setIsLoaded(true);
+        // Additional delay for canvas to fully initialize
+        setTimeout(() => setCanvasReady(true), 200);
+      }, 150);
+      return () => clearTimeout(timer);
+    }
+  }, [screenSize.width, screenSize.height]);
 
   useEffect(() => {
     const handleScroll = () => {
@@ -176,8 +189,6 @@ export default function BeeCanvas() {
 
       setRenderPosition({ x: currentX, y: currentY });
 
-      // Show on-screen debug for mobile
-
       animationFrame = requestAnimationFrame(animate);
     };
 
@@ -210,53 +221,86 @@ export default function BeeCanvas() {
     viewportY = Math.max(minY, Math.min(maxY, viewportY));
   }
 
+  // Don't render until everything is loaded and ready
+  if (!isLoaded || !canvasReady || screenSize.width === 0) {
+    return null;
+  }
+
   return (
-    <>
-      <div
-        style={{
-          position: 'fixed',
-          top: `${viewportY}px`,
-          left: `${finalX}px`,
-          width: `${canvasWidth}px`,
-          height: `${canvasHeight}px`,
-          pointerEvents: 'none',
-          zIndex: 20,
+    <div
+      style={{
+        position: 'fixed',
+        top: `${viewportY}px`,
+        left: `${finalX}px`,
+        width: `${canvasWidth}px`,
+        height: `${canvasHeight}px`,
+        pointerEvents: 'none',
+        zIndex: 20,
+        // Ensure completely transparent background
+        background: 'transparent',
+        backgroundColor: 'transparent',
+        opacity: canvasReady ? 1 : 0,
+        transition: 'opacity 0.5s ease-in-out',
+        // Prevent any white background bleeding
+        overflow: 'hidden',
+      }}
+      // Additional safety to ensure clicks pass through
+      onMouseDown={(e) => e.stopPropagation()}
+      onMouseUp={(e) => e.stopPropagation()}
+      onClick={(e) => {
+        e.stopPropagation();
+        // Find element behind the canvas and trigger click
+        const elementBehind = document.elementFromPoint(
+          e.clientX, 
+          e.clientY - canvasHeight
+        );
+        if (elementBehind && elementBehind !== e.target) {
+          const clickEvent = new MouseEvent('click', {
+            bubbles: true,
+            cancelable: true,
+            clientX: e.clientX,
+            clientY: e.clientY
+          });
+          elementBehind.dispatchEvent(clickEvent);
+        }
+      }}
+    >
+      <Canvas
+        gl={{ 
+          alpha: true, 
+          antialias: true, 
+          powerPreference: 'high-performance',
+          preserveDrawingBuffer: false, // Prevent white flash
+          premultipliedAlpha: false, // Better transparency handling
+          clearColor: [0, 0, 0, 0], // Fully transparent clear color
+        }}
+        style={{ 
+          background: 'transparent',
+          backgroundColor: 'transparent', 
+          width: '100%', 
+          height: '100%',
+          pointerEvents: 'none', // Double ensure no pointer events
+          opacity: 'inherit', // Inherit opacity from parent
+        }}
+        camera={{
+          position: [0, 0, 5],
+          fov: screenSize.isMobile ? 70 : screenSize.isTablet ? 60 : 45,
+        }}
+        // Prevent context menu and other interactions
+        onContextMenu={(e) => e.preventDefault()}
+        onSelectStart={(e) => e.preventDefault()}
+        onDragStart={(e) => e.preventDefault()}
+        // Ensure canvas is created properly
+        onCreated={({ gl, scene }) => {
+          gl.setClearColor(0x000000, 0); // Set transparent clear color
+          scene.background = null; // Ensure no background
         }}
       >
-        <Canvas
-          gl={{ alpha: true, antialias: true, powerPreference: 'high-performance' }}
-          style={{ background: 'transparent', width: '100%', height: '100%' }}
-          camera={{
-            position: [0, 0, 5],
-            fov: screenSize.isMobile ? 70 : screenSize.isTablet ? 60 : 45,
-          }}
-        >
-          <AnimatedCamera scrollY={scrollYRef} />
-          <ambientLight intensity={screenSize.isMobile ? 1.5 : 1.2} />
-          <directionalLight position={[3, 5, 2]} intensity={screenSize.isMobile ? 1.2 : 1} />
-          <BeeModel scrollY={scrollYRef} screenSize={screenSize} />
-        </Canvas>
-      </div>
-
-      {screenSize.isMobile && (
-        <div
-          style={{
-            position: 'fixed',
-            bottom: 20,
-            left: 20,
-            backgroundColor: 'rgba(0, 0, 0, 0.7)',
-            color: 'white',
-            padding: '8px 12px',
-            borderRadius: '8px',
-            fontSize: '14px',
-            zIndex: 9999,
-            fontFamily: 'monospace',
-            
-          }}
-        >
-         
-        </div>
-      )}
-    </>
+        <AnimatedCamera scrollY={scrollYRef} />
+        <ambientLight intensity={screenSize.isMobile ? 1.5 : 1.2} />
+        <directionalLight position={[3, 5, 2]} intensity={screenSize.isMobile ? 1.2 : 1} />
+        <BeeModel scrollY={scrollYRef} screenSize={screenSize} />
+      </Canvas>
+    </div>
   );
 }

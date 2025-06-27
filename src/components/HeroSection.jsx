@@ -62,8 +62,8 @@ const HeroSection = () => {
         </div>
         
         {/* Bottom right description */}
-        <div className="absolute bottom-10 right-5 xs:bottom-10 xs:right-10
-                        sm:bottom-15 sm:right-10 md:bottom-20 md:right-20
+        <div className="absolute bottom-60 right-5 xs:bottom-10 xs:right-10
+                        sm:bottom-15 sm:right-10 md:bottom-40 md:right-20
                         text-black font-poppins text-left
                         max-w-[120px] xs:max-w-[150px] sm:max-w-[180px] md:max-w-[200px] lg:max-w-[250px]
                         leading-relaxed

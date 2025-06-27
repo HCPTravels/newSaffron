@@ -1,13 +1,12 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
-import { LogIn } from "lucide-react";
+import { LogIn, CheckCircle } from "lucide-react";
 import { FcGoogle } from "react-icons/fc";
 import { toast, Toaster } from "sonner"; // Modern toast library
 import Saffron from "../assets/saffron.png";
 import SaffronIcon from "../assets/icons8-saffron-64 (1).png";
 import { useAuth } from '../context/AuthContext'; // adjust path
-
 
 const LoginPage = () => {
   const { logIn , user} = useAuth(); // Use the login function from AuthContext
@@ -15,31 +14,87 @@ const LoginPage = () => {
   const [password, setPassword] = useState("");
   const [isHovered, setIsHovered] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
+  const navigate = useNavigate();
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    setIsLoading(true);
   
     try {
       const response = await logIn({ email, password }); // ✅ pass as object
+      
+      // Show success toast
+      toast.success("Welcome back!", {
+        description: "You have been successfully logged in.",
+        duration: 3000,
+        position: "top-center",
+        icon: <CheckCircle className="h-5 w-5 text-green-500" />,
+        style: {
+          background: "linear-gradient(135deg, #10b981, #059669)",
+          border: "1px solid #065f46",
+          color: "white",
+        },
+        className: "toast-success",
+      });
+
+      // Navigate after a short delay to show the toast
+      setTimeout(() => {
+        navigate("/"); // Redirect to home page on success
+      }, 1500);
+      
       console.log("Login successful:", response, user);
     } catch (error) {
       console.error("Login failed:", error);
+      
+      // Show error toast
+      toast.error("Login failed", {
+        description: error.message || "Please check your credentials and try again.",
+        duration: 4000,
+        position: "top-right",
+        style: {
+          background: "linear-gradient(135deg, #ef4444, #dc2626)",
+          border: "1px solid #991b1b",
+          color: "white",
+        },
+      });
+    } finally {
+      setIsLoading(false);
     }
   
     console.log("Logging in with:", { email, password });
   };
+
   const handleGoogleLogin = () => {
     toast.info("Google login coming soon", {
       description: "This feature will be available soon!",
       duration: 3000,
       position: "top-right",
+      style: {
+        background: "linear-gradient(135deg, #fe6522, #e55a1d)",
+        border: "1px solid #c2410c",
+        color: "white",
+      },
     });
   };
 
   return (
     <div className="mt-20 flex items-center justify-center p-2 md:top-0 relative overflow-hidden bg-[#ff6523]">
-      {/* Toast notifications */}
-      <Toaster richColors closeButton />
+      {/* Toast notifications with custom styling */}
+      <Toaster 
+        richColors 
+        closeButton 
+        toastOptions={{
+          style: {
+            fontFamily: 'system-ui, -apple-system, sans-serif',
+            fontSize: '14px',
+            fontWeight: '500',
+            borderRadius: '12px',
+            padding: '16px',
+            boxShadow: '0 10px 25px rgba(0, 0, 0, 0.1), 0 4px 6px rgba(0, 0, 0, 0.05)',
+            backdropFilter: 'blur(8px)',
+          },
+        }}
+      />
       
       {/* Background image with overlay - only show on larger screens */}
       <div className="hidden sm:flex absolute inset-0 justify-center items-center z-0">
@@ -180,7 +235,7 @@ const LoginPage = () => {
             <div className="px-4 sm:px-6 py-4 bg-gray-50/80 text-center border-t border-gray-200/50">
               <p className="text-xs sm:text-sm text-gray-600">
                 Don't have an account?{' '}
-                <a href="#signup" className="font-medium text-[#fe6522] hover:text-[#e55a1d] transition-colors">
+                <a href="#signup" className="font-medium text-[#fe6522] hover:text-[#e55a1d] transition-colors" onClick={() => navigate('/signup')}>
                   Sign up
                 </a>
               </p>

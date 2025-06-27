@@ -15,7 +15,7 @@ import {
 import { useAuth } from "../context/AuthContext"; // Assuming you have an AuthContext for user info
 
 const Account = ({ isVisible }) => {
-    const {user} = useAuth(); // Assuming you have a context or hook to get user info
+    const {user} = useAuth(); 
   const menuItems = [
     { icon: <ShoppingBag className="h-4 w-4" />, label: "Orders" },
     { icon: <Heart className="h-4 w-4" />, label: "Wishlist" },
@@ -25,7 +25,7 @@ const Account = ({ isVisible }) => {
     { icon: <Star className="h-4 w-4" />, label: "Reviews" },
     { icon: <Settings className="h-4 w-4" />, label: "Settings" }
   ];
-
+ 
   return (
     <AnimatePresence>
       {isVisible && (

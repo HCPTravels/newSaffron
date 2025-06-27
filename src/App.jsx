@@ -1,4 +1,5 @@
 import { Routes, Route } from 'react-router-dom';
+import { useEffect } from 'react';
 import Navbar from './components/Navbar';
 import HeroSection from './components/HeroSection';
 import AllProducts from './components/Allproduct';
@@ -7,13 +8,17 @@ import BeeCanvas from './modal/BeeCanvas';
 import LoginPage from './pages/Login';
 import SignupPage from './pages/Signup';
 import { AuthProvider } from './context/AuthContext';
+import Blog from './components/Blog';
+import About from './pages/About';
+import ContactUs from './pages/Contactus';
+import OurPartners from './pages/OurPartners';
 
 function App() {
+  
+
   return (
     <>
       <AuthProvider>
-
-
         <BeeCanvas />
         <Navbar />
         <Routes>
@@ -29,6 +34,10 @@ function App() {
           />
           <Route path="/login" element={<LoginPage />} />
           <Route path="/signup" element={<SignupPage />} />
+          <Route path="/blog" element={<Blog />} />
+          <Route path="/about" element={<About />} />
+          <Route path="/contact" element={<ContactUs />} />
+          <Route path="/partners" element={<OurPartners />} />
         </Routes>
       </AuthProvider>
     </>
