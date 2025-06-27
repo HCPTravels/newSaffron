@@ -12,6 +12,7 @@ import Blog from './components/Blog';
 import About from './pages/About';
 import ContactUs from './pages/Contactus';
 import OurPartners from './pages/OurPartners';
+import Profile from './components/Profile';
 
 function App() {
   
@@ -19,7 +20,7 @@ function App() {
   return (
     <>
       <AuthProvider>
-        <BeeCanvas />
+        
         <Navbar />
         <Routes>
           <Route
@@ -38,6 +39,7 @@ function App() {
           <Route path="/about" element={<About />} />
           <Route path="/contact" element={<ContactUs />} />
           <Route path="/partners" element={<OurPartners />} />
+          <Route path="/profile" element={<Profile />} />
         </Routes>
       </AuthProvider>
     </>

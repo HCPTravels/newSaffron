@@ -1,9 +1,11 @@
 import React from 'react';
 import saffronHome from '../assets/saffronHome.png';
+import BeeCanvas from '../modal/BeeCanvas';
 
 const HeroSection = () => {
   return (
     <div className="pt-[100px] md:pt-[200px] relative">
+      <BeeCanvas />
       <section className="h-[calc(100vh-80px)] relative overflow-hidden">
         {/* Left decorative image */}
         <img
