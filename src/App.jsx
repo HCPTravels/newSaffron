@@ -1,48 +1,55 @@
-import { Routes, Route } from 'react-router-dom';
-import { useEffect } from 'react';
+import { Routes, Route, useLocation } from 'react-router-dom';
+import { AuthProvider } from './context/AuthContext';
 import Navbar from './components/Navbar';
 import HeroSection from './components/HeroSection';
 import AllProducts from './components/Allproduct';
 import Contact from './components/Contact';
-import BeeCanvas from './modal/BeeCanvas';
 import LoginPage from './pages/Login';
 import SignupPage from './pages/Signup';
-import { AuthProvider } from './context/AuthContext';
 import Blog from './components/Blog';
 import About from './pages/About';
 import ContactUs from './pages/Contactus';
 import OurPartners from './pages/OurPartners';
 import Profile from './components/Profile';
+import ProtectedRoute from './components/ProtectedRoute';
 
 function App() {
-  
+  const location = useLocation(); // ✅ Now it's safe
+
+  const hideNavbarRoutes = ['/profile'];
+  const hideNavbar = hideNavbarRoutes.includes(location.pathname);
 
   return (
-    <>
-      <AuthProvider>
-        
-        <Navbar />
-        <Routes>
-          <Route
-            path="/"
-            element={
-              <>
-                <HeroSection />
-                <AllProducts />
-                <Contact />
-              </>
-            }
-          />
-          <Route path="/login" element={<LoginPage />} />
-          <Route path="/signup" element={<SignupPage />} />
-          <Route path="/blog" element={<Blog />} />
-          <Route path="/about" element={<About />} />
-          <Route path="/contact" element={<ContactUs />} />
-          <Route path="/partners" element={<OurPartners />} />
-          <Route path="/profile" element={<Profile />} />
-        </Routes>
-      </AuthProvider>
-    </>
+    <AuthProvider>
+      {!hideNavbar && <Navbar />}
+
+      <Routes>
+        <Route
+          path="/"
+          element={
+            <>
+              <HeroSection />
+              <AllProducts />
+              <Contact />
+            </>
+          }
+        />
+        <Route path="/login" element={<LoginPage />} />
+        <Route path="/signup" element={<SignupPage />} />
+        <Route path="/blog" element={<Blog />} />
+        <Route path="/about" element={<About />} />
+        <Route path="/contact" element={<ContactUs />} />
+        <Route path="/partners" element={<OurPartners />} />
+        <Route
+          path="/profile"
+          element={
+            <ProtectedRoute>
+              <Profile />
+            </ProtectedRoute>
+          }
+        />
+      </Routes>
+    </AuthProvider>
   );
 }
 

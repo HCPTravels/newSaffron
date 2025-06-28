@@ -39,7 +39,7 @@ const LoginPage = () => {
 
       // Navigate after a short delay to show the toast
       setTimeout(() => {
-        navigate("/"); // Redirect to home page on success
+        navigate("/profile"); // Redirect to home page on success
       }, 1500);
       
       console.log("Login successful:", response, user);

@@ -4,7 +4,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import Subtract from "../assets/saffron logo.png";
 import { User, Menu, LogIn, UserPlus, ChevronDown, BookOpen, Users, Handshake, Contact } from "lucide-react";
 import { useAuth } from "../context/AuthContext";
-import Account from "../modal/Account"; // Assuming you have an Account component for user details
+import Account from "../pages/Account"; // Assuming you have an Account component for user details
 import Profile from "./Profile";
 
 const Navbar = () => {
@@ -151,7 +151,7 @@ const Navbar = () => {
           />
         ) : (
           <Account 
-            visible={isUserDropdownOpen} 
+          isVisible={isUserDropdownOpen} 
             onClose={() => setIsUserDropdownOpen(false)} 
           />
         )
