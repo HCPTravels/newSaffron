@@ -11,7 +11,9 @@ import saffronLogo from "../assets/saffron logo.png";
 
 import HomePage from "../pages/Homepage"; // Replace with actual content
 import CartPage from "../pages/Cart"; // Replace with actual content
-import UserProfilePage from "../pages/Account"; // Replace with actual content
+import Account from "../pages/Account"; // Replace with actual content
+import Categories from "../pages/Categories";
+import As from "../pages/As";
 // import BrowsePage from "./BrowsePage";
 // import CartPage from "./CartPage";
 // import UserProfilePage from "./UserProfilePage";
@@ -32,11 +34,11 @@ const Profile = () => {
       case "Home":
         return <HomePage />;
       case "Browse":
-        return <BrowsePage />;
+        return <Categories />;
       case "Cart":
         return <CartPage />;
       case "Profile":
-        return <UserProfilePage />;
+        return <As />;
       default:
         return null;
     }

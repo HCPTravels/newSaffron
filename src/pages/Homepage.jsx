@@ -133,10 +133,10 @@ const Home = () => {
             {filteredProducts.map((product) => (
               <div 
                 key={product.id} 
-                className="group bg-white/98 backdrop-blur-md rounded-3xl overflow-hidden hover:bg-white transition-all duration-500 hover:shadow-[0_20px_40px_rgba(0,0,0,0.15)] hover:-translate-y-3 border-2 border-white/80 hover:border-white relative"
+                className="group bg-white/98 backdrop-blur-md rounded-xl overflow-hidden hover:bg-white transition-all duration-500 hover:shadow-[0_20px_40px_rgba(0,0,0,0.15)] hover:-translate-y-3 border-2 border-white/80 hover:border-white relative"
               >
                 {/* Premium Glow Effect */}
-                <div className="absolute inset-0 rounded-3xl bg-gradient-to-br from-[#ff6523]/5 via-transparent to-[#e55a1f]/5 opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
+                <div className="absolute inset-0 rounded-xl bg-gradient-to-br from-[#ff6523]/5 via-transparent to-[#e55a1f]/5 opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
                 
                 {/* Product Image Area */}
                 <div className="relative h-28 sm:h-36 lg:h-44 bg-gradient-to-br from-[#ff6523]/15 via-[#ff6523]/8 to-[#e55a1f]/15 overflow-hidden">
