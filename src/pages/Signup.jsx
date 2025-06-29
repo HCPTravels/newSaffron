@@ -1,10 +1,12 @@
 import React, { useState } from "react";
 import { motion } from "framer-motion";
-import { UserPlus } from "lucide-react";
+import { UserPlus, CheckCircle, Loader2 } from "lucide-react";
 import SaffronIcon from "../assets/icons8-saffron-64 (1).png";
 import Saffron from "../assets/saffron.png";
 import { useAuth } from '../context/AuthContext';
 import { useNavigate } from "react-router-dom";
+import { toast, Toaster } from "sonner";
+
 const SignupPage = () => {
   const navigate = useNavigate();
   const { signUp, user } = useAuth();
@@ -15,15 +17,8 @@ const SignupPage = () => {
     contactNumber: "",
     password: ""
   });
-
+  const [isLoading, setIsLoading] = useState(false);
   const [isHovered, setIsHovered] = useState(false);
-  const [focusedFields, setFocusedFields] = useState({
-    firstName: false,
-    lastName: false,
-    email: false,
-    contactNumber: false,
-    password: false
-  });
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -33,35 +28,71 @@ const SignupPage = () => {
     }));
   };
 
-  const handleFocus = (field) => {
-    setFocusedFields(prev => ({
-      ...prev,
-      [field]: true
-    }));
-  };
-
-  const handleBlur = (field) => {
-    setFocusedFields(prev => ({
-      ...prev,
-      [field]: false
-    }));
-  };
-
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    signUp(formData)
-      .then(response => {
-        console.log("Signup successful:", response, user);
-      })
-      .catch(error => {
-        console.error("Signup failed:", error);
+    setIsLoading(true);
+  
+    try {
+      const response = await signUp(formData);
+      
+      // Show success toast
+      toast.success("Account created!", {
+        description: "Your account has been successfully created.",
+        duration: 3000,
+        position: "top-center",
+        icon: <CheckCircle className="h-5 w-5 text-green-500" />,
+        style: {
+          background: "linear-gradient(135deg, #10b981, #059669)",
+          border: "1px solid #065f46",
+          color: "white",
+        },
       });
-    console.log("Signing up with:", formData);
+
+      // Navigate after a short delay to show the toast
+      setTimeout(() => {
+        navigate("/profile");
+      }, 1500);
+      
+      console.log("Signup successful:", response, user);
+    } catch (error) {
+      console.error("Signup failed:", error);
+      
+      // Show error toast
+      toast.error("Signup failed", {
+        description: error.message || "Please check your information and try again.",
+        duration: 4000,
+        position: "top-right",
+        style: {
+          background: "linear-gradient(135deg, #ef4444, #dc2626)",
+          border: "1px solid #991b1b",
+          color: "white",
+        },
+      });
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (
     <div className="mt-20 flex items-center justify-center p-2 md:top-0 relative overflow-hidden bg-[#ff6523]">
-      {/* Background image - matches login page */}
+      {/* Toast notifications */}
+      <Toaster 
+        richColors 
+        closeButton 
+        toastOptions={{
+          style: {
+            fontFamily: 'system-ui, -apple-system, sans-serif',
+            fontSize: '14px',
+            fontWeight: '500',
+            borderRadius: '12px',
+            padding: '16px',
+            boxShadow: '0 10px 25px rgba(0, 0, 0, 0.1), 0 4px 6px rgba(0, 0, 0, 0.05)',
+            backdropFilter: 'blur(8px)',
+          },
+        }}
+      />
+
+      {/* Background image */}
       <div className="hidden sm:flex absolute inset-0 justify-center items-center z-0">
         <img 
           src={Saffron} 
@@ -70,7 +101,7 @@ const SignupPage = () => {
         />
       </div>
 
-      {/* Modal container - matches login page exactly */}
+      {/* Modal container */}
       <div className="w-full mx-auto px-4 flex justify-center items-center h-full py-4 z-30 md:z-30">
         <motion.div 
           className="w-full max-w-md mx-2"
@@ -78,9 +109,9 @@ const SignupPage = () => {
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5 }}
         >
-          {/* White box - matches login styling */}
+          {/* White box */}
           <div className="bg-white rounded-2xl shadow-xl overflow-hidden border border-white/20 backdrop-blur-sm bg-white/95">
-            {/* Header - matches login styling */}
+            {/* Header */}
             <div className="p-4 sm:p-6 bg-gradient-to-r from-[#fe6522] to-[#e55a1d]">
               <div className="flex flex-row justify-between items-center">
                 <div>
@@ -115,8 +146,6 @@ const SignupPage = () => {
                       onChange={handleChange}
                       placeholder="First"
                       className="w-full px-3 py-2 text-sm rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-[#fe6522]/50 focus:border-transparent transition-all duration-200"
-                      onFocus={() => handleFocus("firstName")}
-                      onBlur={() => handleBlur("firstName")}
                       required
                     />
                   </motion.div>
@@ -139,8 +168,6 @@ const SignupPage = () => {
                       onChange={handleChange}
                       placeholder="Last"
                       className="w-full px-3 py-2 text-sm rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-[#fe6522]/50 focus:border-transparent transition-all duration-200"
-                      onFocus={() => handleFocus("lastName")}
-                      onBlur={() => handleBlur("lastName")}
                       required
                     />
                   </motion.div>
@@ -164,8 +191,6 @@ const SignupPage = () => {
                     onChange={handleChange}
                     placeholder="Enter your email"
                     className="w-full px-3 py-2 text-sm rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-[#fe6522]/50 focus:border-transparent transition-all duration-200"
-                    onFocus={() => handleFocus("email")}
-                    onBlur={() => handleBlur("email")}
                     required
                   />
                 </motion.div>
@@ -188,8 +213,6 @@ const SignupPage = () => {
                     onChange={handleChange}
                     placeholder="Phone number"
                     className="w-full px-3 py-2 text-sm rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-[#fe6522]/50 focus:border-transparent transition-all duration-200"
-                    onFocus={() => handleFocus("contactNumber")}
-                    onBlur={() => handleBlur("contactNumber")}
                     required
                   />
                 </motion.div>
@@ -212,8 +235,6 @@ const SignupPage = () => {
                     onChange={handleChange}
                     placeholder="Create password"
                     className="w-full px-3 py-2 text-sm rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-[#fe6522]/50 focus:border-transparent transition-all duration-200"
-                    onFocus={() => handleFocus("password")}
-                    onBlur={() => handleBlur("password")}
                     required
                   />
                 </motion.div>
@@ -229,18 +250,28 @@ const SignupPage = () => {
                 whileTap={{ scale: 0.98 }}
                 onHoverStart={() => setIsHovered(true)}
                 onHoverEnd={() => setIsHovered(false)}
+                disabled={isLoading}
               >
-                <motion.span
-                  animate={{ x: isHovered ? 2 : 0 }}
-                  transition={{ duration: 0.2 }}
-                >
-                  <UserPlus className="h-4 w-4 sm:h-5 sm:w-5" />
-                </motion.span>
-                <span>Sign Up</span>
+                {isLoading ? (
+                  <div className="flex items-center gap-2">
+                    <Loader2 className="h-4 w-4 animate-spin" />
+                    <span>Creating account...</span>
+                  </div>
+                ) : (
+                  <>
+                    <motion.span
+                      animate={{ x: isHovered ? 2 : 0 }}
+                      transition={{ duration: 0.2 }}
+                    >
+                      <UserPlus className="h-4 w-4 sm:h-5 sm:w-5" />
+                    </motion.span>
+                    <span>Sign Up</span>
+                  </>
+                )}
               </motion.button>
             </form>
             
-            {/* Footer - matches login styling */}
+            {/* Footer */}
             <div className="px-4 sm:px-6 py-4 bg-gray-50/80 text-center border-t border-gray-200/50">
               <p className="text-xs sm:text-sm text-gray-600">
                 Already have an account?{' '}

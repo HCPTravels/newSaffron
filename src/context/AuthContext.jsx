@@ -8,33 +8,6 @@ export const AuthProvider = ({ children }) => {
   const [token, setToken] = useState(() => localStorage.getItem("token"));
   const [isLoading, setIsLoading] = useState(true);
 
-  // Auto-fetch user if token exists
-  // useEffect(() => {
-  //   const fetchUser = async () => {
-  //     if (!token) {
-  //       setIsLoading(false);
-  //       return;
-  //     }
-
-  //     try {
-  //       console.log("Fetching user with token:", token); // Debug log
-  //       const res = await axios.get("http://localhost:5001/api/users/login", {
-  //         headers: {
-  //           Authorization: `Bearer ${token}`,
-  //         },
-  //       });
-  //       console.log("User fetch response:", res.data); // Debug log
-  //       setUser(res.data.user);
-  //     } catch (error) {
-  //       console.error("Failed to fetch user from token:", error);
-  //       logout(); // Clean up on error
-  //     } finally {
-  //       setIsLoading(false);
-  //     }
-  //   };
-
-  //   fetchUser();
-  // }, [token]);
 
   useEffect(() => {
     const storedUser = localStorage.getItem("user");
@@ -47,18 +20,22 @@ export const AuthProvider = ({ children }) => {
   const signUp = async (formData) => {
     try {
       const res = await axios.post("https://backendsaffron.onrender.com/api/users/signup", formData);
-      console.log("Signup response:", res.data); // Debug log
+      console.log("Signup response:", res.data);
       if (res.data.success) {
         const { user, token } = res.data;
-        console.log("Setting user:", user); // Debug log
-        console.log("Setting token:", token); // Debug log
         setUser(user);
         setToken(token);
         localStorage.setItem("token", token);
       }
       return res.data;
     } catch (error) {
-      console.error("Signup failed:", error);
+      if (error.response?.status === 409) {
+        // Show specific alert or return message
+        alert("An account with this email or phone number already exists.");
+      } else {
+        console.error("Signup failed:", error);
+        alert("Signup failed. Please try again.");
+      }
       throw error;
     }
   };
