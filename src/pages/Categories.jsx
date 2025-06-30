@@ -68,7 +68,7 @@ const Categories = () => {
   ];
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-orange-50/30">
+    <div className="min-h-screen ">
       {/* Ultra Premium Header */}
       <div className="sticky top-0 z-30 rounded-lg bg-white/80 backdrop-blur-xl border-b border-gray-100/50 shadow-sm">
         <div className="max-w-7xl mx-auto rounded-lg px-8 py-6">
@@ -100,7 +100,7 @@ const Categories = () => {
         <div className="text-center rounded-lg mb-16">
           <h2 className="text-4xl font-bold text-gray-900 mb-4">
             Discover Our
-            <span className="bg-gradient-to-r from-[#ff6523] to-[#ff8c42] bg-clip-text text-transparent"> Premium </span>
+            <span className="bg-gradient-to-r from-[#ff6523] to-[#ff8c42] bg-clip-text"> Premium </span>
             Collections
           </h2>
           <p className="text-lg text-gray-600 max-w-2xl mx-auto">
