@@ -6,7 +6,7 @@ import HomePage from "../pages/Homepage";
 import CartPage from "../pages/Cart";
 import Account from "../pages/Account";
 import Categories from "../pages/Categories";
-import SaffronHome from "../assets/SaffronHome.png";
+import SaffronHome from "../assets/saffronHome.png";
 
 const Profile = () => {
   const [activeTab, setActiveTab] = useState("Home");
