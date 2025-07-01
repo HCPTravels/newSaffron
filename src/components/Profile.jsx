@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef } from "react";
 import { Home, Grid, User, ShoppingCart, Search } from "lucide-react";
 import { useNavigate } from "react-router-dom";
+import { useAuth } from "../context/AuthContext"; // ✅ added
 import saffronLogo from "../assets/saffron logo.png";
 import HomePage from "../pages/Homepage";
 import CartPage from "../pages/Cart";
@@ -13,40 +14,65 @@ const Profile = () => {
   const [scrollY, setScrollY] = useState(0);
   const [isProfileVisible, setIsProfileVisible] = useState(false);
   const [isMobile, setIsMobile] = useState(false);
-  const [isHoveringDropdown, setIsHoveringDropdown] = useState(false);
+  const [isInteractingWithLogout, setIsInteractingWithLogout] = useState(false);
   const dropdownRef = useRef(null);
   const profileButtonRef = useRef(null);
+  const hoverTimeoutRef = useRef(null);
   const navigate = useNavigate();
+  const { user } = useAuth(); // ✅ watch auth user state
 
   useEffect(() => {
     const checkScreenSize = () => {
       setIsMobile(window.innerWidth < 768);
     };
-    
+
     checkScreenSize();
-    window.addEventListener('resize', checkScreenSize);
-    return () => window.removeEventListener('resize', checkScreenSize);
+    window.addEventListener("resize", checkScreenSize);
+    return () => window.removeEventListener("resize", checkScreenSize);
   }, []);
 
   useEffect(() => {
     const handleScroll = () => setScrollY(window.scrollY);
-    window.addEventListener('scroll', handleScroll);
-    return () => window.removeEventListener('scroll', handleScroll);
+    window.addEventListener("scroll", handleScroll);
+    return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
-  // Close dropdown when clicking outside
   useEffect(() => {
     const handleClickOutside = (event) => {
-      if (!isMobile && isProfileVisible && 
-          !dropdownRef.current?.contains(event.target) && 
-          !profileButtonRef.current?.contains(event.target)) {
+      if (
+        !isMobile &&
+        isProfileVisible &&
+        !dropdownRef.current?.contains(event.target) &&
+        !profileButtonRef.current?.contains(event.target) &&
+        !isInteractingWithLogout
+      ) {
         setIsProfileVisible(false);
       }
     };
 
-    document.addEventListener('mousedown', handleClickOutside);
-    return () => document.removeEventListener('mousedown', handleClickOutside);
-  }, [isProfileVisible, isMobile]);
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, [isProfileVisible, isMobile, isInteractingWithLogout]);
+
+  // ✅ Auto close Profile view when user logs out
+  useEffect(() => {
+    if (!user) {
+      setIsProfileVisible(false);
+      setIsInteractingWithLogout(false);
+      if (activeTab === "Profile") {
+        setActiveTab("Home");
+      }
+    }
+  }, [user]);
+
+  // Clear timeout on unmount
+  useEffect(() => {
+    return () => {
+      if (hoverTimeoutRef.current) {
+        clearTimeout(hoverTimeoutRef.current);
+      }
+    };
+  }, []);
 
   const mobileTabs = [
     { icon: Home, label: "Home" },
@@ -64,7 +90,9 @@ const Profile = () => {
       case "Cart":
         return <CartPage />;
       case "Profile":
-        return isMobile ? <Account isVisible={true} onClose={() => setActiveTab("Home")} /> : null;
+        return isMobile ? (
+          <Account isVisible={true} onClose={() => setActiveTab("Home")} />
+        ) : null;
       default:
         return null;
     }
@@ -80,31 +108,66 @@ const Profile = () => {
 
   const handleMouseEnterProfile = () => {
     if (!isMobile) {
+      // Clear any existing timeout
+      if (hoverTimeoutRef.current) {
+        clearTimeout(hoverTimeoutRef.current);
+        hoverTimeoutRef.current = null;
+      }
       setIsProfileVisible(true);
     }
   };
 
   const handleMouseLeaveProfile = () => {
-    if (!isMobile && !isHoveringDropdown) {
-      setTimeout(() => {
-        if (!isHoveringDropdown) {
-          setIsProfileVisible(false);
-        }
-      }, 200);
+    if (!isMobile && !isInteractingWithLogout) {
+      // Set a longer timeout to allow smooth transition to dropdown
+      hoverTimeoutRef.current = setTimeout(() => {
+        setIsProfileVisible(false);
+      }, 300); // Increased timeout for better user experience
     }
   };
 
   const handleMouseEnterDropdown = () => {
-    setIsHoveringDropdown(true);
+    if (!isMobile) {
+      // Clear timeout when mouse enters dropdown
+      if (hoverTimeoutRef.current) {
+        clearTimeout(hoverTimeoutRef.current);
+        hoverTimeoutRef.current = null;
+      }
+      setIsProfileVisible(true);
+    }
   };
 
   const handleMouseLeaveDropdown = () => {
-    setIsHoveringDropdown(false);
-    setTimeout(() => {
-      if (!isHoveringDropdown) {
+    if (!isMobile && !isInteractingWithLogout) {
+      // Set timeout to close dropdown when mouse leaves
+      hoverTimeoutRef.current = setTimeout(() => {
         setIsProfileVisible(false);
-      }
-    }, 200);
+      }, 200); // Slightly longer timeout when leaving dropdown
+    }
+  };
+
+  const handleAccountClose = () => {
+    console.log("Account dropdown closing");
+    if (hoverTimeoutRef.current) {
+      clearTimeout(hoverTimeoutRef.current);
+      hoverTimeoutRef.current = null;
+    }
+    setIsProfileVisible(false);
+    setIsInteractingWithLogout(false);
+  };
+
+  const handleDropdownInteractionStart = () => {
+    console.log("Mouse down on dropdown");
+    setIsInteractingWithLogout(true);
+    if (hoverTimeoutRef.current) {
+      clearTimeout(hoverTimeoutRef.current);
+      hoverTimeoutRef.current = null;
+    }
+  };
+
+  const handleDropdownInteractionEnd = () => {
+    console.log("Mouse up on dropdown");
+    setTimeout(() => setIsInteractingWithLogout(false), 100);
   };
 
   return (
@@ -135,14 +198,14 @@ const Profile = () => {
                 3
               </span>
             </button>
-            <div 
+            <div
               className="relative"
               onMouseEnter={handleMouseEnterProfile}
               onMouseLeave={handleMouseLeaveProfile}
               ref={profileButtonRef}
             >
-              <button 
-                className="p-2 text-black transition-colors"
+              <button
+                className="p-2 text-black transition-colors hover:bg-black/10 rounded-lg"
                 onClick={handleProfileInteraction}
               >
                 <User className="h-6 w-6" />
@@ -150,12 +213,18 @@ const Profile = () => {
               {!isMobile && (
                 <div
                   ref={dropdownRef}
+                  className="absolute right-0 top-full pt-2 -mt-2"
                   onMouseEnter={handleMouseEnterDropdown}
                   onMouseLeave={handleMouseLeaveDropdown}
+                  onMouseDown={handleDropdownInteractionStart}
+                  onMouseUp={handleDropdownInteractionEnd}
+                  style={{ 
+                    minHeight: '8px', // Ensure there's a hover area bridge
+                  }}
                 >
-                  <Account 
-                    isVisible={isProfileVisible} 
-                    onClose={() => setIsProfileVisible(false)} 
+                  <Account
+                    isVisible={isProfileVisible}
+                    onClose={handleAccountClose}
                   />
                 </div>
               )}
@@ -164,10 +233,10 @@ const Profile = () => {
         </div>
       </div>
 
-      {/* Right decorative image */}
-      <img 
-        src={SaffronHome} 
-        alt="Saffron Home" 
+      {/* Decorative images */}
+      <img
+        src={SaffronHome}
+        alt="Saffron Home"
         className="absolute left-full fixed opacity-30
                    w-[200px] h-[200px] xs:w-[250px] xs:h-[250px]
                    sm:w-[300px] sm:h-[300px]
@@ -175,18 +244,19 @@ const Profile = () => {
                    lg:w-[500px] lg:h-[500px]
                    xl:w-[700px] xl:h-[700px]
                    2xl:w-[767px] 2xl:h-[767px]
-                   object-cover z-200 transition-transform duration-700 ease-out" 
+                   object-cover z-200 transition-transform duration-700 ease-out"
         style={{ transform: `translateX(-50%) translateY(${scrollY * 0.3}px)` }}
       />
 
-      {/* Left decorative image */}
       <img
         src={SaffronHome}
         alt="Decorative Saffron"
         className="fixed bottom-[-75px] left-[-75px] w-[150px] h-[150px]
                md:top-[586px] md:left-[-154px] md:w-[375px] md:h-[375px]
                object-cover pointer-events-none opacity-30 z-200 transition-transform duration-700 ease-out"
-        style={{ transform: `translateY(${scrollY * -0.2}px) rotate(${scrollY * 0.1}deg)` }}
+        style={{
+          transform: `translateY(${scrollY * -0.2}px) rotate(${scrollY * 0.1}deg)`,
+        }}
       />
 
       {/* Main Page Content */}
@@ -197,12 +267,12 @@ const Profile = () => {
       {/* Mobile Bottom Tab */}
       <div className="md:hidden fixed inset-x-0 bottom-0 z-50 px-4 pb-6 pt-2">
         <div className="flex relative bg-gradient-to-r from-white/95 via-white/90 to-white/95 backdrop-blur-xl rounded-2xl shadow-2xl overflow-hidden">
-          <div 
+          <div
             className="absolute top-2 bottom-2 bg-gradient-to-r from-[#ff6523]/20 to-[#ff6523]/30 rounded-xl transition-all duration-500 ease-out"
             style={{
-              left: `${(mobileTabs.findIndex(tab => tab.label === activeTab) * 25) + 2}%`,
-              width: '21%',
-              transform: `translateY(${Math.sin(Date.now() * 0.001) * 1}px)`
+              left: `${mobileTabs.findIndex((tab) => tab.label === activeTab) * 25 + 2}%`,
+              width: "21%",
+              transform: `translateY(${Math.sin(Date.now() * 0.001) * 1}px)`,
             }}
           />
 
@@ -211,18 +281,29 @@ const Profile = () => {
               key={index}
               onClick={() => setActiveTab(tab.label)}
               className={`flex-1 py-4 flex flex-col items-center justify-center transition-all duration-300 relative group ${
-                activeTab === tab.label ? "text-[#ff6523] scale-105" : "text-gray-600 hover:text-gray-800"
+                activeTab === tab.label
+                  ? "text-[#ff6523] scale-105"
+                  : "text-gray-600 hover:text-gray-800"
               }`}
               style={{
-                transform: activeTab === tab.label ? `translateY(-2px) scale(1.05)` : 'translateY(0px) scale(1)'
+                transform:
+                  activeTab === tab.label
+                    ? `translateY(-2px) scale(1.05)`
+                    : "translateY(0px) scale(1)",
               }}
             >
-              <div className={`relative transition-all duration-300 ${
-                activeTab === tab.label ? 'mb-1' : 'mb-0.5'
-              }`}>
-                <tab.icon className={`w-6 h-6 transition-all duration-300 ${
-                  activeTab === tab.label ? "scale-110 drop-shadow-sm" : "scale-100 group-hover:scale-105"
-                }`} />
+              <div
+                className={`relative transition-all duration-300 ${
+                  activeTab === tab.label ? "mb-1" : "mb-0.5"
+                }`}
+              >
+                <tab.icon
+                  className={`w-6 h-6 transition-all duration-300 ${
+                    activeTab === tab.label
+                      ? "scale-110 drop-shadow-sm"
+                      : "scale-100 group-hover:scale-105"
+                  }`}
+                />
 
                 {activeTab === tab.label && (
                   <>
@@ -237,9 +318,13 @@ const Profile = () => {
                   </span>
                 )}
               </div>
-              <span className={`text-[10px] tracking-wide transition-all duration-300 ${
-                activeTab === tab.label ? "font-bold opacity-100 scale-105 text-[#ff6523]" : "font-medium opacity-80 scale-100 group-hover:opacity-100"
-              }`}>
+              <span
+                className={`text-[10px] tracking-wide transition-all duration-300 ${
+                  activeTab === tab.label
+                    ? "font-bold opacity-100 scale-105 text-[#ff6523]"
+                    : "font-medium opacity-80 scale-100 group-hover:opacity-100"
+                }`}
+              >
                 {tab.label}
               </span>
               <div className="absolute inset-0 rounded-xl bg-[#ff6523]/5 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />

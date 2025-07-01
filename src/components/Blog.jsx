@@ -1,18 +1,43 @@
 import React from "react";
 import BlogCard from "./BlogCard";
 import blogPosts from "../data/blog";
+import saffronHome from "../assets/saffronHome.png"; // Adjust the path as necessary
 
 const Blog = () => {
     return (
         <div className="flex items-center mt-4 bg-[#ff6523] px-4 md:px-12 w-full">
+            {/* <img
+                src={saffronHome}
+                alt="Decorative Saffron"
+                className="fixed bottom-[-75px] right-[800px] w-[150px] h-[150px]
+         md:top-[100px] md:right-[-154px] md:w-[375px] md:h-[375px]
+         object-cover pointer-events-none opacity-30 z-0"
+            /> */}
+            <img
+                src={saffronHome}
+                alt="Decorative Saffron"
+                className="fixed bottom-[-75px] left-[-75px] w-[150px] h-[150px]
+                                           md:top-[586px] md:left-[-154px] md:w-[375px] md:h-[375px]
+                                           object-cover pointer-events-none opacity-30 z-0"
+            />
+             <img
+                src={saffronHome}
+                alt="Decorative Saffron"
+                className="fixed bottom-[-75px] right-[-75px] w-[150px] h-[150px]
+                                           md:top-[0px] md:left-[1250px] md:w-[375px] md:h-[375px]
+                                           object-cover pointer-events-none opacity-30 z-0"
+            />
+
             <div className="flex flex-col md:flex-row p-8 gap-16 md:p-16 bg-[#ff6523] mt-12 md:mt-24 w-full rounded-lg ">
+
                 {/* Title Section - Only "BLOGS" on mobile */}
                 <div className="mb-8 md:mb-0">
                     {/* Mobile: Only "BLOGS" */}
                     <div className="md:hidden text-6xl text-center font-black text-black leading-none">
                         BLOGS
                     </div>
-                    
+
+
                     {/* Desktop: Original split layout */}
                     <div className="hidden md:block space-y-0">
                         <div className="text-8xl md:text-9xl font-black text-black leading-none">
