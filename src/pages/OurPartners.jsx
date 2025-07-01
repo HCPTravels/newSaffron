@@ -3,6 +3,7 @@ import { motion } from "framer-motion";
 import { Briefcase, Handshake, Award, Globe, ArrowRight } from "lucide-react";
 import saffron from "../assets/saffron.png"; // Adjust the path as necessary
 import SaffronIcon from "../assets/icons8-saffron-64 (1).png"; // Adjust the path as necessary
+import saffronHome from "../assets/saffronHome.png"; // Adjust the path as necessary
 
 const OurPartners = () => {
   // Sample partner data
@@ -80,6 +81,20 @@ const OurPartners = () => {
         <div className="absolute top-1/3 -left-20 w-60 h-60 bg-white/3 rounded-full blur-3xl"></div>
         <div className="absolute bottom-20 right-1/4 w-32 h-32 bg-white/4 rounded-full blur-2xl"></div>
       </div>
+      <img
+                                  src={saffronHome}
+                                  alt="Decorative Saffron"
+                                  className="fixed bottom-[-75px] left-[-75px] w-[150px] h-[150px]
+                                                             md:top-[586px] md:left-[-154px] md:w-[375px] md:h-[375px]
+                                                             object-cover pointer-events-none opacity-30 z-30"
+                              />
+                               <img
+                                  src={saffronHome}
+                                  alt="Decorative Saffron"
+                                  className="fixed bottom-[-75px] right-[-75px] w-[150px] h-[150px]
+                                                             top-[0px] md:left-[1250px] md:w-[375px] md:h-[375px]
+                                                             object-cover pointer-events-none opacity-30 z-30"
+                              />
 
       <div className="relative z-10 px-4 sm:px-6 lg:px-8 py-8 sm:py-12 lg:py-16">
         {/* Header */}
