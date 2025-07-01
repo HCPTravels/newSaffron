@@ -26,6 +26,7 @@ export const AuthProvider = ({ children }) => {
         setUser(user);
         setToken(token);
         localStorage.setItem("token", token);
+        localStorage.setItem("user", JSON.stringify(user));
       }
       return res.data;
     } catch (error) {
@@ -53,6 +54,7 @@ export const AuthProvider = ({ children }) => {
         setUser(user);
         setToken(token);
         localStorage.setItem("token", token);
+        localStorage.setItem("user", JSON.stringify(user));
       } else {
         // If no success flag, but we have user and token directly
         const { user, token } = res.data;
@@ -75,6 +77,8 @@ export const AuthProvider = ({ children }) => {
     setUser(null);
     setToken(null);
     localStorage.removeItem("token");
+    localStorage.removeItem("user");
+    console.log("User logged out successfully");
   };
 
   return (
