@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef } from "react";
-import { Home, Grid, User, ShoppingCart, Search } from "lucide-react";
+import { Home, Grid, User, ShoppingCart, Search, LogIn, UserPlus } from "lucide-react";
 import { useNavigate } from "react-router-dom";
-import { useAuth } from "../context/AuthContext"; // ✅ added
+import { useAuth } from "../context/AuthContext";
 import saffronLogo from "../assets/saffron logo.png";
 import HomePage from "../pages/Homepage";
 import CartPage from "../pages/Cart";
@@ -14,10 +14,8 @@ const Profile = () => {
   const [scrollY, setScrollY] = useState(0);
   const [isProfileVisible, setIsProfileVisible] = useState(false);
   const [isMobile, setIsMobile] = useState(false);
-  const [isInteractingWithLogout, setIsInteractingWithLogout] = useState(false);
   const dropdownRef = useRef(null);
   const profileButtonRef = useRef(null);
-  const hoverTimeoutRef = useRef(null);
   const navigate = useNavigate();
   const { user } = useAuth(); // ✅ watch auth user state
 
@@ -37,14 +35,14 @@ const Profile = () => {
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
+  // ✅ Click outside to close dropdown (desktop only)
   useEffect(() => {
     const handleClickOutside = (event) => {
       if (
         !isMobile &&
         isProfileVisible &&
         !dropdownRef.current?.contains(event.target) &&
-        !profileButtonRef.current?.contains(event.target) &&
-        !isInteractingWithLogout
+        !profileButtonRef.current?.contains(event.target)
       ) {
         setIsProfileVisible(false);
       }
@@ -52,27 +50,17 @@ const Profile = () => {
 
     document.addEventListener("mousedown", handleClickOutside);
     return () => document.removeEventListener("mousedown", handleClickOutside);
-  }, [isProfileVisible, isMobile, isInteractingWithLogout]);
+  }, [isProfileVisible, isMobile]);
 
   // ✅ Auto close Profile view when user logs out
   useEffect(() => {
     if (!user) {
       setIsProfileVisible(false);
-      setIsInteractingWithLogout(false);
       if (activeTab === "Profile") {
         setActiveTab("Home");
       }
     }
   }, [user]);
-
-  // Clear timeout on unmount
-  useEffect(() => {
-    return () => {
-      if (hoverTimeoutRef.current) {
-        clearTimeout(hoverTimeoutRef.current);
-      }
-    };
-  }, []);
 
   const mobileTabs = [
     { icon: Home, label: "Home" },
@@ -91,83 +79,101 @@ const Profile = () => {
         return <CartPage />;
       case "Profile":
         return isMobile ? (
-          <Account isVisible={true} onClose={() => setActiveTab("Home")} />
+          user ? (
+            <Account isVisible={true} onClose={() => setActiveTab("Home")} />
+          ) : (
+            <div className="flex flex-col items-center justify-center min-h-[60vh] bg-white/10 rounded-2xl mx-4 mt-8 p-8">
+              <div className="text-center mb-8">
+                <User className="h-16 w-16 text-white/70 mx-auto mb-4" />
+                <h2 className="text-2xl font-bold text-white mb-2">Welcome</h2>
+                <p className="text-white/80">Please log in to access your account</p>
+              </div>
+              <div className="space-y-4 w-full max-w-sm">
+                <button
+                  onClick={() => navigate('/login')}
+                  className="w-full flex items-center justify-center gap-3 bg-white text-[#ff6523] px-6 py-3 rounded-xl font-semibold hover:bg-white/90 transition-colors"
+                >
+                  <LogIn className="h-5 w-5" />
+                  Log In
+                </button>
+                <button
+                  onClick={() => navigate('/signup')}
+                  className="w-full flex items-center justify-center gap-3 bg-white/20 text-white px-6 py-3 rounded-xl font-semibold hover:bg-white/30 transition-colors border border-white/30"
+                >
+                  <UserPlus className="h-5 w-5" />
+                  Sign Up
+                </button>
+              </div>
+            </div>
+          )
         ) : null;
       default:
         return null;
     }
   };
 
-  const handleProfileInteraction = () => {
+  // ✅ Handle profile button click (both mobile and desktop)
+  const handleProfileClick = () => {
     if (isMobile) {
       setActiveTab("Profile");
     } else {
+      // Desktop: toggle dropdown visibility
       setIsProfileVisible(!isProfileVisible);
     }
   };
 
-  const handleMouseEnterProfile = () => {
-    if (!isMobile) {
-      // Clear any existing timeout
-      if (hoverTimeoutRef.current) {
-        clearTimeout(hoverTimeoutRef.current);
-        hoverTimeoutRef.current = null;
-      }
-      setIsProfileVisible(true);
-    }
-  };
-
-  const handleMouseLeaveProfile = () => {
-    if (!isMobile && !isInteractingWithLogout) {
-      // Set a longer timeout to allow smooth transition to dropdown
-      hoverTimeoutRef.current = setTimeout(() => {
-        setIsProfileVisible(false);
-      }, 300); // Increased timeout for better user experience
-    }
-  };
-
-  const handleMouseEnterDropdown = () => {
-    if (!isMobile) {
-      // Clear timeout when mouse enters dropdown
-      if (hoverTimeoutRef.current) {
-        clearTimeout(hoverTimeoutRef.current);
-        hoverTimeoutRef.current = null;
-      }
-      setIsProfileVisible(true);
-    }
-  };
-
-  const handleMouseLeaveDropdown = () => {
-    if (!isMobile && !isInteractingWithLogout) {
-      // Set timeout to close dropdown when mouse leaves
-      hoverTimeoutRef.current = setTimeout(() => {
-        setIsProfileVisible(false);
-      }, 200); // Slightly longer timeout when leaving dropdown
-    }
-  };
-
+  // ✅ Handle account dropdown close
   const handleAccountClose = () => {
     console.log("Account dropdown closing");
-    if (hoverTimeoutRef.current) {
-      clearTimeout(hoverTimeoutRef.current);
-      hoverTimeoutRef.current = null;
-    }
     setIsProfileVisible(false);
-    setIsInteractingWithLogout(false);
   };
 
-  const handleDropdownInteractionStart = () => {
-    console.log("Mouse down on dropdown");
-    setIsInteractingWithLogout(true);
-    if (hoverTimeoutRef.current) {
-      clearTimeout(hoverTimeoutRef.current);
-      hoverTimeoutRef.current = null;
-    }
-  };
+  // ✅ Render login/signup dropdown when user is not logged in
+  const renderAuthDropdown = () => {
+    if (user) return null;
 
-  const handleDropdownInteractionEnd = () => {
-    console.log("Mouse up on dropdown");
-    setTimeout(() => setIsInteractingWithLogout(false), 100);
+    return (
+      <div className="bg-white rounded-xl overflow-hidden shadow-2xl border border-gray-100 min-w-[280px]">
+        <div className="p-4 bg-gradient-to-r from-[#ff6523] to-[#ff8547]">
+          <h3 className="text-white font-medium text-lg">Welcome</h3>
+          <p className="text-white/90 text-sm">Access your account</p>
+        </div>
+
+        <div className="divide-y divide-gray-100">
+          <div
+            onClick={() => {
+              setIsProfileVisible(false);
+              navigate('/login');
+            }}
+            className="flex items-center px-4 py-3 text-gray-800 hover:bg-gray-50 transition-colors cursor-pointer group"
+          >
+            <div className="p-2 mr-3 rounded-lg bg-[#ff6523]/10 group-hover:bg-[#ff6523]/20 transition-colors">
+              <LogIn className="h-5 w-5 text-[#ff6523]" />
+            </div>
+            <div>
+              <p className="font-medium">Log In</p>
+              <p className="text-sm text-gray-500">Access your account</p>
+            </div>
+          </div>
+
+          <div
+            onClick={() => {
+              setIsProfileVisible(false);
+              navigate('/signup');
+            }}
+            className="flex items-center px-4 py-3 text-gray-800 hover:bg-gray-50 transition-colors cursor-pointer group"
+          >
+            <div className="p-2 mr-3 rounded-lg bg-[#ff6523]/10 group-hover:bg-[#ff6523]/20 transition-colors">
+              <UserPlus className="h-5 w-5 text-[#ff6523]" />
+            </div>
+            <div>
+              <p className="font-medium">Sign Up</p>
+              <p className="text-sm text-gray-500">Create new account</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    );
   };
 
   return (
@@ -198,34 +204,32 @@ const Profile = () => {
                 3
               </span>
             </button>
-            <div
-              className="relative"
-              onMouseEnter={handleMouseEnterProfile}
-              onMouseLeave={handleMouseLeaveProfile}
-              ref={profileButtonRef}
-            >
+            
+            {/* ✅ Profile Button - Click only, no hover */}
+            <div className="relative" ref={profileButtonRef}>
               <button
-                className="p-2 text-black transition-colors hover:bg-black/10 rounded-lg"
-                onClick={handleProfileInteraction}
+                className={`p-2 text-black transition-colors rounded-lg ${
+                  isProfileVisible ? 'bg-black/10' : 'hover:bg-black/10'
+                }`}
+                onClick={handleProfileClick}
               >
                 <User className="h-6 w-6" />
               </button>
-              {!isMobile && (
+              
+              {/* ✅ Desktop Dropdown - Shows on click */}
+              {!isMobile && isProfileVisible && (
                 <div
                   ref={dropdownRef}
-                  className="absolute right-0 top-full pt-2 -mt-2"
-                  onMouseEnter={handleMouseEnterDropdown}
-                  onMouseLeave={handleMouseLeaveDropdown}
-                  onMouseDown={handleDropdownInteractionStart}
-                  onMouseUp={handleDropdownInteractionEnd}
-                  style={{ 
-                    minHeight: '8px', // Ensure there's a hover area bridge
-                  }}
+                  className="absolute right-0 top-full pt-2 z-50"
                 >
-                  <Account
-                    isVisible={isProfileVisible}
-                    onClose={handleAccountClose}
-                  />
+                  {user ? (
+                    <Account
+                      isVisible={isProfileVisible}
+                      onClose={handleAccountClose}
+                    />
+                  ) : (
+                    renderAuthDropdown()
+                  )}
                 </div>
               )}
             </div>

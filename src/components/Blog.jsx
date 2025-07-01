@@ -23,8 +23,8 @@ const Blog = () => {
              <img
                 src={saffronHome}
                 alt="Decorative Saffron"
-                className="fixed bottom-[-75px] right-[-75px] w-[150px] h-[150px]
-                                           md:top-[0px] md:left-[1250px] md:w-[375px] md:h-[375px]
+                className="fixed right-[-75px] w-[150px]  h-[150px]
+                                           top-[0px] md:left-[1250px] md:w-[375px] md:h-[375px]
                                            object-cover pointer-events-none opacity-30 z-0"
             />
 

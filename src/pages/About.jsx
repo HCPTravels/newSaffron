@@ -1,11 +1,12 @@
 import React from "react";
 import SaffronFlower from "../assets/bowlSaffron.png";
+import saffronHome from "../assets/saffronHome.png"; // Adjust the path as necessary    
 
 const About = () => {
     return (
         <div className="relative min-h-screen">
             {/* Fixed Background Image */}
-            <div 
+            {/* <div 
                 className="fixed inset-0 bg-[#ff6523] overflow-hidden -z-10"
                 style={{
                     backgroundImage: `url(${SaffronFlower})`,
@@ -14,12 +15,27 @@ const About = () => {
                     backgroundAttachment: 'fixed',
                     opacity: 0.15,
                 }}
-            ></div>
+            ></div> */}
+
+             <img
+                            src={saffronHome}
+                            alt="Decorative Saffron"
+                            className="fixed bottom-[-75px] left-[-75px] w-[150px] h-[150px]
+                                                       md:top-[586px] md:left-[-154px] md:w-[375px] md:h-[375px]
+                                                       object-cover pointer-events-none opacity-30 z-30"
+                        />
+                         <img
+                            src={saffronHome}
+                            alt="Decorative Saffron"
+                            className="fixed bottom-[-75px] right-[-75px] w-[150px] h-[150px]
+                                                       top-[0px] md:left-[1250px] md:w-[375px] md:h-[375px]
+                                                       object-cover pointer-events-none opacity-30 z-30"
+                        />
 
             {/* Content Container */}
             <div className="relative z-10">
                 {/* Hero Section */}
-                <section className="flex items-center justify-center px-4 sm:px-6 pt-20 pb-16">
+                <section className="flex items-center justify-center px-4 sm:px-6 mt-50 md:mt-50 pb-16">
                     <div className="max-w-7xl mx-auto text-center px-4">
                         <h1 className="text-5xl sm:text-6xl md:text-7xl lg:text-8xl xl:text-9xl font-bold text-white mb-6 sm:mb-8 leading-tight tracking-tight drop-shadow-lg">
                             ABOUT US

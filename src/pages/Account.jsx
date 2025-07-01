@@ -77,9 +77,9 @@ const Account = ({ isVisible, onClose, onMouseEnter, onMouseLeave }) => {
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: 20 }}
             transition={{ type: "spring", damping: 25, stiffness: 300 }}
-            className="fixed md:absolute bottom-25 md:bottom-auto left-0 md:left-auto right-0 md:right-0 
+            className="fixed md:absolute bottom-0 mb-25 md:bottom-auto inset-x-0 md:inset-x-auto md:left-auto md:right-0 
                        md:top-0 max-h-[calc(100vh-8rem)] md:max-h-none
-                       w-full md:w-80 bg-white rounded-t-3xl md:rounded-2xl 
+                       mx-4 md:mx-0 mb-6 md:mb-0 md:w-80 bg-white rounded-2xl 
                        shadow-xl md:shadow-2xl overflow-hidden border-0 md:border border-gray-200
                        z-50 md:z-[60] flex flex-col"
             // Pass through mouse events for desktop hover functionality
