@@ -12,6 +12,10 @@ import ContactUs from './pages/Contactus';
 import OurPartners from './pages/OurPartners';
 import Profile from './components/Profile';
 import ProtectedRoute from './components/ProtectedRoute';
+import Home from './pages/Homepage';
+import Categories from './pages/Categories';
+import Cart from './pages/Cart';
+import Account from './pages/Account';
 
 function App() {
   const location = useLocation(); // ✅ Now it's safe
@@ -48,6 +52,10 @@ function App() {
             </ProtectedRoute>
           }
         />
+        <Route path='homepage' element={<Home/>}/>
+        <Route path='categories' element={<Categories/>}/>
+        <Route path='cart' element={<Cart/>}/>
+        <Route path='account' element={<Account/>}/>
       </Routes>
     </AuthProvider>
   );
