@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from "react";
-import { Home, Grid, User, ShoppingCart, Search, LogIn, UserPlus } from "lucide-react";
+import { Home, Grid, User, ShoppingCart, Search, Heart, ChevronDown, Globe } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 import saffronLogo from "../assets/saffron logo.png";
@@ -14,10 +14,14 @@ const Profile = () => {
   const [scrollY, setScrollY] = useState(0);
   const [isProfileVisible, setIsProfileVisible] = useState(false);
   const [isMobile, setIsMobile] = useState(false);
+  const [isCurrencyOpen, setIsCurrencyOpen] = useState(false);
+  const [selectedCurrency, setSelectedCurrency] = useState("USD");
+  const [searchQuery, setSearchQuery] = useState("");
   const dropdownRef = useRef(null);
   const profileButtonRef = useRef(null);
+  const currencyRef = useRef(null);
   const navigate = useNavigate();
-  const { user } = useAuth(); // ✅ watch auth user state
+  const { user } = useAuth();
 
   useEffect(() => {
     const checkScreenSize = () => {
@@ -35,7 +39,6 @@ const Profile = () => {
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
-  // ✅ Click outside to close dropdown (desktop only)
   useEffect(() => {
     const handleClickOutside = (event) => {
       if (
@@ -46,27 +49,27 @@ const Profile = () => {
       ) {
         setIsProfileVisible(false);
       }
+      if (isCurrencyOpen && !currencyRef.current?.contains(event.target)) {
+        setIsCurrencyOpen(false);
+      }
     };
 
     document.addEventListener("mousedown", handleClickOutside);
     return () => document.removeEventListener("mousedown", handleClickOutside);
-  }, [isProfileVisible, isMobile]);
-
-  // ✅ Auto close Profile view when user logs out
-  useEffect(() => {
-    if (!user) {
-      setIsProfileVisible(false);
-      if (activeTab === "Profile") {
-        setActiveTab("Home");
-      }
-    }
-  }, [user]);
+  }, [isProfileVisible, isMobile, isCurrencyOpen]);
 
   const mobileTabs = [
     { icon: Home, label: "Home" },
     { icon: Grid, label: "Browse" },
     { icon: ShoppingCart, label: "Cart" },
     { icon: User, label: "Profile" },
+  ];
+
+  const currencies = [
+    { code: "USD", symbol: "$", name: "US Dollar" },
+    { code: "EUR", symbol: "€", name: "Euro" },
+    { code: "GBP", symbol: "£", name: "British Pound" },
+    { code: "INR", symbol: "₹", name: "Indian Rupee" },
   ];
 
   const renderActiveTabContent = () => {
@@ -79,109 +82,67 @@ const Profile = () => {
         return <CartPage />;
       case "Profile":
         return isMobile ? (
-          user ? (
-            <Account isVisible={true} onClose={() => setActiveTab("Home")} />
-          ) : (
-            <div className="flex flex-col items-center justify-center min-h-[60vh] bg-white/10 rounded-2xl mx-4 mt-8 p-8">
-              <div className="text-center mb-8">
-                <User className="h-16 w-16 text-white/70 mx-auto mb-4" />
-                <h2 className="text-2xl font-bold text-white mb-2">Welcome</h2>
-                <p className="text-white/80">Please log in to access your account</p>
-              </div>
-              <div className="space-y-4 w-full max-w-sm">
-                <button
-                  onClick={() => navigate('/login')}
-                  className="w-full flex items-center justify-center gap-3 bg-white text-[#ff6523] px-6 py-3 rounded-xl font-semibold hover:bg-white/90 transition-colors"
-                >
-                  <LogIn className="h-5 w-5" />
-                  Log In
-                </button>
-                <button
-                  onClick={() => navigate('/signup')}
-                  className="w-full flex items-center justify-center gap-3 bg-white/20 text-white px-6 py-3 rounded-xl font-semibold hover:bg-white/30 transition-colors border border-white/30"
-                >
-                  <UserPlus className="h-5 w-5" />
-                  Sign Up
-                </button>
-              </div>
-            </div>
-          )
+          <Account isVisible={true} onClose={() => setActiveTab("Home")} />
         ) : null;
       default:
         return null;
     }
   };
 
-  // ✅ Handle profile button click (both mobile and desktop)
   const handleProfileClick = () => {
     if (isMobile) {
       setActiveTab("Profile");
     } else {
-      // Desktop: toggle dropdown visibility
       setIsProfileVisible(!isProfileVisible);
     }
   };
 
-  // ✅ Handle account dropdown close
+  const handleProfileMouseEnter = () => {
+    if (!isMobile) {
+      setIsProfileVisible(true);
+    }
+  };
+
+  const handleProfileMouseLeave = () => {
+    if (!isMobile) {
+      setIsProfileVisible(false);
+    }
+  };
+
   const handleAccountClose = () => {
-    console.log("Account dropdown closing");
     setIsProfileVisible(false);
   };
 
-  // ✅ Render login/signup dropdown when user is not logged in
-  const renderAuthDropdown = () => {
-    if (user) return null;
+  const handleDropdownMouseEnter = () => {
+    if (!isMobile) {
+      setIsProfileVisible(true);
+    }
+  };
 
-    return (
-      <div className="bg-white rounded-xl overflow-hidden shadow-2xl border border-gray-100 min-w-[280px]">
-        <div className="p-4 bg-gradient-to-r from-[#ff6523] to-[#ff8547]">
-          <h3 className="text-white font-medium text-lg">Welcome</h3>
-          <p className="text-white/90 text-sm">Access your account</p>
-        </div>
+  const handleDropdownMouseLeave = () => {
+    if (!isMobile) {
+      setIsProfileVisible(false);
+    }
+  };
 
-        <div className="divide-y divide-gray-100">
-          <div
-            onClick={() => {
-              setIsProfileVisible(false);
-              navigate('/login');
-            }}
-            className="flex items-center px-4 py-3 text-gray-800 hover:bg-gray-50 transition-colors cursor-pointer group"
-          >
-            <div className="p-2 mr-3 rounded-lg bg-[#ff6523]/10 group-hover:bg-[#ff6523]/20 transition-colors">
-              <LogIn className="h-5 w-5 text-[#ff6523]" />
-            </div>
-            <div>
-              <p className="font-medium">Log In</p>
-              <p className="text-sm text-gray-500">Access your account</p>
-            </div>
-          </div>
+  const handleCurrencySelect = (currency) => {
+    setSelectedCurrency(currency.code);
+    setIsCurrencyOpen(false);
+  };
 
-          <div
-            onClick={() => {
-              setIsProfileVisible(false);
-              navigate('/signup');
-            }}
-            className="flex items-center px-4 py-3 text-gray-800 hover:bg-gray-50 transition-colors cursor-pointer group"
-          >
-            <div className="p-2 mr-3 rounded-lg bg-[#ff6523]/10 group-hover:bg-[#ff6523]/20 transition-colors">
-              <UserPlus className="h-5 w-5 text-[#ff6523]" />
-            </div>
-            <div>
-              <p className="font-medium">Sign Up</p>
-              <p className="text-sm text-gray-500">Create new account</p>
-            </div>
-          </div>
-        </div>
-      </div>
-    );
+  const handleSearch = (e) => {
+    e.preventDefault();
+    // Implement search functionality
+    console.log("Searching for:", searchQuery);
   };
 
   return (
     <>
       {/* Desktop Navbar */}
       <div className="hidden md:flex items-center justify-between px-8 py-4 bg-[#ff6523] backdrop-blur-sm sticky top-0 z-50">
-        <div className="flex items-center space-x-8 w-full max-w-6xl mx-auto">
-          <div className="flex items-center space-x-6 flex-1">
+        <div className="flex items-center space-x-8 w-full max-w-7xl mx-auto">
+          {/* Logo */}
+          <div className="flex items-center space-x-6">
             <div
               className="text-2xl font-bold text-black cursor-pointer whitespace-nowrap"
               onClick={() => setActiveTab("Home")}
@@ -194,7 +155,67 @@ const Profile = () => {
             </div>
           </div>
 
-          <div className="flex items-center space-x-6 relative">
+          {/* Search Bar */}
+          <div className="flex-1 max-w-xl mx-4">
+            <form onSubmit={handleSearch} className="relative">
+              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-gray-500" />
+              <input
+                type="text"
+                placeholder="Search for saffron, spices..."
+                className="w-full pl-10 pr-4 py-2 rounded-full bg-white/90 border border-white focus:border-[#ff6523]/50 focus:outline-none focus:ring-2 focus:ring-[#ff6523]/30 transition-all"
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+              />
+              <button 
+                type="submit"
+                className="absolute right-2 top-1/2 transform -translate-y-1/2 bg-[#ff6523] text-white px-3 py-1 rounded-full text-sm font-medium hover:bg-[#e55b1f] transition-colors"
+              >
+                Search
+              </button>
+            </form>
+          </div>
+
+          {/* Navigation Icons */}
+          <div className="flex items-center space-x-6">
+            {/* Currency Selector */}
+            <div className="relative" ref={currencyRef}>
+              <button
+                className="flex items-center space-x-1 px-3 py-1 rounded-lg hover:bg-black/10 transition-colors"
+                onClick={() => setIsCurrencyOpen(!isCurrencyOpen)}
+              >
+                <Globe className="h-5 w-5" />
+                <span className="text-sm font-medium">{selectedCurrency}</span>
+                <ChevronDown className={`h-4 w-4 transition-transform ${isCurrencyOpen ? 'transform rotate-180' : ''}`} />
+              </button>
+              
+              {isCurrencyOpen && (
+                <div className="absolute right-0 mt-2 w-48 bg-white rounded-lg shadow-lg z-50 py-1">
+                  {currencies.map((currency) => (
+                    <button
+                      key={currency.code}
+                      className={`w-full text-left px-4 py-2 hover:bg-[#ff6523]/10 flex items-center ${selectedCurrency === currency.code ? 'bg-[#ff6523]/10 text-[#ff6523]' : 'text-gray-800'}`}
+                      onClick={() => handleCurrencySelect(currency)}
+                    >
+                      <span className="font-medium mr-2">{currency.symbol}</span>
+                      <span>{currency.name}</span>
+                    </button>
+                  ))}
+                </div>
+              )}
+            </div>
+
+            {/* Wishlist */}
+            <button 
+              className="p-2 text-black transition-colors relative group"
+              onClick={() => navigate('/wishlist')}
+            >
+              <Heart className="h-6 w-6 transition-colors" />
+              <span className="absolute -top-1 -right-1 text-white bg-[#ff6523] text-xs rounded-full h-5 w-5 flex items-center justify-center">
+                5
+              </span>
+            </button>
+
+            {/* Cart */}
             <button
               className="p-2 text-black transition-colors relative"
               onClick={() => setActiveTab("Cart")}
@@ -205,8 +226,13 @@ const Profile = () => {
               </span>
             </button>
             
-            {/* ✅ Profile Button - Click only, no hover */}
-            <div className="relative" ref={profileButtonRef}>
+            {/* Profile */}
+            <div 
+              className="relative" 
+              ref={profileButtonRef}
+              onMouseEnter={handleProfileMouseEnter}
+              onMouseLeave={handleProfileMouseLeave}
+            >
               <button
                 className={`p-2 text-black transition-colors rounded-lg ${
                   isProfileVisible ? 'bg-black/10' : 'hover:bg-black/10'
@@ -216,20 +242,17 @@ const Profile = () => {
                 <User className="h-6 w-6" />
               </button>
               
-              {/* ✅ Desktop Dropdown - Shows on click */}
               {!isMobile && isProfileVisible && (
                 <div
                   ref={dropdownRef}
                   className="absolute right-0 top-full pt-2 z-50"
                 >
-                  {user ? (
-                    <Account
-                      isVisible={isProfileVisible}
-                      onClose={handleAccountClose}
-                    />
-                  ) : (
-                    renderAuthDropdown()
-                  )}
+                  <Account
+                    isVisible={isProfileVisible}
+                    onClose={handleAccountClose}
+                    onMouseEnter={handleDropdownMouseEnter}
+                    onMouseLeave={handleDropdownMouseLeave}
+                  />
                 </div>
               )}
             </div>
@@ -237,7 +260,7 @@ const Profile = () => {
         </div>
       </div>
 
-      {/* Decorative images */}
+      {/* Decorative Images */}
       <img
         src={SaffronHome}
         alt="Saffron Home"
@@ -248,7 +271,7 @@ const Profile = () => {
                    lg:w-[500px] lg:h-[500px]
                    xl:w-[700px] xl:h-[700px]
                    2xl:w-[767px] 2xl:h-[767px]
-                   object-cover z-200 transition-transform duration-700 ease-out"
+                   object-cover z-30 transition-transform duration-700 ease-out"
         style={{ transform: `translateX(-50%) translateY(${scrollY * 0.3}px)` }}
       />
 
