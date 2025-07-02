@@ -4,7 +4,6 @@ import { motion, AnimatePresence } from "framer-motion";
 import Subtract from "../assets/saffron logo.png";
 import { User, Menu, LogIn, UserPlus, ChevronDown, BookOpen, Users, Handshake, Contact } from "lucide-react";
 import { useAuth } from "../context/AuthContext";
-import Account from "../pages/Account"; // Assuming you have an Account component for user details
 import Profile from "./Profile";
 
 const Navbar = () => {
@@ -104,7 +103,7 @@ const Navbar = () => {
           </div>
 
           <div className="flex items-center space-x-4 sm:space-x-6 md:space-x-8 lg:space-x-10">
-            {/* User Dropdown - Show Account component when logged in, Login/Signup when not */}
+            {/* User Dropdown - Show different content based on authentication state */}
             <div 
               ref={userDropdownRef}
               className="relative group"
@@ -113,11 +112,10 @@ const Navbar = () => {
             >
               <motion.button 
                 onClick={() => {
-                  if (isMobile && user) {
-                    navigate("/profile"); // ✅ Navigate to Profile page
-                    setIsUserDropdownOpen(false); // ✅ Optional: close dropdown
+                  if (isMobile) {
+                    toggleUserDropdown();
                   } else {
-                    toggleUserDropdown(); // ✅ Toggle as usual
+                    toggleUserDropdown();
                   }
                 }}
                 className="flex items-center gap-1 cursor-pointer p-2 sm:px-2 sm:py-1 rounded-lg transition-all duration-300"
@@ -133,90 +131,76 @@ const Navbar = () => {
               </motion.button>
 
               <AnimatePresence>
-  {isUserDropdownOpen && (
-    <motion.div 
-      className={`${isMobile ? 
-        'fixed left-1/2 transform -translate-x-1/2 w-[92vw] max-w-[400px] px-4 mt-[55px]' : 
-        'absolute right-0 w-64 mt-2'}`}
-      variants={dropdownVariants}
-      initial="hidden"
-      animate="visible"
-      exit="exit"
-    >
-      {user ? (
-        isMobile ? (
-          <Profile 
-            visible={isUserDropdownOpen} 
-            onClose={() => setIsUserDropdownOpen(false)} 
-          />
-        ) : (
-          <Account 
-          isVisible={isUserDropdownOpen} 
-            onClose={() => setIsUserDropdownOpen(false)} 
-          />
-        )
-      ) : (
-        <div className="bg-white rounded-xl overflow-hidden border border-gray-100 z-[60]">
-          <div className="p-4 bg-gradient-to-r from-[#fe6522] to-[#e55a1d]">
-            <h3 className="text-white font-medium text-lg">Welcome</h3>
-            <p className="text-white/90 text-sm">Access your account</p>
-          </div>
+                {isUserDropdownOpen && (
+                  <motion.div 
+                    className={`${isMobile ? 
+                      'fixed left-1/2 transform -translate-x-1/2 w-[92vw] max-w-[400px] px-4 mt-[55px]' : 
+                      'absolute right-0 w-64 mt-2'}`}
+                    variants={dropdownVariants}
+                    initial="hidden"
+                    animate="visible"
+                    exit="exit"
+                  >
+                    <div className="bg-white rounded-xl overflow-hidden border border-gray-100 z-[60]">
+                      <div className="p-4 bg-gradient-to-r from-[#fe6522] to-[#e55a1d]">
+                        <h3 className="text-white font-medium text-lg">Welcome</h3>
+                        <p className="text-white/90 text-sm">Access your account</p>
+                      </div>
 
-          <div className="divide-y divide-gray-100">
-            <motion.div
-              onClick={() => {
-                setIsUserDropdownOpen(false);
-                navigate('/login');
-              }}
-              className="flex items-center px-4 py-3 text-gray-800 transition-all duration-200 group/item cursor-pointer"
-              variants={itemVariants}
-              initial="hidden"
-              animate="visible"
-              custom={0}
-              whileHover={{ backgroundColor: "#f9fafb", x: 5 }}
-            >
-              <motion.div 
-                className="p-2 mr-3 rounded-lg bg-[#fe6522]/10 group-hover/item:bg-[#fe6522]/20"
-                whileHover={{ scale: 1.1, rotate: 5 }}
-              >
-                <LogIn className="h-5 w-5 text-[#fe6522]" />
-              </motion.div>
-              <div>
-                <p className="font-medium">Log In</p>
-              </div>
-            </motion.div>
+                      <div className="divide-y divide-gray-100">
+                        <motion.div
+                          onClick={() => {
+                            setIsUserDropdownOpen(false);
+                            navigate('/login');
+                          }}
+                          className="flex items-center px-4 py-3 text-gray-800 transition-all duration-200 group/item cursor-pointer"
+                          variants={itemVariants}
+                          initial="hidden"
+                          animate="visible"
+                          custom={0}
+                          whileHover={{ backgroundColor: "#f9fafb", x: 5 }}
+                        >
+                          <motion.div 
+                            className="p-2 mr-3 rounded-lg bg-[#fe6522]/10 group-hover/item:bg-[#fe6522]/20"
+                            whileHover={{ scale: 1.1, rotate: 5 }}
+                          >
+                            <LogIn className="h-5 w-5 text-[#fe6522]" />
+                          </motion.div>
+                          <div>
+                            <p className="font-medium">Log In</p>
+                          </div>
+                        </motion.div>
 
-            <motion.div
-              onClick={() => {
-                setIsUserDropdownOpen(false);
-                navigate('/signup');
-              }}
-              className="flex items-center px-4 py-3 text-gray-800 transition-all duration-200 group/item cursor-pointer"
-              variants={itemVariants}
-              initial="hidden"
-              animate="visible"
-              custom={1}
-              whileHover={{ backgroundColor: "#f9fafb", x: 5 }}
-            >
-              <motion.div 
-                className="p-2 mr-3 rounded-lg bg-[#fe6522]/10 group-hover/item:bg-[#fe6522]/20"
-                whileHover={{ scale: 1.1, rotate: 5 }}
-              >
-                <UserPlus className="h-5 w-5 text-[#fe6522]" />
-              </motion.div>
-              <div>
-                <p className="font-medium">Sign Up</p>
-              </div>
-            </motion.div>
-          </div>
-        </div>
-      )}
-    </motion.div>
-  )}
-</AnimatePresence>
+                        <motion.div
+                          onClick={() => {
+                            setIsUserDropdownOpen(false);
+                            navigate('/signup');
+                          }}
+                          className="flex items-center px-4 py-3 text-gray-800 transition-all duration-200 group/item cursor-pointer"
+                          variants={itemVariants}
+                          initial="hidden"
+                          animate="visible"
+                          custom={1}
+                          whileHover={{ backgroundColor: "#f9fafb", x: 5 }}
+                        >
+                          <motion.div 
+                            className="p-2 mr-3 rounded-lg bg-[#fe6522]/10 group-hover/item:bg-[#fe6522]/20"
+                            whileHover={{ scale: 1.1, rotate: 5 }}
+                          >
+                            <UserPlus className="h-5 w-5 text-[#fe6522]" />
+                          </motion.div>
+                          <div>
+                            <p className="font-medium">Sign Up</p>
+                          </div>
+                        </motion.div>
+                      </div>
+                    </div>
+                  </motion.div>
+                )}
+              </AnimatePresence>
             </div>
 
-            {/* Nav Dropdown - remains unchanged */}
+            {/* Nav Dropdown - Navigation menu */}
             <div 
               ref={navDropdownRef}
               className="relative group"
