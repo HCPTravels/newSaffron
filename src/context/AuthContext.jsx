@@ -19,7 +19,7 @@ export const AuthProvider = ({ children }) => {
 
   const emailOtp = async (email) => {
     try {
-      const res = await axios.post("http://localhost:5001/api/email/send-otp", { email });
+      const res = await axios.post("https://backendsaffron.onrender.com/api/email/send-otp", { email });
       console.log("Email OTP response:", res.data);
       return res.data;
     } catch (error) {
@@ -65,7 +65,7 @@ export const AuthProvider = ({ children }) => {
       console.log("Sending payload:", payload);
       console.log("Payload JSON:", JSON.stringify(payload));
       
-      const res = await axios.post("http://localhost:5001/api/email/verify-otp", payload);
+      const res = await axios.post("https://backendsaffron.onrender.com/api/email/verify-otp", payload);
       console.log("Success response:", res.data);
       
       // ... rest of your code
