@@ -16,7 +16,70 @@ export const AuthProvider = ({ children }) => {
     }
     setIsLoading(false);
   }, [token]);
-  
+
+  const emailOtp = async (email) => {
+    try {
+      const res = await axios.post("http://localhost:5001/api/email/send-otp", { email });
+      console.log("Email OTP response:", res.data);
+      return res.data;
+    } catch (error) {
+      console.error("Email OTP request failed:", error);
+      console.error("Error details:", error.response?.data);
+      console.error("Error status:", error.response?.status);
+      
+      // Handle specific error cases
+      if (error.response?.status === 401) {
+        const errorMessage = error.response?.data?.message || "Authentication failed";
+        
+        if (errorMessage.includes("User already exists")) {
+          // User exists, they should log in instead
+          throw new Error("Account already exists. Please log in instead of signing up.");
+        } else if (errorMessage.includes("Please log in")) {
+          // User exists but needs to log in
+          throw new Error("Please log in to access your account.");
+        } else {
+          // Other 401 errors
+          throw new Error("Authentication failed. Please try again.");
+        }
+      } else if (error.response?.status === 404) {
+        throw new Error("Service not found. Please check your connection.");
+      } else if (error.response?.status === 500) {
+        throw new Error("Server error. Please try again later.");
+      } else if (error.code === 'ECONNREFUSED') {
+        throw new Error("Cannot connect to server. Please check if the server is running.");
+      } else {
+        // Generic error message
+        throw new Error(error.response?.data?.message || "Failed to send OTP. Please try again.");
+      }
+    } 
+  }
+
+  const verifyOtp = async ({ email, otp }) => {
+    console.log("=== FRONTEND DEBUG ===");
+    console.log("Function called with:", { email, otp });
+    console.log("Email:", email, "Type:", typeof email, "Length:", email?.length);
+    console.log("OTP:", otp, "Type:", typeof otp, "Length:", otp?.length);
+    
+    try {
+      const payload = { email, otp };
+      console.log("Sending payload:", payload);
+      console.log("Payload JSON:", JSON.stringify(payload));
+      
+      const res = await axios.post("http://localhost:5001/api/email/verify-otp", payload);
+      console.log("Success response:", res.data);
+      
+      // ... rest of your code
+    } catch (error) {
+      console.error("Error details:", {
+        message: error.message,
+        status: error.response?.status,
+        data: error.response?.data,
+        headers: error.response?.headers
+      });
+      throw error;
+    }
+  };
+
   const signUp = async (formData) => {
     try {
       const res = await axios.post("https://backendsaffron.onrender.com/api/users/signup", formData);
@@ -40,6 +103,8 @@ export const AuthProvider = ({ children }) => {
       throw error;
     }
   };
+
+
 
   const logIn = async ({ email, password }) => {
     try {
@@ -80,9 +145,28 @@ export const AuthProvider = ({ children }) => {
     localStorage.removeItem("user");
     console.log("User logged out successfully");
   };
+  const loginWithGoogle = async (googleToken) => {
+    try {
+      const res = await axios.post("https://backendsaffron.onrender.com/api/users/google-login", {
+        token: googleToken,
+      });
+      if (res.data.success) {
+        const { user, token } = res.data;
+        setUser(user);
+        setToken(token);
+        localStorage.setItem("token", token);
+        localStorage.setItem("user", JSON.stringify(user));
+      }
+      return res.data;
+    } catch (error) {
+      console.error("Google login failed:", error);
+      alert("Google login failed.");
+      throw error;
+    }
+  };
 
   return (
-    <AuthContext.Provider value={{ user, token, isLoading, signUp, logIn, logout }}>
+    <AuthContext.Provider value={{ user, token, isLoading, signUp, logIn, logout, loginWithGoogle, emailOtp, verifyOtp }}>
       {children}
     </AuthContext.Provider>
   );

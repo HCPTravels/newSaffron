@@ -5,7 +5,7 @@ import HeroSection from './components/HeroSection';
 import AllProducts from './components/Allproduct';
 import Contact from './components/Contact';
 import LoginPage from './pages/Login';
-import SignupPage from './pages/Signup';
+import Signup from './pages/SignupPage';
 import Blog from './components/Blog';
 import About from './pages/About';
 import ContactUs from './pages/Contactus';
@@ -16,6 +16,8 @@ import Home from './pages/Homepage';
 import Categories from './pages/Categories';
 import Cart from './pages/Cart';
 import Account from './pages/Account';
+import OtpVerificationPage from './pages/OtpverifyPage';
+import SignupPage from './pages/Signup';
 
 function App() {
   const location = useLocation(); // ✅ Now it's safe
@@ -39,7 +41,9 @@ function App() {
           }
         />
         <Route path="/login" element={<LoginPage />} />
-        <Route path="/signup" element={<SignupPage />} />
+        <Route path="/signup" element={<Signup />} />
+        <Route path="/otpverify" element={<OtpVerificationPage />} />
+        <Route path="/signupform" element={<SignupPage />} />
         <Route path="/blog" element={<Blog />} />
         <Route path="/about" element={<About />} />
         <Route path="/contact" element={<ContactUs />} />

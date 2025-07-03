@@ -7,14 +7,17 @@ import Saffron from "../assets/saffron.png";
 import { useAuth } from '../context/AuthContext';
 import { useNavigate } from "react-router-dom";
 import { toast, Toaster } from "sonner";
+import { useLocation } from "react-router-dom";
 
 const SignupPage = () => {
+  const location = useLocation();
+  const passedEmail = location.state?.email || "";
   const navigate = useNavigate();
   const { signUp, user } = useAuth();
   const [formData, setFormData] = useState({
     firstName: "",
     lastName: "",
-    email: "",
+    email: passedEmail,
     contactNumber: "",
     password: "",
     accountType: "user", // 'user' or 'seller'
