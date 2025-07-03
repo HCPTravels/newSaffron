@@ -82,7 +82,7 @@ export const AuthProvider = ({ children }) => {
 
   const signUp = async (formData) => {
     try {
-      const res = await axios.post("https://backendsaffron.onrender.com/api/users/signup", formData);
+      const res = await axios.post("https://backendsaffron.onrender.com/api/user/signup", formData);
       console.log("Signup response:", res.data);
       if (res.data.success) {
         const { user, token } = res.data;
@@ -108,7 +108,7 @@ export const AuthProvider = ({ children }) => {
 
   const logIn = async ({ email, password }) => {
     try {
-      const res = await axios.post("https://backendsaffron.onrender.com/api/users/login", { email, password });
+      const res = await axios.post("https://backendsaffron.onrender.com/api/user/login", { email, password });
       console.log("Login response:", res.data); // Debug log
       
       // Check if response has success flag
