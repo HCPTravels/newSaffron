@@ -1,15 +1,15 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
-import { LogIn, CheckCircle } from "lucide-react";
+import { LogIn, CheckCircle, Store } from "lucide-react";
 import { FcGoogle } from "react-icons/fc";
 import { toast, Toaster } from "sonner";
 import Saffron from "../assets/saffron.png";
 import SaffronIcon from "../assets/icons8-saffron-64 (1).png";
 import { useAuth } from '../context/AuthContext';
 
-const LoginPage = () => {
-  const { logIn } = useAuth();
+const SellerLogin = () => {
+  const { sellerLogin } = useAuth(); // Using sellerLogin from AuthContext
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [isHovered, setIsHovered] = useState(false);
@@ -21,10 +21,10 @@ const LoginPage = () => {
     setIsLoading(true);
   
     try {
-      const response = await logIn({ email, password });
+      const response = await sellerLogin({ email, password });
       
-      toast.success("Welcome back!", {
-        description: "You have been successfully logged in.",
+      toast.success("Welcome back, Seller!", {
+        description: "You have successfully logged in to your seller account.",
         duration: 3000,
         position: "top-center",
         icon: <CheckCircle className="h-5 w-5 text-green-500" />,
@@ -36,14 +36,14 @@ const LoginPage = () => {
       });
 
       setTimeout(() => {
-        navigate("/profile");
+        navigate("/sellerdashboard",); // Redirect to seller dashboard
       }, 1500);
       
-      console.log("Login successful:", response);
+      console.log("Seller login successful:", response);
     } catch (error) {
-      console.error("Login failed:", error);
+      console.error("Seller login failed:", error);
       
-      toast.error("Login failed", {
+      toast.error("Seller Login Failed", {
         description: error.message || "Please check your credentials and try again.",
         duration: 4000,
         position: "top-right",
@@ -59,8 +59,8 @@ const LoginPage = () => {
   };
 
   const handleGoogleLogin = () => {
-    toast.info("Google login coming soon", {
-      description: "This feature will be available soon!",
+    toast.info("Google login for sellers coming soon", {
+      description: "This feature will be available soon for seller accounts!",
       duration: 3000,
       position: "top-right",
       style: {
@@ -105,25 +105,30 @@ const LoginPage = () => {
           transition={{ duration: 0.5 }}
         >
           <div className="bg-white rounded-2xl shadow-xl overflow-hidden border border-white/20 backdrop-blur-sm bg-white/95">
+            {/* Seller-specific header */}
             <div className="p-4 sm:p-6 bg-gradient-to-r from-[#fe6522] to-[#e55a1d]">
               <div className="flex flex-row justify-between items-center">
                 <div>
-                  <h2 className="text-white text-xl sm:text-2xl font-bold">Welcome Back</h2>
-                  <p className="text-white/90 text-xs sm:text-sm mt-1">Sign in to your account</p>
+                  <h2 className="text-white text-xl sm:text-2xl font-bold">Seller Portal</h2>
+                  <p className="text-white/90 text-xs sm:text-sm mt-1">Sign in to your seller account</p>
                 </div>
-                <img 
-                  src={SaffronIcon}
-                  alt="Saffron Icon"
-                  className="h-10 w-10 sm:h-16 sm:w-16 hover:shadow-lg transition-shadow duration-300 transform hover:scale-105"
-                />
+                <div className="flex items-center">
+                  <Store className="h-8 w-8 text-white mr-2" />
+                  <img 
+                    src={SaffronIcon}
+                    alt="Saffron Icon"
+                    className="h-10 w-10 sm:h-16 sm:w-16 hover:shadow-lg transition-shadow duration-300 transform hover:scale-105"
+                  />
+                </div>
               </div>
             </div>
             
+            {/* Form area */}
             <form onSubmit={handleSubmit} className="p-4 sm:p-6 space-y-4">
               <div className="space-y-4">
                 <div>
                   <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-1">
-                    Email Address
+                    Business Email
                   </label>
                   <motion.div 
                     className="relative"
@@ -135,7 +140,7 @@ const LoginPage = () => {
                       id="email"
                       value={email}
                       onChange={(e) => setEmail(e.target.value)}
-                      placeholder="Enter your email"
+                      placeholder="Enter your business email"
                       className="w-full px-4 py-2 sm:py-3 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-[#fe6522]/50 focus:border-transparent transition-all duration-200 bg-white/90 text-sm sm:text-base"
                       required
                     />
@@ -187,9 +192,9 @@ const LoginPage = () => {
                       animate={{ x: isHovered ? 2 : 0 }}
                       transition={{ duration: 0.2 }}
                     >
-                      <LogIn className="h-4 w-4 sm:h-5 sm:w-5" />
+                      <Store className="h-4 w-4 sm:h-5 sm:w-5" />
                     </motion.span>
-                    <span>Log In</span>
+                    <span>Login as Seller</span>
                   </>
                 )}
               </motion.button>
@@ -218,28 +223,29 @@ const LoginPage = () => {
                 <FcGoogle className="h-4 w-4 sm:h-5 sm:w-5" />
                 <span>Sign in with Google</span>
               </motion.button>
+
+              {/* Link to customer login */}
+              <div className="text-center pt-2">
+                <button
+                  type="button"
+                  onClick={() => navigate('/login')}
+                  className="text-xs sm:text-sm text-gray-600 hover:text-[#fe6522] transition-colors"
+                >
+                  Are you a customer? <span className="font-medium text-[#fe6522]">Login here</span>
+                </button>
+              </div>
             </form>
             
             {/* Footer */}
-            <div className="px-4 sm:px-6 py-4 bg-gray-50/80 text-center border-t border-gray-200/50 space-y-2">
+            <div className="px-4 sm:px-6 py-4 bg-gray-50/80 text-center border-t border-gray-200/50">
               <p className="text-xs sm:text-sm text-gray-600">
-                Don't have an account?{' '}
+                Don't have a seller account?{' '}
                 <a 
                   href="#signup" 
                   className="font-medium text-[#fe6522] hover:text-[#e55a1d] transition-colors" 
-                  onClick={() => navigate('/signup')}
+                  onClick={() => navigate('/sellersignup')}
                 >
-                  Sign up
-                </a>
-              </p>
-              <p className="text-xs sm:text-sm text-gray-600">
-                Are you a seller?{' '}
-                <a 
-                  href="#seller-login" 
-                  className="font-medium text-[#fe6522] hover:text-[#e55a1d] transition-colors" 
-                  onClick={() => navigate('/sellerlogin')}
-                >
-                  Login as seller
+                  Register as seller
                 </a>
               </p>
             </div>
@@ -250,4 +256,4 @@ const LoginPage = () => {
   );
 };
 
-export default LoginPage;
+export default SellerLogin;

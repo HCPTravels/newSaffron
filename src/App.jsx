@@ -17,7 +17,11 @@ import Categories from './pages/Categories';
 import Cart from './pages/Cart';
 import Account from './pages/Account';
 import OtpVerificationPage from './pages/OtpverifyPage';
-import SignupPage from './pages/Signup';
+import SignupForm from './pages/SignupForm';
+import SellerSignupPage from './pages/SellerSignupPage';
+import SaffronProductListing from './components/ProductListing';
+import SellerDashboard from './components/SellerDashboard';
+import SellerLogin from './pages/SellerLogin';
 
 function App() {
   const location = useLocation(); // ✅ Now it's safe
@@ -43,11 +47,16 @@ function App() {
         <Route path="/login" element={<LoginPage />} />
         <Route path="/signup" element={<Signup />} />
         <Route path="/otpverify" element={<OtpVerificationPage />} />
-        <Route path="/signupform" element={<SignupPage />} />
+        <Route path="/signupform" element={<SignupForm />} />
         <Route path="/blog" element={<Blog />} />
         <Route path="/about" element={<About />} />
         <Route path="/contact" element={<ContactUs />} />
         <Route path="/partners" element={<OurPartners />} />
+        <Route path="/sellersignup" element={<SellerSignupPage />} />
+        <Route path="/sellerdashboard" element={<SellerDashboard />} />
+        <Route path="/sellerlogin" element={<SellerLogin />} />
+        <Route path="/productlisting" element={<SaffronProductListing />} />
+
         <Route
           path="/profile"
           element={
