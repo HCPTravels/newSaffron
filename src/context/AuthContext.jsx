@@ -174,7 +174,7 @@ export const AuthProvider = ({ children }) => {
 
   const sellerSignUp = async (formData) => {
     try {
-      const res = await axios.post("http://localhost:5001/api/seller/create", formData);
+      const res = await axios.post("https://backendsaffron.onrender.com/api/seller/create", formData);
       console.log("Seller signup response:", res.data);
   
       if (res.data.success) {
@@ -195,7 +195,7 @@ export const AuthProvider = ({ children }) => {
 
   const sellerLogin = async ({ email, password }) => {
     try{
-      const res = await axios.post("http://localhost:5001/api/seller/login", { email, password });
+      const res = await axios.post("https://backendsaffron.onrender.com/api/seller/login", { email, password });
       console.log("Seller login response:", res.data);
       if (res.data.success) {
         const { seller, token } = res.data;
