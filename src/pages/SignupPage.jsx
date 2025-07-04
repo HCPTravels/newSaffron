@@ -335,13 +335,22 @@ const Signup = () => {
             </form>
             
             <div className="px-4 sm:px-6 py-4 bg-gray-50/80 text-center border-t border-gray-200/50">
-              <p className="text-xs sm:text-sm text-gray-600">
+              {/* <p className="text-xs sm:text-sm text-gray-600 mb-2">
                 Don't have an account?{' '}
                 <button 
                   className="font-medium text-[#fe6522] hover:text-[#e55a1d] transition-colors" 
                   onClick={() => navigate('/signup')}
                 >
                   Sign up
+                </button>
+              </p> */}
+              <p className="text-xs sm:text-sm text-gray-600">
+                Want to sell on our platform?{' '}
+                <button 
+                  className="font-medium text-[#fe6522] hover:text-[#e55a1d] transition-colors" 
+                  onClick={() => navigate('/sellersignup')}
+                >
+                  Sign up as seller
                 </button>
               </p>
             </div>

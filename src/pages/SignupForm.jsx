@@ -1,6 +1,6 @@
 import React, { useState } from "react";
-import { motion, AnimatePresence } from "framer-motion";
-import { UserPlus, CheckCircle, Loader2, Store, User } from "lucide-react";
+import { motion } from "framer-motion";
+import { UserPlus, CheckCircle, Loader2, User } from "lucide-react";
 import { FcGoogle } from "react-icons/fc";
 import SaffronIcon from "../assets/icons8-saffron-64 (1).png";
 import Saffron from "../assets/saffron.png";
@@ -9,7 +9,7 @@ import { useNavigate } from "react-router-dom";
 import { toast, Toaster } from "sonner";
 import { useLocation } from "react-router-dom";
 
-const SignupPage = () => {
+const SignupForm = () => {
   const location = useLocation();
   const passedEmail = location.state?.email || "";
   const navigate = useNavigate();
@@ -19,10 +19,7 @@ const SignupPage = () => {
     lastName: "",
     email: passedEmail,
     contactNumber: "",
-    password: "",
-    accountType: "user", // 'user' or 'seller'
-    businessName: "", // Only for sellers
-    businessType: "" // Only for sellers
+    password: ""
   });
   const [isLoading, setIsLoading] = useState(false);
   const [isHovered, setIsHovered] = useState(false);
@@ -35,24 +32,15 @@ const SignupPage = () => {
     }));
   };
 
-  const handleAccountTypeChange = (type) => {
-    setFormData(prev => ({
-      ...prev,
-      accountType: type,
-      businessName: type === 'seller' ? prev.businessName : "",
-      businessType: type === 'seller' ? prev.businessType : ""
-    }));
-  };
-
   const handleSubmit = async (e) => {
     e.preventDefault();
     setIsLoading(true);
   
     try {
-      const response = await signUp(formData);
+      const response = await signUp({ ...formData, accountType: 'user' });
       
       toast.success("Account created!", {
-        description: `Your ${formData.accountType} account has been successfully created.`,
+        description: "Your user account has been successfully created.",
         duration: 3000,
         position: "top-center",
         icon: <CheckCircle className="h-5 w-5 text-green-500" />,
@@ -64,7 +52,7 @@ const SignupPage = () => {
       });
 
       setTimeout(() => {
-        navigate(formData.accountType === 'seller' ? "/seller-dashboard" : "/profile");
+        navigate("/profile");
       }, 1500);
       
       console.log("Signup successful:", response, user);
@@ -137,15 +125,14 @@ const SignupPage = () => {
             <div className="p-6 bg-gradient-to-r from-[#fe6522] to-[#e55a1d]">
               <div className="flex flex-row justify-between items-center">
                 <div>
-                  <h2 className="text-white text-2xl lg:text-3xl font-bold">Create Account</h2>
+                  <h2 className="text-white text-2xl lg:text-3xl font-bold">Create User Account</h2>
                   <motion.p 
                     className="text-white/90 text-sm mt-1"
-                    key={formData.accountType}
                     initial={{ opacity: 0, y: -10 }}
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ duration: 0.3 }}
                   >
-                    Join as {formData.accountType === 'seller' ? 'seller' : 'user'}
+                    Join as a regular user
                   </motion.p>
                 </div>
                 <img 
@@ -161,79 +148,13 @@ const SignupPage = () => {
               <div className="grid grid-cols-1 lg:grid-cols-5 gap-4 lg:gap-8 items-start">
                 {/* Left Side - Input Fields */}
                 <div className="lg:col-span-3 space-y-4 lg:space-y-6">
-                  {/* Account Type Selector */}
-                  <div>
-                    <h3 className="text-lg font-semibold text-gray-800 mb-3">Account Type</h3>
-                    <div className="relative flex rounded-xl bg-gray-100 p-1 shadow-inner">
-                      {/* Animated sliding background */}
-                      <motion.div
-                        className="absolute top-1 bottom-1 bg-white rounded-lg shadow-md"
-                        initial={false}
-                        animate={{
-                          left: formData.accountType === 'user' ? '4px' : '50%',
-                          right: formData.accountType === 'user' ? '50%' : '4px',
-                        }}
-                        transition={{
-                          type: "spring",
-                          stiffness: 400,
-                          damping: 30,
-                          duration: 0.3
-                        }}
-                      />
-                      
-                      <motion.button
-                        type="button"
-                        className={`relative z-10 flex-1 py-3 px-4 rounded-lg flex items-center justify-center space-x-2 text-sm font-medium transition-all duration-300 ${
-                          formData.accountType === 'user' 
-                            ? 'text-[#fe6522]' 
-                            : 'text-gray-600 hover:text-gray-800'
-                        }`}
-                        onClick={() => handleAccountTypeChange('user')}
-                        whileHover={{ scale: 1.02 }}
-                        whileTap={{ scale: 0.98 }}
-                      >
-                        <motion.div
-                          animate={{
-                            scale: formData.accountType === 'user' ? 1.1 : 1,
-                            rotate: formData.accountType === 'user' ? [0, -5, 5, 0] : 0
-                          }}
-                          transition={{ duration: 0.2 }}
-                        >
-                          <User className="h-5 w-5" />
-                        </motion.div>
-                        <span>User</span>
-                      </motion.button>
-                      
-                      <motion.button
-                        type="button"
-                        className={`relative z-10 flex-1 py-3 px-4 rounded-lg flex items-center justify-center space-x-2 text-sm font-medium transition-all duration-300 ${
-                          formData.accountType === 'seller' 
-                            ? 'text-[#fe6522]' 
-                            : 'text-gray-600 hover:text-gray-800'
-                        }`}
-                        onClick={() => handleAccountTypeChange('seller')}
-                        whileHover={{ scale: 1.02 }}
-                        whileTap={{ scale: 0.98 }}
-                      >
-                        <motion.div
-                          animate={{
-                            scale: formData.accountType === 'seller' ? 1.1 : 1,
-                            rotate: formData.accountType === 'seller' ? [0, -5, 5, 0] : 0
-                          }}
-                          transition={{ duration: 0.2 }}
-                        >
-                          <Store className="h-5 w-5" />
-                        </motion.div>
-                        <span>Seller</span>
-                      </motion.button>
-                    </div>
-                  </div>
-
                   {/* Personal Information */}
                   <div>
                     <h3 className="text-lg font-semibold text-gray-800 mb-3">Personal Information</h3>
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
-                      <div>
+                    
+                    {/* Name fields in a single row for all screen sizes */}
+                    <div className="flex flex-row gap-4 mb-4">
+                      <div className="flex-1 min-w-0">
                         <label htmlFor="firstName" className="block text-sm font-medium text-gray-700 mb-2">
                           First Name
                         </label>
@@ -243,7 +164,7 @@ const SignupPage = () => {
                           name="firstName"
                           value={formData.firstName}
                           onChange={handleChange}
-                          placeholder="Enter first name"
+                          placeholder="First name"
                           className="w-full px-4 py-2 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-[#fe6522]/50 focus:border-transparent transition-all duration-200"
                           whileHover={{ scale: 1.01 }}
                           transition={{ duration: 0.2 }}
@@ -251,7 +172,7 @@ const SignupPage = () => {
                         />
                       </div>
 
-                      <div>
+                      <div className="flex-1 min-w-0">
                         <label htmlFor="lastName" className="block text-sm font-medium text-gray-700 mb-2">
                           Last Name
                         </label>
@@ -261,7 +182,7 @@ const SignupPage = () => {
                           name="lastName"
                           value={formData.lastName}
                           onChange={handleChange}
-                          placeholder="Enter last name"
+                          placeholder="Last name"
                           className="w-full px-4 py-2 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-[#fe6522]/50 focus:border-transparent transition-all duration-200"
                           whileHover={{ scale: 1.01 }}
                           transition={{ duration: 0.2 }}
@@ -327,103 +248,6 @@ const SignupPage = () => {
                       </div>
                     </div>
                   </div>
-
-                  {/* Business Information Container - Dynamic Height */}
-                  <AnimatePresence mode="wait">
-                    {formData.accountType === 'seller' && (
-                      <motion.div
-                        initial={{ opacity: 0, height: 0, scale: 0.95 }}
-                        animate={{ 
-                          opacity: 1, 
-                          height: "auto", 
-                          scale: 1,
-                          transition: {
-                            height: { duration: 0.4, ease: "easeOut" },
-                            opacity: { duration: 0.3, delay: 0.1 },
-                            scale: { duration: 0.3, delay: 0.1 }
-                          }
-                        }}
-                        exit={{ 
-                          opacity: 0, 
-                          height: 0, 
-                          scale: 0.95,
-                          transition: {
-                            height: { duration: 0.3, ease: "easeIn" },
-                            opacity: { duration: 0.2 },
-                            scale: { duration: 0.2 }
-                          }
-                        }}
-                        className="overflow-hidden"
-                      >
-                          <h3 className="text-lg font-semibold text-gray-800 mb-3">Business Information</h3>
-                          <div className="space-y-4">
-                            <motion.div
-                              initial={{ x: -20, opacity: 0 }}
-                              animate={{ x: 0, opacity: 1 }}
-                              transition={{ duration: 0.3, delay: 0.2 }}
-                            >
-                              <label htmlFor="businessName" className="block text-sm font-medium text-gray-700 mb-2">
-                                Business Name
-                              </label>
-                              <motion.input
-                                type="text"
-                                id="businessName"
-                                name="businessName"
-                                value={formData.businessName}
-                                onChange={handleChange}
-                                placeholder="Enter your business name"
-                                className="w-full px-4 py-2 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-[#fe6522]/50 focus:border-transparent transition-all duration-200"
-                                whileHover={{ scale: 1.01 }}
-                                transition={{ duration: 0.2 }}
-                                required={formData.accountType === 'seller'}
-                              />
-                            </motion.div>
-
-                            <motion.div
-                              initial={{ x: -20, opacity: 0 }}
-                              animate={{ x: 0, opacity: 1 }}
-                              transition={{ duration: 0.3, delay: 0.3 }}
-                            >
-                              <label htmlFor="businessType" className="block text-sm font-medium text-gray-700 mb-2">
-                                Business Type
-                              </label>
-                              <motion.div 
-                                className="relative"
-                                whileHover={{ scale: 1.01 }}
-                                transition={{ duration: 0.2 }}
-                              >
-                                <select
-                                  id="businessType"
-                                  name="businessType"
-                                  value={formData.businessType}
-                                  onChange={handleChange}
-                                  className="w-full px-4 py-2 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-[#fe6522]/50 focus:border-transparent transition-all duration-200 appearance-none"
-                                  required={formData.accountType === 'seller'}
-                                >
-                                  <option value="">Select business type</option>
-                                  <option value="individual">Individual Seller</option>
-                                  <option value="retailer">Retail Business</option>
-                                  <option value="wholesaler">Wholesaler</option>
-                                  <option value="producer">Producer/Farmer</option>
-                                </select>
-                                <div className="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none">
-                                  <motion.svg
-                                    className="w-5 h-5 text-gray-400"
-                                    fill="none"
-                                    stroke="currentColor"
-                                    viewBox="0 0 24 24"
-                                    animate={{ rotate: formData.businessType ? 180 : 0 }}
-                                    transition={{ duration: 0.2 }}
-                                  >
-                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-                                  </motion.svg>
-                                </div>
-                              </motion.div>
-                            </motion.div>
-                          </div>
-                        </motion.div>
-                      )}
-                    </AnimatePresence>
                 </div>
 
                 {/* Right Side - Actions - Fixed Position */}
@@ -453,17 +277,13 @@ const SignupPage = () => {
                           <motion.span
                             animate={{ 
                               x: isHovered ? 2 : 0,
-                              rotate: formData.accountType === 'seller' && isHovered ? [0, -5, 5, 0] : 0
+                              rotate: isHovered ? [0, -5, 5, 0] : 0
                             }}
                             transition={{ duration: 0.2 }}
                           >
-                            {formData.accountType === 'seller' ? (
-                              <Store className="h-5 w-5" />
-                            ) : (
-                              <UserPlus className="h-5 w-5" />
-                            )}
+                            <UserPlus className="h-5 w-5" />
                           </motion.span>
-                          <span>Sign Up as {formData.accountType === 'seller' ? 'Seller' : 'User'}</span>
+                          <span>Sign Up as User</span>
                         </>
                       )}
                     </motion.button>
@@ -478,7 +298,7 @@ const SignupPage = () => {
                       </div>
                     </div>
 
-                    {/* Google Sign-Up Button - Same style as signup button on mobile */}
+                    {/* Google Sign-Up Button */}
                     <motion.button
                       type="button"
                       onClick={handleGoogleSignup}
@@ -493,7 +313,7 @@ const SignupPage = () => {
                       <span>Sign up with Google</span>
                     </motion.button>
 
-                    {/* Login Link - Reduced spacing on mobile */}
+                    {/* Login Link */}
                     <div className="text-center mt-4 lg:mt-6 pt-3 lg:pt-4 border-t border-gray-200">
                       <p className="text-sm text-gray-600">
                         Already have an account?{' '}
@@ -517,4 +337,4 @@ const SignupPage = () => {
   );
 };
 
-export default SignupPage;
+export default SignupForm;

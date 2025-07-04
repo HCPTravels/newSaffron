@@ -7,6 +7,7 @@ export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
   const [token, setToken] = useState(() => localStorage.getItem("token"));
   const [isLoading, setIsLoading] = useState(true);
+  const [seller, setSeller] = useState(null);
 
 
   useEffect(() => {
@@ -16,6 +17,8 @@ export const AuthProvider = ({ children }) => {
     }
     setIsLoading(false);
   }, [token]);
+
+  // Function to send OTP to email
 
   const emailOtp = async (email) => {
     try {
@@ -79,6 +82,8 @@ export const AuthProvider = ({ children }) => {
       throw error;
     }
   };
+
+  //user signup and login functions
 
   const signUp = async (formData) => {
     try {
@@ -165,8 +170,52 @@ export const AuthProvider = ({ children }) => {
     }
   };
 
+  // seller signup and login functions
+
+  const sellerSignUp = async (formData) => {
+    try {
+      const res = await axios.post("http://localhost:5001/api/seller/create", formData);
+      console.log("Seller signup response:", res.data);
+  
+      if (res.data.success) {
+        const { seller, token } = res.data;
+        setSeller(seller);
+        setToken(token);
+        localStorage.setItem("token", token);
+        localStorage.setItem("seller", JSON.stringify(seller));
+      }
+  
+      return res.data;
+    } catch (error) {
+      console.error("Seller signup failed:", error);
+      alert("Seller signup failed. Please try again.");
+      throw error;
+    }
+  };
+
+  const sellerLogin = async ({ email, password }) => {
+    try{
+      const res = await axios.post("http://localhost:5001/api/seller/login", { email, password });
+      console.log("Seller login response:", res.data);
+      if (res.data.success) {
+        const { seller, token } = res.data;
+        setSeller(seller);
+        setToken(token);
+        localStorage.setItem("token", token);
+        localStorage.setItem("seller", JSON.stringify(seller));
+      } else {
+        console.error("Seller login failed:", res.data.message);
+        alert("Seller login failed. Please check your credentials.");
+      }
+
+    }catch(err){
+      console.error("Seller login failed:", err);
+      alert("Seller login failed. Please try again.");
+      throw err;
+    }
+  }
   return (
-    <AuthContext.Provider value={{ user, token, isLoading, signUp, logIn, logout, loginWithGoogle, emailOtp, verifyOtp }}>
+    <AuthContext.Provider value={{ user, token, isLoading, signUp, logIn, logout, loginWithGoogle, emailOtp, verifyOtp ,sellerSignUp, seller, sellerLogin}}>
       {children}
     </AuthContext.Provider>
   );
