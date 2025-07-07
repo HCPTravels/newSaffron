@@ -9,20 +9,18 @@ import SaffronIcon from "../assets/icons8-saffron-64 (1).png";
 import { useAuth } from '../context/AuthContext';
 
 const SellerLogin = () => {
-  const { sellerLogin } = useAuth(); // Using sellerLogin from AuthContext
+  const { sellerLogin } = useAuth();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [isHovered, setIsHovered] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const navigate = useNavigate();
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setIsLoading(true);
-  
+
     try {
       const response = await sellerLogin({ email, password });
-      
       toast.success("Welcome back, Seller!", {
         description: "You have successfully logged in to your seller account.",
         duration: 3000,
@@ -34,15 +32,12 @@ const SellerLogin = () => {
           color: "white",
         },
       });
-
       setTimeout(() => {
-        navigate("/sellerdashboard",); // Redirect to seller dashboard
+        navigate("/sellerdashboard");
       }, 1500);
-      
       console.log("Seller login successful:", response);
     } catch (error) {
       console.error("Seller login failed:", error);
-      
       toast.error("Seller Login Failed", {
         description: error.message || "Please check your credentials and try again.",
         duration: 4000,
@@ -71,11 +66,89 @@ const SellerLogin = () => {
     });
   };
 
+  // Container animation variants
+  const containerVariants = {
+    hidden: { opacity: 0 },
+    visible: {
+      opacity: 1,
+      transition: {
+        duration: 0.6,
+        staggerChildren: 0.1,
+        delayChildren: 0.1
+      }
+    }
+  };
+
+  // Card animation variants
+  const cardVariants = {
+    hidden: { 
+      opacity: 0, 
+      y: 30,
+      scale: 0.95
+    },
+    visible: {
+      opacity: 1,
+      y: 0,
+      scale: 1,
+      transition: {
+        duration: 0.6,
+        ease: "easeOut"
+      }
+    }
+  };
+
+  // Image animation variants
+  const imageVariants = {
+    hidden: { 
+      opacity: 0, 
+      scale: 0.9
+    },
+    visible: {
+      opacity: 1,
+      scale: 1,
+      transition: {
+        duration: 0.7,
+        ease: "easeOut"
+      }
+    }
+  };
+
+  // Form elements animation variants
+  const formVariants = {
+    hidden: { opacity: 0, y: 20 },
+    visible: {
+      opacity: 1,
+      y: 0,
+      transition: {
+        duration: 0.5,
+        ease: "easeOut"
+      }
+    }
+  };
+
+  // Individual form field variants
+  const fieldVariants = {
+    hidden: { opacity: 0, y: 15 },
+    visible: {
+      opacity: 1,
+      y: 0,
+      transition: {
+        duration: 0.4,
+        ease: "easeOut"
+      }
+    }
+  };
+
   return (
-    <div className="mt-20 flex items-center justify-center p-2 md:top-0 relative overflow-hidden bg-[#ff6523]">
-      <Toaster 
-        richColors 
-        closeButton 
+    <motion.div 
+      className="min-h-[calc(100vh-85px)] flex items-center justify-center p-4"
+      variants={containerVariants}
+      initial="hidden"
+      animate="visible"
+    >
+      <Toaster
+        richColors
+        closeButton
         toastOptions={{
           style: {
             fontFamily: 'system-ui, -apple-system, sans-serif',
@@ -88,98 +161,165 @@ const SellerLogin = () => {
           },
         }}
       />
-      
-      <div className="hidden sm:flex absolute inset-0 justify-center items-center z-0">
-        <img 
-          src={Saffron} 
-          alt="Saffron background" 
-          className="w-full max-w-4xl h-auto object-cover opacity-70"
-        />
-      </div>
 
-      <div className="w-full mx-auto px-4 flex justify-center items-center h-full py-4 z-30 md:z-30">
+      <motion.div
+        variants={cardVariants}
+        className="flex w-full max-w-4xl bg-white mt-30 rounded-xl overflow-hidden shadow-2xl"
+      >
+        {/* Left side image */}
         <motion.div 
-          className="w-full max-w-md mx-2"
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.5 }}
+          variants={imageVariants}
+          className="hidden md:flex w-1/2 items-center 
+    border-t-2 border-b-2 border-l-2 border-black 
+    rounded-tl-xl rounded-bl-xl 
+    justify-center p-4 
+    bg-gradient-to-br from-[#fe6522] to-[#e55a1d]"
         >
-          <div className="bg-white rounded-2xl shadow-xl overflow-hidden border border-white/20 backdrop-blur-sm bg-white/95">
-            {/* Seller-specific header */}
-            <div className="p-4 sm:p-6 bg-gradient-to-r from-[#fe6522] to-[#e55a1d]">
-              <div className="flex flex-row justify-between items-center">
-                <div>
-                  <h2 className="text-white text-xl sm:text-2xl font-bold">Seller Portal</h2>
-                  <p className="text-white/90 text-xs sm:text-sm mt-1">Sign in to your seller account</p>
-                </div>
-                <div className="flex items-center">
-                  <Store className="h-8 w-8 text-white mr-2" />
-                  <img 
-                    src={SaffronIcon}
-                    alt="Saffron Icon"
-                    className="h-10 w-10 sm:h-16 sm:w-16 hover:shadow-lg transition-shadow duration-300 transform hover:scale-105"
-                  />
-                </div>
-              </div>
-            </div>
-            
-            {/* Form area */}
-            <form onSubmit={handleSubmit} className="p-4 sm:p-6 space-y-4">
-              <div className="space-y-4">
-                <div>
-                  <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-1">
-                    Business Email
-                  </label>
-                  <motion.div 
-                    className="relative"
-                    whileHover={{ scale: 1.01 }}
-                    transition={{ duration: 0.2 }}
-                  >
-                    <input
-                      type="email"
-                      id="email"
-                      value={email}
-                      onChange={(e) => setEmail(e.target.value)}
-                      placeholder="Enter your business email"
-                      className="w-full px-4 py-2 sm:py-3 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-[#fe6522]/50 focus:border-transparent transition-all duration-200 bg-white/90 text-sm sm:text-base"
-                      required
-                    />
-                  </motion.div>
-                </div>
+          <motion.img
+            src={Saffron}
+            alt="Saffron background"
+            className="w-80 h-80 object-contain opacity-90"
+            initial={{ opacity: 0, scale: 0.8 }}
+            animate={{ opacity: 0.9, scale: 1 }}
+            transition={{
+              duration: 0.8,
+              ease: "easeOut",
+              delay: 0.2
+            }}
+          />
+        </motion.div>
 
-                <div>
-                  <label htmlFor="password" className="block text-sm font-medium text-gray-700 mb-1">
-                    Password
-                  </label>
-                  <motion.div 
-                    className="relative"
-                    whileHover={{ scale: 1.01 }}
-                    transition={{ duration: 0.2 }}
-                  >
-                    <input
-                      type="password"
-                      id="password"
-                      value={password}
-                      onChange={(e) => setPassword(e.target.value)}
-                      placeholder="Enter your password"
-                      className="w-full px-4 py-2 sm:py-3 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-[#fe6522]/50 focus:border-transparent transition-all duration-200 bg-white/90 text-sm sm:text-base"
-                      required
-                    />
-                  </motion.div>
-                </div>
+        {/* Right side login form */}
+        <motion.div 
+          variants={formVariants}
+          className="w-full md:w-1/2 
+    border-2 md:border-l-0 border-black 
+    rounded-xl md:rounded-tr-xl md:rounded-br-xl md:rounded-tl-none md:rounded-bl-none 
+    shadow-lg bg-white p-6"
+        >
+          <motion.div
+            variants={containerVariants}
+            initial="hidden"
+            animate="visible"
+          >
+            <motion.div 
+              variants={fieldVariants}
+              className="flex justify-between items-center mb-6"
+            >
+              <div>
+                <motion.h2 
+                  className="text-2xl font-bold text-gray-800"
+                  initial={{ opacity: 0, y: 10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: 0.3, duration: 0.5 }}
+                >
+                  Seller Portal
+                </motion.h2>
+                <motion.p 
+                  className="text-gray-600 text-sm"
+                  initial={{ opacity: 0, y: 10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: 0.4, duration: 0.5 }}
+                >
+                  Sign in to your seller account
+                </motion.p>
               </div>
-              
+              <div className="flex items-center">
+                <motion.div
+                  initial={{ opacity: 0, scale: 0.8 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  transition={{
+                    duration: 0.5,
+                    ease: "easeOut",
+                    delay: 0.3
+                  }}
+                >
+                  <Store className="h-8 w-8 text-[#fe6522] mr-2" />
+                </motion.div>
+                <motion.img
+                  src={SaffronIcon}
+                  alt="Saffron Icon"
+                  className="h-12 w-12"
+                  initial={{ opacity: 0, scale: 0.8 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  transition={{
+                    duration: 0.5,
+                    ease: "easeOut",
+                    delay: 0.4
+                  }}
+                />
+              </div>
+            </motion.div>
+
+            <form onSubmit={handleSubmit} className="space-y-4">
+              <motion.div variants={fieldVariants}>
+                <motion.label 
+                  htmlFor="email" 
+                  className="block text-sm font-medium text-gray-700 mb-1"
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  transition={{ delay: 0.5, duration: 0.4 }}
+                >
+                  Business Email
+                </motion.label>
+                <motion.input
+                  type="email"
+                  id="email"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  placeholder="Enter your business email"
+                  className="w-full px-3 py-2 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-[#fe6522]/50 focus:border-transparent transition-all"
+                  required
+                  initial={{ opacity: 0, y: 10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{
+                    duration: 0.4,
+                    delay: 0.6,
+                    ease: "easeOut"
+                  }}
+                />
+              </motion.div>
+
+              <motion.div variants={fieldVariants}>
+                <motion.label 
+                  htmlFor="password" 
+                  className="block text-sm font-medium text-gray-700 mb-1"
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  transition={{ delay: 0.7, duration: 0.4 }}
+                >
+                  Password
+                </motion.label>
+                <motion.input
+                  type="password"
+                  id="password"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  placeholder="Enter your password"
+                  className="w-full px-3 py-2 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-[#fe6522]/50 focus:border-transparent transition-all"
+                  required
+                  initial={{ opacity: 0, y: 10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{
+                    duration: 0.4,
+                    delay: 0.8,
+                    ease: "easeOut"
+                  }}
+                />
+              </motion.div>
+
               <motion.button
                 type="submit"
-                className="w-full flex items-center justify-center gap-2 px-4 py-3 rounded-lg bg-gradient-to-r from-[#fe6522] to-[#e55a1d] text-white font-medium shadow-sm hover:shadow-md transition-all duration-300 text-sm sm:text-base"
-                whileHover={{ 
-                  scale: 1.02,
-                  boxShadow: "0 4px 12px rgba(254, 101, 34, 0.3)"
-                }}
+                className="w-full flex items-center justify-center gap-2 px-4 py-2 rounded-lg bg-gradient-to-r from-[#fe6522] to-[#e55a1d] text-white font-medium shadow-sm"
                 whileTap={{ scale: 0.98 }}
-                onHoverStart={() => setIsHovered(true)}
-                onHoverEnd={() => setIsHovered(false)}
                 disabled={isLoading}
+                initial={{ opacity: 0, y: 15 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{
+                  duration: 0.5,
+                  ease: "easeOut",
+                  delay: 0.9
+                }}
               >
                 {isLoading ? (
                   <div className="flex items-center gap-2">
@@ -188,71 +328,89 @@ const SellerLogin = () => {
                   </div>
                 ) : (
                   <>
-                    <motion.span
-                      animate={{ x: isHovered ? 2 : 0 }}
-                      transition={{ duration: 0.2 }}
-                    >
-                      <Store className="h-4 w-4 sm:h-5 sm:w-5" />
-                    </motion.span>
+                    <Store className="h-4 w-4" />
                     <span>Login as Seller</span>
                   </>
                 )}
               </motion.button>
 
-              {/* Divider */}
-              <div className="relative py-4">
+              <motion.div 
+                className="relative py-2"
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                transition={{ delay: 1.0, duration: 0.4 }}
+              >
                 <div className="absolute inset-0 flex items-center">
                   <div className="w-full border-t border-gray-300"></div>
                 </div>
-                <div className="relative flex justify-center text-xs sm:text-sm">
+                <div className="relative flex justify-center text-sm">
                   <span className="px-2 bg-white text-gray-500">Or continue with</span>
                 </div>
-              </div>
+              </motion.div>
 
-              {/* Google Sign-In Button */}
               <motion.button
                 type="button"
                 onClick={handleGoogleLogin}
-                className="w-full flex items-center justify-center gap-2 px-4 py-3 rounded-lg border border-gray-300 bg-white text-gray-700 font-medium shadow-sm hover:shadow-md transition-all duration-300 text-sm sm:text-base"
-                whileHover={{ 
-                  scale: 1.02,
-                  boxShadow: "0 4px 12px rgba(0, 0, 0, 0.1)"
-                }}
+                className="w-full flex items-center justify-center gap-2 px-4 py-2 rounded-lg border border-gray-300 bg-white text-gray-700 font-medium shadow-sm transition-all"
                 whileTap={{ scale: 0.98 }}
+                initial={{ opacity: 0, y: 15 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{
+                  duration: 0.5,
+                  ease: "easeOut",
+                  delay: 1.1
+                }}
               >
-                <FcGoogle className="h-4 w-4 sm:h-5 sm:w-5" />
+                <FcGoogle className="h-5 w-5" />
                 <span>Sign in with Google</span>
               </motion.button>
-
-              {/* Link to customer login */}
-              <div className="text-center pt-2">
-                <button
-                  type="button"
-                  onClick={() => navigate('/login')}
-                  className="text-xs sm:text-sm text-gray-600 hover:text-[#fe6522] transition-colors"
-                >
-                  Are you a customer? <span className="font-medium text-[#fe6522]">Login here</span>
-                </button>
-              </div>
             </form>
-            
-            {/* Footer */}
-            <div className="px-4 sm:px-6 py-4 bg-gray-50/80 text-center border-t border-gray-200/50">
-              <p className="text-xs sm:text-sm text-gray-600">
+
+            <motion.div 
+              className="mt-6 pt-4 border-t border-gray-200 space-y-2 text-sm"
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{
+                duration: 0.5,
+                ease: "easeOut",
+                delay: 1.2
+              }}
+            >
+              <motion.p 
+                className="text-gray-600"
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                transition={{ delay: 1.3, duration: 0.4 }}
+              >
                 Don't have a seller account?{' '}
-                <a 
-                  href="#signup" 
-                  className="font-medium text-[#fe6522] hover:text-[#e55a1d] transition-colors" 
+                <a
+                  href="#seller-signup"
+                  className="font-medium text-[#fe6522] hover:text-[#e55a1d] transition-colors"
                   onClick={() => navigate('/sellersignup')}
                 >
                   Register as seller
                 </a>
-              </p>
-            </div>
-          </div>
+              </motion.p>
+              <motion.p 
+                className="text-gray-600"
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                transition={{ delay: 1.4, duration: 0.4 }}
+              >
+                Are you a customer?{' '}
+                <a
+                  href="#customer-login"
+                  className="font-medium text-[#fe6522] hover:text-[#e55a1d] transition-colors"
+                  onClick={() => navigate('/login')}
+                >
+                  Login here
+                </a>
+              </motion.p>
+            </motion.div>
+          </motion.div>
         </motion.div>
-      </div>
-    </div>
+      </motion.div>
+    </motion.div>
   );
 };
 

@@ -36,14 +36,18 @@ const saffronGrades = [
 ];
 
 const Home = () => {
-  const [searchTerm, setSearchTerm] = useState('');
-  const [priceFilter, setPriceFilter] = useState('all');
-  const [originFilter, setOriginFilter] = useState('all');
-  const [gradeFilter, setGradeFilter] = useState('all');
-  const [showFilters, setShowFilters] = useState(false);
+  // Commented out search and filter states
+  // const [searchTerm, setSearchTerm] = useState('');
+  // const [priceFilter, setPriceFilter] = useState('all');
+  // const [originFilter, setOriginFilter] = useState('all');
+  // const [gradeFilter, setGradeFilter] = useState('all');
+  // const [showFilters, setShowFilters] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [isHovered, setIsHovered] = useState(false);
 
+  // Commented out the filter logic and just show all products
+  const filteredProducts = saffronProducts; // Show all products without filtering
+  /*
   const filteredProducts = saffronProducts.filter(product => {
     const matchesSearch = product.name.toLowerCase().includes(searchTerm.toLowerCase());
     const matchesPrice = 
@@ -56,6 +60,7 @@ const Home = () => {
     
     return matchesSearch && matchesPrice && matchesOrigin && matchesGrade;
   });
+  */
 
   const handleAddToCart = (product) => {
     setIsLoading(true);
@@ -66,8 +71,8 @@ const Home = () => {
         duration: 3000,
         position: "top-center",
         style: {
-          background: "linear-gradient(135deg, #10b981, #059669)",
-          border: "1px solid #065f46",
+          background: "linear-gradient(135deg, #ff6523, #e55a1d)",
+          border: "1px solid #c2410c",
           color: "white",
         },
       });
@@ -76,28 +81,54 @@ const Home = () => {
   };
 
   return (
-    <div className="min-h-screen bg-white">
+    <div className="min-h-screen">
       <Toaster richColors closeButton />
       
-      {/* Hero Section */}
-      <div className="relative pt-24 pb-16 px-4 bg-gradient-to-r from-[#fe6522] to-[#e55a1d]">
+      {/* Enhanced Hero Section */}
+      <div className="relative pt-24 pb-16 px-4  overflow-hidden">
+        {/* Decorative elements */}
+        <div className="absolute inset-0 opacity-10">
+          <div className="absolute top-0 left-0 w-32 h-32 bg-white rounded-full mix-blend-overlay blur-xl"></div>
+          <div className="absolute bottom-0 right-0 w-64 h-64 bg-white rounded-full mix-blend-overlay blur-xl"></div>
+        </div>
+        
         <motion.div 
-          className="max-w-4xl mx-auto text-center"
+          className="max-w-4xl mx-auto text-center relative z-10"
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5 }}
         >
-          <h1 className="text-4xl md:text-6xl font-bold text-white mb-6 leading-tight">
-            World's Finest Saffron
-          </h1>
-          <p className="text-lg md:text-xl text-white/90 max-w-2xl mx-auto mb-8 leading-relaxed">
+          <motion.h1 
+            className="text-4xl md:text-6xl font-bold text-white mb-6 leading-tight"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ delay: 0.2 }}
+          >
+            World's Finest <span className="text-amber-100">Saffron</span>
+          </motion.h1>
+          <motion.p 
+            className="text-lg md:text-xl text-white/90 max-w-2xl mx-auto mb-8 leading-relaxed"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ delay: 0.3 }}
+          >
             Discover premium saffron from Kashmir, Iran, and Spain. Each thread carefully selected for exceptional quality and flavor.
-          </p>
+          </motion.p>
+          
+          <motion.div
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.4 }}
+            className="inline-flex items-center gap-2 px-6 py-3 bg-white/10 backdrop-blur-sm border border-white/20 rounded-full"
+          >
+            <Star className="w-5 h-5 text-amber-200 fill-current" />
+            <span className="text-amber-100 font-medium">Trusted by chefs worldwide</span>
+          </motion.div>
         </motion.div>
       </div>
 
-      {/* Search and Filter Section */}
-      <div className="sticky top-0 z-40 py-6 px-4 bg-white shadow-sm">
+      {/* Commented out Search and Filter Section */}
+      {/* <div className="sticky top-0 z-40 py-6 px-4 shadow-sm border-b border-gray-100">
         <motion.div 
           className="max-w-6xl mx-auto"
           initial={{ opacity: 0 }}
@@ -105,7 +136,6 @@ const Home = () => {
           transition={{ delay: 0.2 }}
         >
           <div className="flex flex-col md:flex-row items-center gap-4">
-            {/* Enhanced Search Bar */}
             <motion.div 
               className="relative flex-1 max-w-lg w-full"
               whileHover={{ scale: 1.01 }}
@@ -116,18 +146,17 @@ const Home = () => {
               <input
                 type="text"
                 placeholder="Search premium saffron varieties..."
-                className="block w-full pl-12 pr-4 py-3 text-gray-900 bg-gray-50 rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-[#fe6522]/50 focus:border-transparent transition-all duration-300 placeholder:text-gray-400 hover:border-gray-300"
+                className="block w-full pl-12 pr-4 py-3 text-gray-900 bg-gray-50 rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-[#ff6523]/50 focus:border-transparent transition-all duration-300 placeholder:text-gray-400 hover:border-gray-300"
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
               />
             </motion.div>
 
-            {/* Modern Filter Button */}
             <motion.button 
               onClick={() => setShowFilters(!showFilters)}
               className={`flex items-center gap-3 px-6 py-3 rounded-xl font-medium transition-all duration-300 ${
                 showFilters 
-                  ? 'bg-[#fe6522] text-white shadow-lg shadow-[#fe6522]/25' 
+                  ? 'bg-[#ff6523] text-white shadow-lg shadow-[#ff6523]/25' 
                   : 'bg-gray-50 text-gray-700 border border-gray-200 hover:border-gray-300'
               }`}
               whileHover={{ scale: 1.05 }}
@@ -139,7 +168,6 @@ const Home = () => {
             </motion.button>
           </div>
 
-          {/* Enhanced Filter Options */}
           {showFilters && (
             <motion.div 
               className="mt-6 p-6 bg-white rounded-xl border border-gray-200 shadow-lg"
@@ -151,7 +179,7 @@ const Home = () => {
                 <div className="space-y-3">
                   <label className="block text-sm font-medium text-gray-700">Price Range</label>
                   <select 
-                    className="w-full px-4 py-2 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-[#fe6522]/50 focus:border-transparent transition-all duration-200"
+                    className="w-full px-4 py-2 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-[#ff6523]/50 focus:border-transparent transition-all duration-200"
                     value={priceFilter}
                     onChange={(e) => setPriceFilter(e.target.value)}
                   >
@@ -165,7 +193,7 @@ const Home = () => {
                 <div className="space-y-3">
                   <label className="block text-sm font-medium text-gray-700">Origin</label>
                   <select 
-                    className="w-full px-4 py-2 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-[#fe6522]/50 focus:border-transparent transition-all duration-200"
+                    className="w-full px-4 py-2 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-[#ff6523]/50 focus:border-transparent transition-all duration-200"
                     value={originFilter}
                     onChange={(e) => setOriginFilter(e.target.value)}
                   >
@@ -179,7 +207,7 @@ const Home = () => {
                 <div className="space-y-3">
                   <label className="block text-sm font-medium text-gray-700">Grade</label>
                   <select 
-                    className="w-full px-4 py-2 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-[#fe6522]/50 focus:border-transparent transition-all duration-200"
+                    className="w-full px-4 py-2 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-[#ff6523]/50 focus:border-transparent transition-all duration-200"
                     value={gradeFilter}
                     onChange={(e) => setGradeFilter(e.target.value)}
                   >
@@ -195,7 +223,7 @@ const Home = () => {
             </motion.div>
           )}
         </motion.div>
-      </div>
+      </div> */}
 
       {/* Product Grid */}
       <div className="max-w-7xl mx-auto px-4 py-12">
@@ -212,45 +240,58 @@ const Home = () => {
                 className="group bg-white rounded-xl overflow-hidden border border-gray-200 hover:shadow-lg transition-all duration-300 hover:-translate-y-1 cursor-pointer"
                 whileHover={{ scale: 1.02 }}
                 whileTap={{ scale: 0.98 }}
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.3 }}
               >
-                {/* Product Image Area */}
-                <div className="relative h-48 bg-gradient-to-br from-amber-100 via-orange-100 to-red-100 overflow-hidden">
-                  {/* Large Origin Letter */}
-                  <div className="absolute inset-0 flex items-center justify-center">
-                    <div className="text-6xl font-black text-amber-500/20 group-hover:text-amber-500/30 transition-colors duration-300">
+                {/* Enhanced Product Image Area */}
+                <div className="relative h-48 bg-gradient-to-br from-amber-50 via-orange-50 to-amber-100 overflow-hidden">
+                  {/* Large Origin Letter with subtle animation */}
+                  <motion.div 
+                    className="absolute inset-0 flex items-center justify-center"
+                    initial={{ opacity: 0.1 }}
+                    whileHover={{ opacity: 0.15 }}
+                  >
+                    <div className="text-7xl font-black text-amber-400/20 transition-colors duration-300">
                       {product.origin.charAt(0)}
                     </div>
-                  </div>
+                  </motion.div>
                   
-                  {/* Grade Badge */}
+                  {/* Grade Badge with improved styling */}
                   <div className="absolute top-4 right-4">
-                    <span className={`inline-flex items-center px-3 py-1 rounded-full text-xs font-bold ${
-                      product.grade === 'premium' 
-                        ? 'bg-gradient-to-r from-amber-500 to-orange-500 text-white' 
-                        : product.grade === 'category1' 
-                        ? 'bg-gradient-to-r from-orange-400 to-red-400 text-white' 
-                        : 'bg-gray-200 text-gray-800'
-                    }`}>
+                    <motion.span 
+                      className={`inline-flex items-center px-3 py-1 rounded-full text-xs font-bold ${
+                        product.grade === 'premium' 
+                          ? 'bg-gradient-to-r from-amber-500 to-[#ff6523] text-white shadow-md' 
+                          : product.grade === 'category1' 
+                          ? 'bg-gradient-to-r from-[#ff6523] to-orange-500 text-white' 
+                          : 'bg-gray-200 text-gray-800'
+                      }`}
+                      whileHover={{ scale: 1.05 }}
+                    >
                       {product.grade === 'premium' && <Zap className="w-3 h-3 mr-1" />}
                       {product.grade === 'premium' && 'Premium'}
                       {product.grade === 'category1' && 'Category I'}
                       {product.grade === 'category2' && 'Category II'}
                       {product.grade === 'category3' && 'Category III'}
                       {product.grade === 'bunch' && 'Bunch'}
-                    </span>
+                    </motion.span>
                   </div>
 
-                  {/* Rating Badge */}
-                  <div className="absolute bottom-4 left-4 flex items-center gap-1 bg-white/90 backdrop-blur-sm px-3 py-1 rounded-full">
+                  {/* Rating Badge with animation */}
+                  <motion.div 
+                    className="absolute bottom-4 left-4 flex items-center gap-1 bg-white/90 backdrop-blur-sm px-3 py-1 rounded-full shadow-sm"
+                    whileHover={{ scale: 1.05 }}
+                  >
                     <Star className="w-3 h-3 text-yellow-500 fill-current" />
                     <span className="text-xs text-gray-800 font-semibold">{product.rating}</span>
-                  </div>
+                  </motion.div>
                 </div>
 
-                {/* Product Info */}
+                {/* Enhanced Product Info */}
                 <div className="p-6">
                   <div className="mb-4">
-                    <h3 className="text-lg font-bold text-gray-900 mb-2 group-hover:text-[#fe6522] transition-colors duration-300">
+                    <h3 className="text-lg font-bold text-gray-900 mb-2 group-hover:text-[#ff6523] transition-colors duration-300">
                       {product.name}
                     </h3>
                     <div className="flex items-center justify-between mb-2">
@@ -267,7 +308,7 @@ const Home = () => {
                       <div className="text-sm text-gray-500">per gram</div>
                     </div>
                     <motion.button 
-                      className="px-4 py-2 bg-gradient-to-r from-[#fe6522] to-[#e55a1d] text-white text-sm font-semibold rounded-lg transition-all duration-300"
+                      className="px-4 py-2 bg-gradient-to-r from-[#ff6523] to-[#e55a1d] text-white text-sm font-semibold rounded-lg transition-all duration-300 shadow-md hover:shadow-lg"
                       onClick={() => handleAddToCart(product)}
                       whileHover={{ scale: 1.05 }}
                       whileTap={{ scale: 0.95 }}
@@ -292,19 +333,23 @@ const Home = () => {
             transition={{ delay: 0.3 }}
           >
             <div className="max-w-md mx-auto">
-              <div className="w-16 h-16 bg-gradient-to-r from-[#fe6522] to-[#e55a1d] rounded-full flex items-center justify-center mx-auto mb-6">
+              <motion.div 
+                className="w-16 h-16 bg-gradient-to-r from-[#ff6523] to-[#e55a1d] rounded-full flex items-center justify-center mx-auto mb-6"
+                animate={{ rotate: 360 }}
+                transition={{ duration: 2, repeat: Infinity, ease: "linear" }}
+              >
                 <Search className="w-8 h-8 text-white" />
-              </div>
+              </motion.div>
               <h3 className="text-xl font-bold text-gray-900 mb-4">No products found</h3>
               <p className="text-gray-600 mb-8">Try adjusting your search terms or filters to find what you're looking for.</p>
               <motion.button 
                 onClick={() => {
-                  setSearchTerm('');
-                  setPriceFilter('all');
-                  setOriginFilter('all');
-                  setGradeFilter('all');
+                  // setSearchTerm('');
+                  // setPriceFilter('all');
+                  // setOriginFilter('all');
+                  // setGradeFilter('all');
                 }}
-                className="px-6 py-3 bg-gradient-to-r from-[#fe6522] to-[#e55a1d] text-white font-semibold rounded-lg transition-all duration-300"
+                className="px-6 py-3 bg-gradient-to-r from-[#ff6523] to-[#e55a1d] text-white font-semibold rounded-lg transition-all duration-300 shadow-md hover:shadow-lg"
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
               >
@@ -315,21 +360,47 @@ const Home = () => {
         )}
       </div>
 
-      {/* Footer */}
-      <footer className="mt-20 py-12 px-4 bg-gradient-to-r from-amber-50 to-orange-50 border-t border-gray-200">
+      {/* Enhanced Footer */}
+      {/* <footer className="mt-20 py-12 px-4 bg-gradient-to-r from-amber-50 to-orange-50 border-t border-gray-200">
         <motion.div 
           className="max-w-4xl mx-auto text-center"
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ delay: 0.4 }}
         >
-          <div className="flex items-center justify-center gap-2 mb-4">
-            <div className="w-3 h-3 bg-gradient-to-r from-[#fe6522] to-[#e55a1d] rounded-full"></div>
-            <span className="text-lg font-bold text-gray-800">Premium Saffron Marketplace</span>
+          <div className="flex items-center justify-center gap-2 mb-6">
+            <div className="w-8 h-8 bg-gradient-to-r from-[#ff6523] to-[#e55a1d] rounded-full flex items-center justify-center">
+              <Zap className="w-4 h-4 text-white" />
+            </div>
+            <span className="text-xl font-bold text-gray-800">Premium Saffron Marketplace</span>
           </div>
-          <p className="text-gray-600">Sourced globally • Delivered fresh • Trusted quality since 2020</p>
+          <p className="text-gray-600 mb-6">Sourced globally • Delivered fresh • Trusted quality since 2020</p>
+          
+          <div className="flex justify-center gap-4">
+            <motion.a 
+              href="#" 
+              className="text-gray-500 hover:text-[#ff6523] transition-colors"
+              whileHover={{ y: -2 }}
+            >
+              About Us
+            </motion.a>
+            <motion.a 
+              href="#" 
+              className="text-gray-500 hover:text-[#ff6523] transition-colors"
+              whileHover={{ y: -2 }}
+            >
+              Contact
+            </motion.a>
+            <motion.a 
+              href="#" 
+              className="text-gray-500 hover:text-[#ff6523] transition-colors"
+              whileHover={{ y: -2 }}
+            >
+              FAQ
+            </motion.a>
+          </div>
         </motion.div>
-      </footer>
+      </footer> */}
     </div>
   );
 };

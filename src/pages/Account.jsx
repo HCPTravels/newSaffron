@@ -96,7 +96,7 @@ const Account = ({ isVisible, onClose, onMouseEnter, onMouseLeave }) => {
             <div className="p-5 md:p-6 bg-gradient-to-r from-[#ff6523] to-[#ff8547] flex-shrink-0">
               <div className="flex items-center gap-4">
                 <div className="p-3 md:p-3 bg-white/20 rounded-full backdrop-blur-sm">
-                  <User className="text-white" size={24} />
+                 {user?.profilePicture}
                 </div>
                 <div className="min-w-0 flex-1">
                   <h3 className="text-white font-semibold text-lg md:text-lg truncate">
