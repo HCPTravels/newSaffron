@@ -1,24 +1,25 @@
 import React, { useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
-import { 
-  PlusCircle, 
-  Trash2, 
-  List, 
-  Home, 
-  Package, 
-  ShoppingCart, 
-  Users, 
-  Settings, 
+import {
+  PlusCircle,
+  Trash2,
+  List,
+  Home,
+  Package,
+  ShoppingCart,
+  Users,
+  Settings,
   LogOut,
   ChevronDown,
   ChevronUp
 } from "lucide-react";
 import { toast, Toaster } from "sonner";
 import { useAuth } from '../context/AuthContext'; // Adjust the import based on your context file structure
+import axios from "axios";
 
 const SellerDashboard = () => {
-  const {seller} = useAuth() 
+  const { seller } = useAuth()
   const navigate = useNavigate();
   const [products, setProducts] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -27,39 +28,52 @@ const SellerDashboard = () => {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isProductsDropdownOpen, setIsProductsDropdownOpen] = useState(false);
 
-  // Mock data - replace with actual API calls
   useEffect(() => {
     const fetchProducts = async () => {
       try {
         // Simulate API call
-        await new Promise(resolve => setTimeout(resolve, 800));
-        const mockProducts = [
-          {
-            id: 1,
-            name: "Premium Kashmiri Saffron",
-            price: 20.99,
-            stock: 15,
-            image: "https://via.placeholder.com/100",
-            status: "Active"
-          },
-          {
-            id: 2,
-            name: "Organic Persian Saffron",
-            price: 18.50,
-            stock: 8,
-            image: "https://via.placeholder.com/100",
-            status: "Active"
-          },
-          {
-            id: 3,
-            name: "Spanish Saffron Threads",
-            price: 15.75,
-            stock: 0,
-            image: "https://via.placeholder.com/100",
-            status: "Out of Stock"
+        setIsLoading(true);
+        // Simulating a delay to mimic network request
+        const res = await axios.get("http://localhost:5001/api/product/get", {
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem("token")}`
           }
-        ];
-        setProducts(mockProducts);
+        })
+        if (res.data.success) {
+          setProducts(res.data.products);
+          toast.success("Products loaded successfully");
+          console.log("Products fetched:", res.data.products);
+        } else {
+          toast.error("Failed to load products");
+        }
+        await new Promise(resolve => setTimeout(resolve, 800));
+        // const mockProducts = [
+        //   {
+        //     id: 1,
+        //     name: "Premium Kashmiri Saffron",
+        //     price: 20.99,
+        //     stock: 15,
+        //     image: "https://via.placeholder.com/100",
+        //     status: "Active"
+        //   },
+        //   {
+        //     id: 2,
+        //     name: "Organic Persian Saffron",
+        //     price: 18.50,
+        //     stock: 8,
+        //     image: "https://via.placeholder.com/100",
+        //     status: "Active"
+        //   },
+        //   {
+        //     id: 3,
+        //     name: "Spanish Saffron Threads",
+        //     price: 15.75,
+        //     stock: 0,
+        //     image: "https://via.placeholder.com/100",
+        //     status: "Out of Stock"
+        //   }
+        // ];
+        // setProducts(mockProducts);
       } catch (error) {
         toast.error("Failed to load products");
       } finally {
@@ -70,11 +84,27 @@ const SellerDashboard = () => {
     fetchProducts();
   }, []);
 
-  const handleDeleteProduct = (productId) => {
-    // Confirm before deleting
-    if (window.confirm("Are you sure you want to delete this product?")) {
-      setProducts(products.filter(product => product.id !== productId));
-      toast.success("Product deleted successfully");
+  const handleDeleteProduct = async (productId) => {
+    const confirmDelete = window.confirm("Are you sure you want to delete this product?");
+    
+    if (!confirmDelete) return;
+  
+    try {
+      const res = await axios.delete(`http://localhost:5001/api/product/productDelete/${productId}`, {
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem("token")}`
+        }
+      });
+  
+      if (res.data.success) {
+        setProducts(products.filter(product => product._id !== productId));
+        toast.success("Product deleted successfully");
+      } else {
+        toast.error("Failed to delete product");
+      }
+    } catch (error) {
+      console.error(error);
+      toast.error("Something went wrong while deleting the product");
     }
   };
 
@@ -90,9 +120,9 @@ const SellerDashboard = () => {
 
   return (
     <div className="flex h-screen mt-30 bg-gray-50">
-      <Toaster 
-        richColors 
-        closeButton 
+      <Toaster
+        richColors
+        closeButton
         toastOptions={{
           style: {
             fontFamily: 'system-ui, -apple-system, sans-serif',
@@ -105,7 +135,7 @@ const SellerDashboard = () => {
           },
         }}
       />
-      
+
       {/* Sidebar */}
       <div className="hidden md:flex md:flex-shrink-0">
         <div className="flex flex-col w-64 bg-white border-r border-gray-200">
@@ -121,7 +151,7 @@ const SellerDashboard = () => {
                 <Home className="h-5 w-5" />
                 <span className="ml-3">Dashboard</span>
               </Link>
-              
+
               <div>
                 <button
                   onClick={toggleProductsDropdown}
@@ -137,7 +167,7 @@ const SellerDashboard = () => {
                     <ChevronDown className="h-5 w-5" />
                   )}
                 </button>
-                
+
                 {isProductsDropdownOpen && (
                   <div className="pl-12 mt-1 space-y-1">
                     <Link
@@ -157,7 +187,7 @@ const SellerDashboard = () => {
                   </div>
                 )}
               </div>
-              
+
               <Link
                 to="/seller/orders"
                 className="flex items-center px-4 py-2 text-gray-700 rounded-lg hover:bg-orange-50 hover:text-orange-600"
@@ -165,7 +195,7 @@ const SellerDashboard = () => {
                 <ShoppingCart className="h-5 w-5" />
                 <span className="ml-3">Orders</span>
               </Link>
-              
+
               <Link
                 to="/seller/customers"
                 className="flex items-center px-4 py-2 text-gray-700 rounded-lg hover:bg-orange-50 hover:text-orange-600"
@@ -173,7 +203,7 @@ const SellerDashboard = () => {
                 <Users className="h-5 w-5" />
                 <span className="ml-3">Customers</span>
               </Link>
-              
+
               <Link
                 to="/seller/settings"
                 className="flex items-center px-4 py-2 text-gray-700 rounded-lg hover:bg-orange-50 hover:text-orange-600"
@@ -182,7 +212,7 @@ const SellerDashboard = () => {
                 <span className="ml-3">Settings</span>
               </Link>
             </nav>
-            
+
             <div className="mt-auto pb-4">
               <button
                 onClick={handleLogout}
@@ -195,7 +225,7 @@ const SellerDashboard = () => {
           </div>
         </div>
       </div>
-      
+
       {/* Mobile sidebar */}
       {isMobileMenuOpen && (
         <div className="fixed inset-0 z-40 md:hidden">
@@ -214,7 +244,7 @@ const SellerDashboard = () => {
                   <Home className="h-5 w-5" />
                   <span className="ml-3">Dashboard</span>
                 </Link>
-                
+
                 <div>
                   <button
                     onClick={toggleProductsDropdown}
@@ -230,7 +260,7 @@ const SellerDashboard = () => {
                       <ChevronDown className="h-5 w-5" />
                     )}
                   </button>
-                  
+
                   {isProductsDropdownOpen && (
                     <div className="pl-12 mt-1 space-y-1">
                       <Link
@@ -252,7 +282,7 @@ const SellerDashboard = () => {
                     </div>
                   )}
                 </div>
-                
+
                 <Link
                   to="/seller/orders"
                   className="flex items-center px-4 py-2 text-gray-700 rounded-lg hover:bg-orange-50 hover:text-orange-600"
@@ -261,7 +291,7 @@ const SellerDashboard = () => {
                   <ShoppingCart className="h-5 w-5" />
                   <span className="ml-3">Orders</span>
                 </Link>
-                
+
                 <Link
                   to="/seller/customers"
                   className="flex items-center px-4 py-2 text-gray-700 rounded-lg hover:bg-orange-50 hover:text-orange-600"
@@ -270,7 +300,7 @@ const SellerDashboard = () => {
                   <Users className="h-5 w-5" />
                   <span className="ml-3">Customers</span>
                 </Link>
-                
+
                 <Link
                   to="/seller/settings"
                   className="flex items-center px-4 py-2 text-gray-700 rounded-lg hover:bg-orange-50 hover:text-orange-600"
@@ -280,7 +310,7 @@ const SellerDashboard = () => {
                   <span className="ml-3">Settings</span>
                 </Link>
               </nav>
-              
+
               <div className="mt-auto pb-4">
                 <button
                   onClick={handleLogout}
@@ -294,7 +324,7 @@ const SellerDashboard = () => {
           </div>
         </div>
       )}
-      
+
       {/* Main content */}
       <div className="flex flex-col flex-1 overflow-hidden">
         {/* Top navigation */}
@@ -310,7 +340,7 @@ const SellerDashboard = () => {
             </button>
             <h1 className="ml-4 text-xl font-semibold text-gray-800">Seller Dashboard</h1>
           </div>
-          
+
           <div className="flex items-center">
             <div className="relative">
               <button
@@ -322,9 +352,8 @@ const SellerDashboard = () => {
                   src="https://via.placeholder.com/32"
                   alt="User profile"
                 />
-                <span className="hidden md:inline">{seller.firstName}</span>
-              </button>
-              
+                <h1>{seller?.firstName || "Loading..."}</h1>               </button>
+
               {isMenuOpen && (
                 <div className="absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg py-1 z-10">
                   <Link
@@ -350,13 +379,13 @@ const SellerDashboard = () => {
             </div>
           </div>
         </div>
-        
+
         {/* Main content area */}
         <div className="flex-1 overflow-auto p-4 bg-gray-50">
           <div className="max-w-7xl mx-auto">
             {/* Stats cards */}
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
-              <motion.div 
+              <motion.div
                 className="bg-white p-6 rounded-lg shadow"
                 whileHover={{ y: -2 }}
               >
@@ -370,8 +399,8 @@ const SellerDashboard = () => {
                   </div>
                 </div>
               </motion.div>
-              
-              <motion.div 
+
+              <motion.div
                 className="bg-white p-6 rounded-lg shadow"
                 whileHover={{ y: -2 }}
               >
@@ -385,8 +414,8 @@ const SellerDashboard = () => {
                   </div>
                 </div>
               </motion.div>
-              
-              <motion.div 
+
+              <motion.div
                 className="bg-white p-6 rounded-lg shadow"
                 whileHover={{ y: -2 }}
               >
@@ -401,7 +430,7 @@ const SellerDashboard = () => {
                 </div>
               </motion.div>
             </div>
-            
+
             {/* Products section */}
             <div className="bg-white rounded-lg shadow overflow-hidden">
               <div className="px-6 py-4 border-b border-gray-200">
@@ -416,7 +445,7 @@ const SellerDashboard = () => {
                   </Link>
                 </div>
               </div>
-              
+
               <div className="overflow-x-auto">
                 <table className="min-w-full divide-y divide-gray-200">
                   <thead className="bg-gray-50">
@@ -431,7 +460,7 @@ const SellerDashboard = () => {
                         Stock
                       </th>
                       <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                        Status
+                        Grade
                       </th>
                       <th scope="col" className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
                         Actions
@@ -455,7 +484,7 @@ const SellerDashboard = () => {
                       </tr>
                     ) : (
                       products.map((product) => (
-                        <tr key={product.id}>
+                        <tr key={product._id}>
                           <td className="px-6 py-4 whitespace-nowrap">
                             <div className="flex items-center">
                               <div className="flex-shrink-0 h-10 w-10">
@@ -467,29 +496,31 @@ const SellerDashboard = () => {
                             </div>
                           </td>
                           <td className="px-6 py-4 whitespace-nowrap">
-                            <div className="text-sm text-gray-900">${product.price.toFixed(2)}</div>
-                          </td>
+                            <div className="text-sm text-gray-900">
+                              {typeof product.price === "number"
+                                ? `$${product.price.toFixed(2)}`
+                                : `$${Number(product.price || 0).toFixed(2)}`}
+                            </div>                          </td>
                           <td className="px-6 py-4 whitespace-nowrap">
                             <div className="text-sm text-gray-900">{product.stock}</div>
                           </td>
                           <td className="px-6 py-4 whitespace-nowrap">
-                            <span className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${
-                              product.status === "Active" 
-                                ? "bg-green-100 text-green-800" 
-                                : "bg-red-100 text-red-800"
-                            }`}>
-                              {product.status}
+                            <span className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${product.grade
+                              ? "bg-green-100 text-green-800"
+                              : "bg-red-100 text-red-800"
+                              }`}>
+                              {product.grade}
                             </span>
                           </td>
                           <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
                             <button
-                              onClick={() => handleDeleteProduct(product.id)}
+                              onClick={() => handleDeleteProduct(product._id)}
                               className="text-red-600 hover:text-red-900 mr-4"
                             >
                               <Trash2 className="h-5 w-5" />
                             </button>
                             <Link
-                              to={`/seller/edit-product/${product.id}`}
+                              to={`/seller/edit-product/${product._id}`}
                               className="text-orange-600 hover:text-orange-900"
                             >
                               Edit

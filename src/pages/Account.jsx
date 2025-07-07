@@ -17,7 +17,7 @@ import { useNavigate } from "react-router-dom";
 
 const Account = ({ isVisible, onClose, onMouseEnter, onMouseLeave }) => {
   const navigate = useNavigate();
-  const { user, logout } = useAuth();
+  const { user, logout, email } = useAuth();
   
   const menuItems = [
     { icon: <ShoppingBag size={20} />, label: "Orders", count: 3 },
@@ -37,18 +37,17 @@ const Account = ({ isVisible, onClose, onMouseEnter, onMouseLeave }) => {
   };
 
   const logoutHandler = async (e) => {
-    // Prevent event bubbling to avoid triggering mouse leave events
     e.stopPropagation();
     e.preventDefault();
-    
+  
     console.log("Logout button clicked in desktop mode");
-    
+  
     try {
       await logout();
+      localStorage.removeItem("email"); // 🧹 clear email if not done in context
       navigate("/", { replace: true });
       console.log("User logged out from desktop");
-      
-      // Force close the dropdown immediately
+  
       if (onClose) {
         onClose();
       }
@@ -56,6 +55,10 @@ const Account = ({ isVisible, onClose, onMouseEnter, onMouseLeave }) => {
       console.error("Logout failed:", error);
     }
   };
+
+  // Add debug logging to see what values we have
+  console.log("Account component - email:", email);
+  console.log("Account component - user:", user);
 
   return (
     <AnimatePresence>
@@ -100,7 +103,7 @@ const Account = ({ isVisible, onClose, onMouseEnter, onMouseLeave }) => {
                     {user?.firstName || "Welcome"}
                   </h3>
                   <p className="text-white/90 text-sm md:text-sm truncate">
-                    {user?.email || "Sign in to your account"}
+                  {user?.email || email || "No email provided"}
                   </p>
                 </div>
               </div>

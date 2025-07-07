@@ -8,8 +8,11 @@ import CartPage from "../pages/Cart";
 import Account from "../pages/Account";
 import Categories from "../pages/Categories";
 import SaffronHome from "../assets/saffronHome.png";
+import { useLocation } from "react-router-dom";
 
 const Profile = () => {
+  const location = useLocation();
+  const passedEmail = location.state?.email || "";
   const [activeTab, setActiveTab] = useState("Home");
   const [scrollY, setScrollY] = useState(0);
   const [isProfileVisible, setIsProfileVisible] = useState(false);

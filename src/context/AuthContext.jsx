@@ -8,15 +8,28 @@ export const AuthProvider = ({ children }) => {
   const [token, setToken] = useState(() => localStorage.getItem("token"));
   const [isLoading, setIsLoading] = useState(true);
   const [seller, setSeller] = useState(null);
-
+  const [email, setEmail] = useState(() => localStorage.getItem("email") || "");
 
   useEffect(() => {
     const storedUser = localStorage.getItem("user");
-    if (storedUser && token) {
+    const storedSeller = localStorage.getItem("seller");
+    const storedToken = localStorage.getItem("token");
+  
+    if (storedUser && storedToken) {
       setUser(JSON.parse(storedUser));
     }
+  
+    if (storedSeller && storedToken) {
+      setSeller(JSON.parse(storedSeller));
+    }
+  
+    if (storedToken) {
+      setToken(storedToken);
+      axios.defaults.headers.common["Authorization"] = `Bearer ${storedToken}`;
+    }
+  
     setIsLoading(false);
-  }, [token]);
+  }, []);
 
   // Function to send OTP to email
 
@@ -26,9 +39,7 @@ export const AuthProvider = ({ children }) => {
       console.log("Email OTP response:", res.data);
       return res.data;
     } catch (error) {
-      console.error("Email OTP request failed:", error);
-      console.error("Error details:", error.response?.data);
-      console.error("Error status:", error.response?.status);
+     
       
       // Handle specific error cases
       if (error.response?.status === 401) {
@@ -57,12 +68,7 @@ export const AuthProvider = ({ children }) => {
     } 
   }
 
-  const verifyOtp = async ({ email, otp }) => {
-    console.log("=== FRONTEND DEBUG ===");
-    console.log("Function called with:", { email, otp });
-    console.log("Email:", email, "Type:", typeof email, "Length:", email?.length);
-    console.log("OTP:", otp, "Type:", typeof otp, "Length:", otp?.length);
-    
+  const verifyOtp = async ({ email, otp }) => {  
     try {
       const payload = { email, otp };
       console.log("Sending payload:", payload);
@@ -71,7 +77,20 @@ export const AuthProvider = ({ children }) => {
       const res = await axios.post("https://backendsaffron.onrender.com/api/email/verify-otp", payload);
       console.log("Success response:", res.data);
       
-      // ... rest of your code
+      // Handle successful verification
+      if (res.data.success) {
+        if (res.data.token && res.data.email) {
+          setEmail(res.data.email); // ✅ Correctly store verified email
+          setToken(res.data.token);
+          localStorage.setItem("token", res.data.token);
+          localStorage.setItem("email", res.data.email); // Optional: persist
+        }
+        // For email verification, you might just want to return success
+        return res.data;
+      } else {
+        throw new Error(res.data.message || "OTP verification failed");
+      }
+      
     } catch (error) {
       console.error("Error details:", {
         message: error.message,
@@ -79,7 +98,20 @@ export const AuthProvider = ({ children }) => {
         data: error.response?.data,
         headers: error.response?.headers
       });
-      throw error;
+      
+      // Handle specific error cases
+      if (error.response?.status === 500) {
+        throw new Error("Server error occurred. Please try again or contact support.");
+      } else if (error.response?.status === 400) {
+        const errorMessage = error.response?.data?.message || "Invalid OTP or email";
+        throw new Error(errorMessage);
+      } else if (error.response?.status === 404) {
+        throw new Error("OTP not found or expired. Please request a new OTP.");
+      } else if (error.response?.status === 401) {
+        throw new Error("OTP verification failed. Please check your OTP and try again.");
+      } else {
+        throw new Error(error.response?.data?.message || "OTP verification failed. Please try again.");
+      }
     }
   };
 
@@ -145,11 +177,15 @@ export const AuthProvider = ({ children }) => {
 
   const logout = () => {
     setUser(null);
+    setSeller(null); // clear seller
     setToken(null);
     localStorage.removeItem("token");
     localStorage.removeItem("user");
-    console.log("User logged out successfully");
+    localStorage.removeItem("seller"); // also remove seller
+    console.log("User/seller logged out successfully");
   };
+
+  
   const loginWithGoogle = async (googleToken) => {
     try {
       const res = await axios.post("https://backendsaffron.onrender.com/api/users/google-login", {
@@ -194,28 +230,52 @@ export const AuthProvider = ({ children }) => {
   };
 
   const sellerLogin = async ({ email, password }) => {
-    try{
+    try {
       const res = await axios.post("https://backendsaffron.onrender.com/api/seller/login", { email, password });
-      console.log("Seller login response:", res.data);
+      
+      if (!res.data) {
+        console.error("No data in response");
+        alert("Login failed - no response data");
+        return;
+      }
+      
+      console.log("Response data structure:", JSON.stringify(res.data, null, 2));
+      
       if (res.data.success) {
         const { seller, token } = res.data;
-        setSeller(seller);
-        setToken(token);
-        localStorage.setItem("token", token);
-        localStorage.setItem("seller", JSON.stringify(seller));
+        console.log("Seller object:", seller);
+        console.log("Token:", token);
+        
+        if (seller && token) {
+          setSeller(seller);
+          setToken(token);
+          localStorage.setItem("token", token);
+          localStorage.setItem("seller", JSON.stringify(seller));
+          console.log("Seller login successful!");
+          
+          // ADD THIS LINE - Return the response data
+          return res.data;
+        } else {
+          console.error("Missing seller or token in response");
+          alert("Login failed - incomplete response data");
+          return null;
+        }
       } else {
-        console.error("Seller login failed:", res.data.message);
+        console.error("Seller login failed:", res.data.message || "Unknown error");
         alert("Seller login failed. Please check your credentials.");
+        return null;
       }
-
-    }catch(err){
-      console.error("Seller login failed:", err);
+  
+    } catch (err) {
+      console.error("Seller login error:", err);
+      console.error("Error response:", err.response?.data);
+      console.error("Error status:", err.response?.status);
       alert("Seller login failed. Please try again.");
       throw err;
     }
-  }
+  };
   return (
-    <AuthContext.Provider value={{ user, token, isLoading, signUp, logIn, logout, loginWithGoogle, emailOtp, verifyOtp ,sellerSignUp, seller, sellerLogin}}>
+    <AuthContext.Provider value={{ user, token, isLoading, signUp, logIn, logout, loginWithGoogle, emailOtp, verifyOtp ,sellerSignUp, seller, sellerLogin, email, setEmail}}>
       {children}
     </AuthContext.Provider>
   );

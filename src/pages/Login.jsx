@@ -227,7 +227,7 @@ const LoginPage = () => {
                 <a 
                   href="#signup" 
                   className="font-medium text-[#fe6522] hover:text-[#e55a1d] transition-colors" 
-                  onClick={() => navigate('/signup')}
+                  onClick={() => navigate('/login')}
                 >
                   Sign up
                 </a>
