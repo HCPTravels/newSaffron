@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import { motion } from "framer-motion";
 import { ImagePlus, Trash2, Loader2, Save, ChevronDown } from "lucide-react";
 import { toast, Toaster } from "sonner";
+import axios from "axios";
 
 const SaffronProductListing = () => {
   const [products, setProducts] = useState([]);
@@ -57,26 +58,36 @@ const SaffronProductListing = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     setIsLoading(true);
-    
+  
     try {
+      // Prepare images (if needed as base64 or multipart, modify here)
+      const payload = {
+        name: currentProduct.name,
+        grade: currentProduct.grade,
+        price: currentProduct.price,
+        description: currentProduct.description,
+        images: currentProduct.images.map(img => img.preview), // you may need to upload to Cloudinary separately
+        stock: currentProduct.stock,
+        origin: currentProduct.origin,
+      };
+  
+      // Replace with your backend endpoint
+      const res = await axios.post("http://localhost:5001/api/product/create", payload, {
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem("token")}`, // or from context
+        }
+      });
+  
+      // Ensure the returned product has the images property
       const newProduct = {
-        ...currentProduct,
-        id: Date.now().toString()
+        ...res.data,
+        images: res.data.images || currentProduct.images // fallback to current images if API doesn't return them
       };
       
       setProducts([...products, newProduct]);
-      
-      toast.success("Product added!", {
-        description: "Your saffron product has been successfully listed.",
-        duration: 3000,
-        position: "top-center",
-        style: {
-          background: "linear-gradient(135deg, #10b981, #059669)",
-          border: "1px solid #065f46",
-          color: "white",
-        },
-      });
-
+      toast.success("Product added!");
+  
+      // Reset form
       setCurrentProduct({
         name: "",
         grade: "",
@@ -87,16 +98,11 @@ const SaffronProductListing = () => {
         origin: ""
       });
       setShowFullDescription(false);
+  
     } catch (error) {
+      console.error(error);
       toast.error("Failed to add product", {
-        description: error.message || "Please check your information and try again.",
-        duration: 4000,
-        position: "top-right",
-        style: {
-          background: "linear-gradient(135deg, #ef4444, #dc2626)",
-          border: "1px solid #991b1b",
-          color: "white",
-        },
+        description: error?.response?.data?.message || error.message,
       });
     } finally {
       setIsLoading(false);
@@ -477,10 +483,11 @@ const SaffronProductListing = () => {
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ duration: 0.3 }}
                 >
-                  {product.images.length > 0 ? (
+                  {/* Fixed: Added safety check for images */}
+                  {product.images && product.images.length > 0 ? (
                     <div className="h-48 overflow-hidden">
                       <img 
-                        src={product.images[0].preview} 
+                        src={typeof product.images[0] === 'string' ? product.images[0] : product.images[0].preview} 
                         alt={product.name}
                         className="w-full h-full object-cover"
                       />

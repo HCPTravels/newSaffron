@@ -19,7 +19,7 @@ import { useAuth } from '../context/AuthContext'; // Adjust the import based on 
 import axios from "axios";
 
 const SellerDashboard = () => {
-  const { seller } = useAuth()
+  const { seller,deleteProduct } = useAuth()
   const navigate = useNavigate();
   const [products, setProducts] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -90,22 +90,22 @@ const SellerDashboard = () => {
     if (!confirmDelete) return;
   
     try {
-      const res = await axios.delete(`http://localhost:5001/api/product/productDelete/${productId}`, {
-        headers: {
-          Authorization: `Bearer ${localStorage.getItem("token")}`
-        }
-      });
-  
-      if (res.data.success) {
-        setProducts(products.filter(product => product._id !== productId));
+      // Call the delete function from context
+      const result = await deleteProduct(productId);
+      
+      // Check if the deletion was successful
+      if (result && result.success) {
+        // Update local state to remove the deleted product
+        setProducts(prevProducts => prevProducts.filter(product => product._id !== productId));
         toast.success("Product deleted successfully");
       } else {
+        // Handle case where delete function doesn't throw error but returns failure
         toast.error("Failed to delete product");
       }
     } catch (error) {
-      console.error(error);
-      toast.error("Something went wrong while deleting the product");
-    }
+      console.error("Product deletion failed:", error);
+      toast.error("Failed to delete product");
+    } 
   };
 
   const toggleProductsDropdown = () => {

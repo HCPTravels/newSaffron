@@ -198,9 +198,44 @@ export const AuthProvider = ({ children }) => {
     }
   };
 
+  const createProduct = async (productData) => {
+    try {
+      const res = await axios.post(`${backendUrl}/api/product/create`, productData, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+      return res.data;
+    } catch (error) {
+      console.error("Product creation failed:", error);
+      throw error;
+    }
+  };
+  const deleteProduct = async (productId) => {
+    try{
+      const res = await axios.delete(`${backendUrl}/api/product/delete/${productId}`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+      if (res.data.success) {
+        console.log("Product deleted successfully");
+        return res.data;
+      } else {
+        throw new Error("Failed to delete product");
+      }
+
+    }catch (error) {
+      console.error("Product deletion failed:", error);
+      throw error;
+    }
+  }
+
   return (
     <AuthContext.Provider
       value={{
+        createProduct,
+        deleteProduct,
         user,
         token,
         isLoading,

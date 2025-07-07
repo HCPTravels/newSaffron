@@ -40,7 +40,7 @@ const SellerSignupPage = () => {
   
     try {
       console.log("FormData being sent to API:", formData);
-      const response = await sellerSignUp(formData); // Only called once
+      const response = await sellerSignUp(formData);
   
       if (!response.success) {
         throw new Error(response.message || "Signup failed");
@@ -85,7 +85,7 @@ const SellerSignupPage = () => {
   };
 
   return (
-    <div className="mt-20 flex items-center justify-center p-4 md:top-0 relative overflow-hidden bg-[#ff6523] min-h-screen">
+    <div className="flex items-center justify-center p-4 bg-[#ff6523] min-h-screen">
       <Toaster 
         richColors 
         closeButton 
@@ -102,15 +102,15 @@ const SellerSignupPage = () => {
         }}
       />
 
-      <div className="hidden sm:flex absolute inset-0 justify-center items-center z-0">
+      {/* <div className="hidden sm:flex absolute inset-0 justify-center items-center z-0">
         <img 
           src={Saffron} 
           alt="Saffron background" 
           className="w-full max-w-4xl h-auto object-cover opacity-70"
         />
-      </div>
+      </div> */}
 
-      <div className="w-full max-w-6xl mx-auto px-4 flex justify-center items-center h-full py-4 z-30">
+      <div className="w-full max-w-6xl mx-auto px-4 mt-20 flex justify-center items-center h-full py-4 z-30">
         <motion.div 
           className="w-full max-w-5xl"
           initial={{ opacity: 0, y: 20 }}
@@ -142,114 +142,114 @@ const SellerSignupPage = () => {
 
             <form onSubmit={handleSubmit} className="p-4 sm:p-6">
               {/* Main Content Grid */}
-              <div className="grid grid-cols-1 lg:grid-cols-5 gap-4 lg:gap-8 items-start">
-                {/* Left Side - Input Fields */}
-                <div className="lg:col-span-3 space-y-4 lg:space-y-6">
-                  {/* Personal Information */}
-                  <div>
-                    <h3 className="text-lg font-semibold text-gray-800 mb-3">Personal Information</h3>
-                    <div className="grid grid-cols-2 gap-4 mb-4">
-                      <div>
-                        <label htmlFor="firstName" className="block text-sm font-medium text-gray-700 mb-2">
-                          First Name
-                        </label>
-                        <motion.input
-                          type="text"
-                          id="firstName"
-                          name="firstName"
-                          value={formData.firstName}
-                          onChange={handleChange}
-                          placeholder="Enter first name"
-                          className="w-full px-4 py-2 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-[#fe6522]/50 focus:border-transparent transition-all duration-200"
-                          whileHover={{ scale: 1.01 }}
-                          transition={{ duration: 0.2 }}
-                          required
-                        />
-                      </div>
-
-                      <div>
-                        <label htmlFor="lastName" className="block text-sm font-medium text-gray-700 mb-2">
-                          Last Name
-                        </label>
-                        <motion.input
-                          type="text"
-                          id="lastName"
-                          name="lastName"
-                          value={formData.lastName}
-                          onChange={handleChange}
-                          placeholder="Enter last name"
-                          className="w-full px-4 py-2 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-[#fe6522]/50 focus:border-transparent transition-all duration-200"
-                          whileHover={{ scale: 1.01 }}
-                          transition={{ duration: 0.2 }}
-                          required
-                        />
-                      </div>
+              <div className="grid grid-cols-1 lg:grid-cols-5 gap-4 lg:gap-6 items-start">
+                {/* Left Side - Personal Information Only */}
+                <div className="lg:col-span-3 space-y-3 lg:space-y-4">
+                  <h3 className="text-lg font-semibold text-gray-800 mb-2">Personal Information</h3>
+                  <div className="grid grid-cols-2 gap-3 mb-3">
+                    <div>
+                      <label htmlFor="firstName" className="block text-sm font-medium text-gray-700 mb-1">
+                        First Name
+                      </label>
+                      <motion.input
+                        type="text"
+                        id="firstName"
+                        name="firstName"
+                        value={formData.firstName}
+                        onChange={handleChange}
+                        placeholder="First name"
+                        className="w-full px-3 py-2 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-[#fe6522]/50 focus:border-transparent transition-all duration-200 text-sm"
+                        whileHover={{ scale: 1.01 }}
+                        transition={{ duration: 0.2 }}
+                        required
+                      />
                     </div>
 
-                    <div className="space-y-4">
-                      <div>
-                        <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-2">
-                          Email Address
-                        </label>
-                        <motion.input
-                          type="email"
-                          id="email"
-                          name="email"
-                          value={formData.email}
-                          onChange={handleChange}
-                          placeholder="Enter your email"
-                          className="w-full px-4 py-2 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-[#fe6522]/50 focus:border-transparent transition-all duration-200"
-                          whileHover={{ scale: 1.01 }}
-                          transition={{ duration: 0.2 }}
-                          required
-                        />
-                      </div>
-
-                      <div>
-                        <label htmlFor="contactNumber" className="block text-sm font-medium text-gray-700 mb-2">
-                          Contact Number
-                        </label>
-                        <motion.input
-                          type="tel"
-                          id="contactNumber"
-                          name="contactNumber"
-                          value={formData.contactNumber}
-                          onChange={handleChange}
-                          placeholder="Enter phone number"
-                          className="w-full px-4 py-2 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-[#fe6522]/50 focus:border-transparent transition-all duration-200"
-                          whileHover={{ scale: 1.01 }}
-                          transition={{ duration: 0.2 }}
-                          required
-                        />
-                      </div>
-
-                      <div>
-                        <label htmlFor="password" className="block text-sm font-medium text-gray-700 mb-2">
-                          Password
-                        </label>
-                        <motion.input
-                          type="password"
-                          id="password"
-                          name="password"
-                          value={formData.password}
-                          onChange={handleChange}
-                          placeholder="Create password (min 8 characters)"
-                          minLength="8"
-                          className="w-full px-4 py-2 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-[#fe6522]/50 focus:border-transparent transition-all duration-200"
-                          whileHover={{ scale: 1.01 }}
-                          transition={{ duration: 0.2 }}
-                          required
-                        />
-                      </div>
+                    <div>
+                      <label htmlFor="lastName" className="block text-sm font-medium text-gray-700 mb-1">
+                        Last Name
+                      </label>
+                      <motion.input
+                        type="text"
+                        id="lastName"
+                        name="lastName"
+                        value={formData.lastName}
+                        onChange={handleChange}
+                        placeholder="Last name"
+                        className="w-full px-3 py-2 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-[#fe6522]/50 focus:border-transparent transition-all duration-200 text-sm"
+                        whileHover={{ scale: 1.01 }}
+                        transition={{ duration: 0.2 }}
+                        required
+                      />
                     </div>
                   </div>
 
-                  {/* Business Information */}
-                  <div>
+                  <div className="space-y-3">
+                    <div>
+                      <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-1">
+                        Email Address
+                      </label>
+                      <motion.input
+                        type="email"
+                        id="email"
+                        name="email"
+                        value={formData.email}
+                        onChange={handleChange}
+                        placeholder="Your email"
+                        className="w-full px-3 py-2 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-[#fe6522]/50 focus:border-transparent transition-all duration-200 text-sm"
+                        whileHover={{ scale: 1.01 }}
+                        transition={{ duration: 0.2 }}
+                        required
+                      />
+                    </div>
+
+                    <div>
+                      <label htmlFor="contactNumber" className="block text-sm font-medium text-gray-700 mb-1">
+                        Contact Number
+                      </label>
+                      <motion.input
+                        type="tel"
+                        id="contactNumber"
+                        name="contactNumber"
+                        value={formData.contactNumber}
+                        onChange={handleChange}
+                        placeholder="Phone number"
+                        className="w-full px-3 py-2 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-[#fe6522]/50 focus:border-transparent transition-all duration-200 text-sm"
+                        whileHover={{ scale: 1.01 }}
+                        transition={{ duration: 0.2 }}
+                        required
+                      />
+                    </div>
+
+                    <div>
+                      <label htmlFor="password" className="block text-sm font-medium text-gray-700 mb-1">
+                        Password
+                      </label>
+                      <motion.input
+                        type="password"
+                        id="password"
+                        name="password"
+                        value={formData.password}
+                        onChange={handleChange}
+                        placeholder="Password (min 8 chars)"
+                        minLength="8"
+                        className="w-full px-3 py-2 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-[#fe6522]/50 focus:border-transparent transition-all duration-200 text-sm"
+                        whileHover={{ scale: 1.01 }}
+                        transition={{ duration: 0.2 }}
+                        required
+                      />
+                    </div>
+                  </div>
+                </div>
+
+                {/* Right Side - Business Information + Actions */}
+                <div className="lg:col-span-2 space-y-4">
+                  <div className="bg-gray-50 rounded-xl p-4 lg:p-5 border border-gray-200">
                     <h3 className="text-lg font-semibold text-gray-800 mb-3">Business Information</h3>
-                    <div className="space-y-4">
+                    
+                    <div className="space-y-3">
                       <div>
-                        <label htmlFor="businessName" className="block text-sm font-medium text-gray-700 mb-2">
+                        <label htmlFor="businessName" className="block text-sm font-medium text-gray-700 mb-1">
                           Business Name
                         </label>
                         <motion.input
@@ -258,8 +258,8 @@ const SellerSignupPage = () => {
                           name="businessName"
                           value={formData.businessName}
                           onChange={handleChange}
-                          placeholder="Enter your business name"
-                          className="w-full px-4 py-2 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-[#fe6522]/50 focus:border-transparent transition-all duration-200"
+                          placeholder="Business name"
+                          className="w-full px-3 py-2 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-[#fe6522]/50 focus:border-transparent transition-all duration-200 text-sm"
                           whileHover={{ scale: 1.01 }}
                           transition={{ duration: 0.2 }}
                           required
@@ -267,7 +267,7 @@ const SellerSignupPage = () => {
                       </div>
 
                       <div>
-                        <label htmlFor="businessType" className="block text-sm font-medium text-gray-700 mb-2">
+                        <label htmlFor="businessType" className="block text-sm font-medium text-gray-700 mb-1">
                           Business Type
                         </label>
                         <motion.div 
@@ -280,7 +280,7 @@ const SellerSignupPage = () => {
                             name="businessType"
                             value={formData.businessType}
                             onChange={handleChange}
-                            className="w-full px-4 py-2 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-[#fe6522]/50 focus:border-transparent transition-all duration-200 appearance-none"
+                            className="w-full px-3 py-2 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-[#fe6522]/50 focus:border-transparent transition-all duration-200 appearance-none text-sm"
                             required
                           >
                             <option value="">Select business type</option>
@@ -305,16 +305,13 @@ const SellerSignupPage = () => {
                       </div>
                     </div>
                   </div>
-                </div>
 
-                {/* Right Side - Actions - Fixed Position */}
-                <div className="lg:col-span-2 lg:sticky lg:top-44">
-                  <div className="bg-gray-50 rounded-xl p-4 lg:p-6 border border-gray-200">
-                    <h3 className="text-lg font-semibold text-gray-800 mb-4">Complete Registration</h3>
+                  <div className="bg-gray-50 rounded-xl p-4 lg:p-5 border border-gray-200">
+                    <h3 className="text-lg font-semibold text-gray-800 mb-3">Complete Registration</h3>
                     
                     <motion.button
                       type="submit"
-                      className="w-full flex items-center justify-center gap-3 px-6 py-3 rounded-lg bg-gradient-to-r from-[#fe6522] to-[#e55a1d] text-white font-medium shadow-sm hover:shadow-lg transition-all duration-300 mb-3 lg:mb-4"
+                      className="w-full flex items-center justify-center gap-2 px-4 py-2.5 rounded-lg bg-gradient-to-r from-[#fe6522] to-[#e55a1d] text-white font-medium shadow-sm hover:shadow-lg transition-all duration-300 mb-3 text-sm"
                       whileHover={{ 
                         scale: 1.02,
                         boxShadow: "0 8px 25px rgba(254, 101, 34, 0.3)"
@@ -325,8 +322,8 @@ const SellerSignupPage = () => {
                       disabled={isLoading}
                     >
                       {isLoading ? (
-                        <div className="flex items-center gap-3">
-                          <Loader2 className="h-5 w-5 animate-spin" />
+                        <div className="flex items-center gap-2">
+                          <Loader2 className="h-4 w-4 animate-spin" />
                           <span>Creating account...</span>
                         </div>
                       ) : (
@@ -338,7 +335,7 @@ const SellerSignupPage = () => {
                             }}
                             transition={{ duration: 0.2 }}
                           >
-                            <Store className="h-5 w-5" />
+                            <Store className="h-4 w-4" />
                           </motion.span>
                           <span>Sign Up as Seller</span>
                         </>
@@ -346,12 +343,12 @@ const SellerSignupPage = () => {
                     </motion.button>
 
                     {/* Divider */}
-                    <div className="relative py-2 lg:py-4">
+                    <div className="relative py-2">
                       <div className="absolute inset-0 flex items-center">
                         <div className="w-full border-t border-gray-300"></div>
                       </div>
-                      <div className="relative flex justify-center text-sm">
-                        <span className="px-3 bg-gray-50 text-gray-500">Or continue with</span>
+                      <div className="relative flex justify-center text-xs">
+                        <span className="px-2 bg-gray-50 text-gray-500">Or continue with</span>
                       </div>
                     </div>
 
@@ -359,20 +356,20 @@ const SellerSignupPage = () => {
                     <motion.button
                       type="button"
                       onClick={handleGoogleSignup}
-                      className="w-full flex items-center justify-center gap-3 px-6 py-3 rounded-lg bg-gradient-to-r from-[#fe6522] to-[#e55a1d] text-white font-medium shadow-sm hover:shadow-lg transition-all duration-300 lg:bg-white lg:text-gray-700 lg:border lg:border-gray-300 lg:from-transparent lg:to-transparent"
+                      className="w-full flex items-center justify-center gap-2 px-4 py-2.5 rounded-lg bg-white text-gray-700 font-medium shadow-sm hover:shadow-lg transition-all duration-300 border border-gray-300 text-sm"
                       whileHover={{ 
                         scale: 1.02,
                         boxShadow: "0 8px 25px rgba(254, 101, 34, 0.3)"
                       }}
                       whileTap={{ scale: 0.98 }}
                     >
-                      <FcGoogle className="h-5 w-5" />
+                      <FcGoogle className="h-4 w-4" />
                       <span>Sign up with Google</span>
                     </motion.button>
 
                     {/* Login Link */}
-                    <div className="text-center mt-4 lg:mt-6 pt-3 lg:pt-4 border-t border-gray-200">
-                      <p className="text-sm text-gray-600">
+                    <div className="text-center mt-3 pt-3 border-t border-gray-200">
+                      <p className="text-xs text-gray-600">
                         Already have an account?{' '}
                         <button 
                           type="button"
