@@ -8,7 +8,8 @@ const Home = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [isHovered, setIsHovered] = useState(false);
   const [products, setProducts] = useState([]);
-  const backendUrl = import.meta.env.VITE_BACKEND_URL
+  const backendUrl = import.meta.env.VITE_BACKEND_URL;
+
   useEffect(() => {
     const fetchApprovedProducts = async () => {
       try {
@@ -46,6 +47,57 @@ const Home = () => {
       setIsLoading(false);
     }, 1000);
   };
+
+  // Enhanced loading component
+  const LoadingState = () => (
+    <motion.div 
+      className="flex flex-col items-center justify-center py-20"
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      exit={{ opacity: 0 }}
+    >
+      <motion.div
+        animate={{
+          scale: [1, 1.1, 1],
+          rotate: [0, 10, -10, 0],
+        }}
+        transition={{
+          duration: 2,
+          ease: "easeInOut",
+          repeat: Infinity,
+        }}
+        className="relative mb-8"
+      >
+        <div className="w-24 h-24 rounded-full bg-gradient-to-r from-amber-100 to-[#ff6523] flex items-center justify-center shadow-lg">
+          <Loader2 className="w-12 h-12 text-white animate-spin" />
+        </div>
+        <div className="absolute -inset-4 border-4 border-amber-200/30 rounded-full animate-ping"></div>
+      </motion.div>
+      
+      <motion.div
+        initial={{ y: 20, opacity: 0 }}
+        animate={{ y: 0, opacity: 1 }}
+        transition={{ delay: 0.3 }}
+        className="text-center max-w-md"
+      >
+        <h3 className="text-2xl font-bold text-gray-900 mb-3">Harvesting the Finest Saffron</h3>
+        <p className="text-gray-600 mb-6">
+          We're carefully gathering the world's most precious saffron threads for you. Each strand is being hand-selected for quality.
+        </p>
+        <div className="flex justify-center gap-2">
+          {['Kashmir', 'Iran', 'Spain'].map((origin) => (
+            <motion.span
+              key={origin}
+              className="px-3 py-1 bg-amber-50 text-amber-800 rounded-full text-sm font-medium"
+              whileHover={{ scale: 1.05 }}
+            >
+              {origin}
+            </motion.span>
+          ))}
+        </div>
+      </motion.div>
+    </motion.div>
+  );
 
   return (
     <div className="min-h-screen">
@@ -97,9 +149,7 @@ const Home = () => {
       {/* Product Grid */}
       <div className="max-w-7xl mx-auto px-4 py-12">
         {isLoading ? (
-          <div className="flex justify-center items-center py-20">
-            <Loader2 className="h-12 w-12 animate-spin text-[#ff6523]" />
-          </div>
+          <LoadingState />
         ) : products.length > 0 ? (
           <motion.div 
             className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8"
