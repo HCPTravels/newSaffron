@@ -15,13 +15,15 @@ import ProtectedRoute from './components/ProtectedRoute';
 import Home from './pages/Homepage';
 import Categories from './pages/Categories';
 import Cart from './pages/Cart';
-import Account from './pages/Account';
+import Account from './components/Account';
 import OtpVerificationPage from './pages/OtpverifyPage';
 import SignupForm from './pages/SignupForm';
 import SellerSignupPage from './pages/SellerSignupPage';
 import SaffronProductListing from './components/ProductListing';
 import SellerDashboard from './components/SellerDashboard';
 import SellerLogin from './pages/SellerLogin';
+import AdminProductPanel from './components/Adminpannel';
+import AdminRoute from "./components/AdminRoute"
 
 function App() {
   const location = useLocation(); // ✅ Now it's safe
@@ -56,7 +58,14 @@ function App() {
         <Route path="/sellerdashboard" element={<SellerDashboard />} />
         <Route path="/sellerlogin" element={<SellerLogin />} />
         <Route path="/productlisting" element={<SaffronProductListing />} />
-
+        <Route
+          path="/adminpanel"
+          element={
+            <AdminRoute>
+              <AdminProductPanel />
+            </AdminRoute>
+          }
+        />
         <Route
           path="/profile"
           element={
@@ -65,10 +74,10 @@ function App() {
             </ProtectedRoute>
           }
         />
-        <Route path='homepage' element={<Home/>}/>
-        <Route path='categories' element={<Categories/>}/>
-        <Route path='cart' element={<Cart/>}/>
-        <Route path='account' element={<Account/>}/>
+        <Route path='homepage' element={<Home />} />
+        <Route path='categories' element={<Categories />} />
+        <Route path='cart' element={<Cart />} />
+        <Route path='account' element={<Account />} />
       </Routes>
     </AuthProvider>
   );

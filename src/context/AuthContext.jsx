@@ -1,11 +1,13 @@
 import { useState, useContext, createContext, useEffect } from "react";
 import axios from "axios";
+import { useNavigate } from "react-router-dom";
 
 const backendUrl = import.meta.env.VITE_BACKEND_URL;
 
 const AuthContext = createContext();
 
 export const AuthProvider = ({ children }) => {
+  const navigate = useNavigate()
   const [user, setUser] = useState(null);
   const [token, setToken] = useState(() => localStorage.getItem("token"));
   const [isLoading, setIsLoading] = useState(true);
@@ -109,20 +111,40 @@ export const AuthProvider = ({ children }) => {
   const logIn = async ({ email, password }) => {
     try {
       const res = await axios.post(`${backendUrl}/api/user/login`, { email, password });
+      
+      console.log("Backend response:", res.data); // Debug log
+      
       if (res.data.success) {
         const { user, token } = res.data;
+        
+        // Validate user data
+        if (!user) {
+          throw new Error("No user data received from server");
+        }
+        
         setUser(user);
         setToken(token);
         localStorage.setItem("token", token);
         localStorage.setItem("user", JSON.stringify(user));
+        
+        console.log("User set in context:", user); // Debug log
       }
+      
       return res.data;
     } catch (error) {
       console.error("Login failed:", error);
-      throw error;
+      
+      // Re-throw the error with proper message
+      if (error.response?.data?.message) {
+        throw new Error(error.response.data.message);
+      } else if (error.message) {
+        throw error;
+      } else {
+        throw new Error("Login failed. Please try again.");
+      }
     }
   };
-
+  
   const logout = () => {
     setUser(null);
     setSeller(null);

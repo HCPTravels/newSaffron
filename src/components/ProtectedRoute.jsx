@@ -1,14 +1,20 @@
-// components/ProtectedRoute.jsx
 import { Navigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 
 const ProtectedRoute = ({ children }) => {
-  const { token, isLoading } = useAuth();
+  const { user, token, isLoading } = useAuth();
 
-  console.log("ProtectedRoute - token:", token, "isLoading:", isLoading);
+  if (isLoading) return null; // or loading spinner
 
-  if (isLoading) return null; // or a spinner
-  if (!token) return <Navigate to="/login" replace />;
+  if (!token || !user) {
+    return <Navigate to="/login" replace />;
+  }
+
+  // ✅ Redirect admin users to adminpanel
+  if (user.role === "admin") {
+    return <Navigate to="/adminpanel" replace />;
+  }
+
   return children;
 };
 

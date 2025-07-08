@@ -5,7 +5,7 @@ import { useAuth } from "../context/AuthContext";
 import saffronLogo from "../assets/saffron logo.png";
 import HomePage from "../pages/Homepage";
 import CartPage from "../pages/Cart";
-import Account from "../pages/Account";
+import Account from "./Account";
 import Categories from "../pages/Categories";
 import SaffronHome from "../assets/saffronHome.png";
 import { useLocation } from "react-router-dom";

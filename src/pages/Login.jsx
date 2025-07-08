@@ -18,9 +18,20 @@ const LoginPage = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     setIsLoading(true);
-
+  
     try {
       const response = await logIn({ email, password });
+      
+    
+      
+      if (!response || !response.success) {
+        throw new Error("Login failed - unsuccessful response");
+      }
+  
+      if (!response.user) {
+        throw new Error("No user data received from server");
+      }
+  
       toast.success("Welcome back!", {
         description: "You have been successfully logged in.",
         duration: 3000,
@@ -32,14 +43,29 @@ const LoginPage = () => {
           color: "white",
         },
       });
+  
+      // Navigate based on user role
+      const userRole = response.user.role;
+      console.log("User role:", userRole);
+      
       setTimeout(() => {
-        navigate("/profile");
+        if (userRole === 'admin') {
+          navigate('/adminpanel');
+        } else {
+          navigate('/profile');
+        }
       }, 1500);
-      console.log("Login successful:", response);
+  
     } catch (error) {
       console.error("Login failed:", error);
+      
+      // Handle axios errors specifically
+      const errorMessage = error.response?.data?.message || 
+                          error.message || 
+                          "Please check your credentials and try again.";
+      
       toast.error("Login failed", {
-        description: error.message || "Please check your credentials and try again.",
+        description: errorMessage,
         duration: 4000,
         position: "top-right",
         style: {
@@ -52,7 +78,6 @@ const LoginPage = () => {
       setIsLoading(false);
     }
   };
-
   const handleGoogleLogin = () => {
     window.location.href = `${import.meta.env.VITE_BACKEND_URL}/api/auth/google`;
   };
