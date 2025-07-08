@@ -5,6 +5,7 @@ import { toast, Toaster } from "sonner";
 import axios from "axios";
 
 const SaffronProductListing = () => {
+  const backendUrl = import.meta.env.VITE_BACKEND_URL;
   const [products, setProducts] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
   const [isHovered, setIsHovered] = useState(false);
@@ -72,7 +73,7 @@ const SaffronProductListing = () => {
       };
   
       // Replace with your backend endpoint
-      const res = await axios.post("http://localhost:5001/api/product/create", payload, {
+      const res = await axios.post(`${backendUrl}/api/product/create`, payload, {
         headers: {
           Authorization: `Bearer ${localStorage.getItem("token")}`, // or from context
         }
