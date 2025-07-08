@@ -27,6 +27,7 @@ const SellerDashboard = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isProductsDropdownOpen, setIsProductsDropdownOpen] = useState(false);
+  const backendUrl = import.meta.env.VITE_BACKEND_URL;
 
   useEffect(() => {
     const fetchProducts = async () => {
@@ -34,7 +35,7 @@ const SellerDashboard = () => {
         // Simulate API call
         setIsLoading(true);
         // Simulating a delay to mimic network request
-        const res = await axios.get("http://localhost:5001/api/product/get", {
+        const res = await axios.get(`${backendUrl}/api/product/get`, {
           headers: {
             Authorization: `Bearer ${localStorage.getItem("token")}`
           }
