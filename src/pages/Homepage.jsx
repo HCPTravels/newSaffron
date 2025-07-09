@@ -8,6 +8,7 @@ const Home = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [isHovered, setIsHovered] = useState(false);
   const [products, setProducts] = useState([]);
+  const [loadingProductId, setLoadingProductId] = useState(null); // Track which product is being added to cart
   const backendUrl = import.meta.env.VITE_BACKEND_URL;
 
   useEffect(() => {
@@ -28,10 +29,10 @@ const Home = () => {
     };
   
     fetchApprovedProducts();
-  }, []);
+  }, [backendUrl]); // Add backendUrl to dependency array
 
   const handleAddToCart = (product) => {
-    setIsLoading(true);
+    setLoadingProductId(product._id); // Set loading for specific product
     // Simulate API call
     setTimeout(() => {
       toast.success("Added to cart", {
@@ -39,12 +40,12 @@ const Home = () => {
         duration: 3000,
         position: "top-center",
         style: {
-          background: "linear-gradient(135deg, #ff6523, #e55a1d)",
+          background: "green",
           border: "1px solid #c2410c",
           color: "white",
         },
       });
-      setIsLoading(false);
+      setLoadingProductId(null); // Clear loading state
     }, 1000);
   };
 
@@ -100,11 +101,11 @@ const Home = () => {
   );
 
   return (
-    <div className="min-h-screen">
+    <div className="min-h-screen relative">
       <Toaster richColors closeButton />
       
       {/* Enhanced Hero Section */}
-      <div className="relative pt-24 pb-16 px-4 overflow-hidden">
+      <div className="relative pt-24 pb-16 px-4 overflow-hidden z-10">
         {/* Decorative elements */}
         <div className="absolute inset-0 opacity-10">
           <div className="absolute top-0 left-0 w-32 h-32 bg-white rounded-full mix-blend-overlay blur-xl"></div>
@@ -147,7 +148,7 @@ const Home = () => {
       </div>
 
       {/* Product Grid */}
-      <div className="max-w-7xl mx-auto px-4 py-12">
+      <div className="max-w-7xl mx-auto px-4 py-12 relative z-30">
         {isLoading ? (
           <LoadingState />
         ) : products.length > 0 ? (
@@ -160,7 +161,7 @@ const Home = () => {
             {products.map((product) => (
               <motion.div 
                 key={product._id} 
-                className="group bg-white rounded-xl overflow-hidden border border-gray-200 hover:shadow-lg transition-all duration-300 hover:-translate-y-1 cursor-pointer"
+                className="group bg-white border-2 border-black rounded-xl overflow-hidden hover:shadow-lg transition-all duration-300 hover:-translate-y-1 cursor-pointer relative z-40"
                 whileHover={{ scale: 1.02 }}
                 whileTap={{ scale: 0.98 }}
                 initial={{ opacity: 0, y: 20 }}
@@ -235,13 +236,16 @@ const Home = () => {
                       <div className="text-sm text-gray-500">per gram</div>
                     </div>
                     <motion.button 
-                      className="px-4 py-2 bg-gradient-to-r from-[#ff6523] to-[#e55a1d] text-white text-sm font-semibold rounded-lg transition-all duration-300 shadow-md hover:shadow-lg"
-                      onClick={() => handleAddToCart(product)}
+                      className="px-4 py-2 bg-gradient-to-r from-[#ff6523] to-[#e55a1d] text-white text-sm font-semibold rounded-lg transition-all duration-300 shadow-md hover:shadow-lg relative z-50"
+                      onClick={(e) => {
+                        e.stopPropagation(); // Prevent event bubbling
+                        handleAddToCart(product);
+                      }}
                       whileHover={{ scale: 1.05 }}
                       whileTap={{ scale: 0.95 }}
-                      disabled={isLoading}
+                      disabled={loadingProductId === product._id} // Disable only for this specific product
                     >
-                      {isLoading ? (
+                      {loadingProductId === product._id ? (
                         <Loader2 className="h-4 w-4 animate-spin" />
                       ) : (
                         "Add to Cart"

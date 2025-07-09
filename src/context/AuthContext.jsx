@@ -19,7 +19,18 @@ export const AuthProvider = ({ children }) => {
     const storedSeller = localStorage.getItem("seller");
     const storedToken = localStorage.getItem("token");
 
-    if (storedUser && storedToken) setUser(JSON.parse(storedUser));
+    if (storedUser && storedToken) {
+      const userData = JSON.parse(storedUser);
+      setUser(userData);
+      
+      // ✅ Check if user is already logged in and redirect appropriately
+      if (userData.role === 'admin') {
+        navigate('/adminpanel', { replace: true });
+      } else if (window.location.pathname === '/login') {
+        navigate('/profile', { replace: true });
+      }
+    }
+    
     if (storedSeller && storedToken) setSeller(JSON.parse(storedSeller));
     if (storedToken) {
       setToken(storedToken);
@@ -27,7 +38,7 @@ export const AuthProvider = ({ children }) => {
     }
 
     setIsLoading(false);
-  }, []);
+  }, [navigate]);
 
   const emailOtp = async (email) => {
     try {
@@ -95,6 +106,9 @@ export const AuthProvider = ({ children }) => {
         setToken(token);
         localStorage.setItem("token", token);
         localStorage.setItem("user", JSON.stringify(user));
+        
+        // ✅ Use replace to avoid going back to signup
+        navigate('/profile', { replace: true });
       }
       return res.data;
     } catch (error) {
@@ -112,12 +126,11 @@ export const AuthProvider = ({ children }) => {
     try {
       const res = await axios.post(`${backendUrl}/api/user/login`, { email, password });
       
-      console.log("Backend response:", res.data); // Debug log
+      console.log("Backend response:", res.data);
       
       if (res.data.success) {
         const { user, token } = res.data;
         
-        // Validate user data
         if (!user) {
           throw new Error("No user data received from server");
         }
@@ -127,14 +140,20 @@ export const AuthProvider = ({ children }) => {
         localStorage.setItem("token", token);
         localStorage.setItem("user", JSON.stringify(user));
         
-        console.log("User set in context:", user); // Debug log
+        console.log("User set in context:", user);
+        
+        // ✅ Navigate immediately with replace to remove login from history
+        if (user.role === 'admin') {
+          navigate('/adminpanel', { replace: true });
+        } else {
+          navigate('/profile', { replace: true });
+        }
       }
       
       return res.data;
     } catch (error) {
       console.error("Login failed:", error);
       
-      // Re-throw the error with proper message
       if (error.response?.data?.message) {
         throw new Error(error.response.data.message);
       } else if (error.message) {
@@ -152,6 +171,10 @@ export const AuthProvider = ({ children }) => {
     localStorage.removeItem("token");
     localStorage.removeItem("user");
     localStorage.removeItem("seller");
+    localStorage.removeItem("email");
+    
+    // ✅ Use replace to avoid going back to protected pages
+    navigate('/login', { replace: true });
     console.log("User/seller logged out successfully");
   };
 
@@ -166,6 +189,9 @@ export const AuthProvider = ({ children }) => {
         setToken(token);
         localStorage.setItem("token", token);
         localStorage.setItem("user", JSON.stringify(user));
+        
+        // ✅ Navigate with replace
+        navigate('/profile', { replace: true });
       }
       return res.data;
     } catch (error) {
@@ -184,6 +210,9 @@ export const AuthProvider = ({ children }) => {
         setToken(token);
         localStorage.setItem("token", token);
         localStorage.setItem("seller", JSON.stringify(seller));
+        
+        // ✅ Navigate to seller dashboard
+        navigate('/sellerdashboard', { replace: true });
       }
       return res.data;
     } catch (error) {
@@ -204,6 +233,9 @@ export const AuthProvider = ({ children }) => {
           setToken(token);
           localStorage.setItem("token", token);
           localStorage.setItem("seller", JSON.stringify(seller));
+          
+          // ✅ Navigate to seller dashboard
+          navigate('/sellerdashboard', { replace: true });
           return res.data;
         } else {
           alert("Login failed - incomplete response data");
@@ -233,6 +265,7 @@ export const AuthProvider = ({ children }) => {
       throw error;
     }
   };
+
   const deleteProduct = async (productId) => {
     try{
       const res = await axios.delete(`${backendUrl}/api/product/delete/${productId}`, {
@@ -246,7 +279,6 @@ export const AuthProvider = ({ children }) => {
       } else {
         throw new Error("Failed to delete product");
       }
-
     }catch (error) {
       console.error("Product deletion failed:", error);
       throw error;

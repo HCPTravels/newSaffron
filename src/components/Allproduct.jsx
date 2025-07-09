@@ -74,7 +74,10 @@ import saffron3 from'../assets/saffron3.png'
     return (
       <>
         {data.map((item) => (
-          <div key={item.id} className={item.topMargin}>
+          <div 
+            key={item.id} 
+            className={`${item.topMargin} ${item.id % 2 !== 0 ? 'pl-8 md:pl-12 lg:pl-16' : ''}`}
+          >
             <ProductFeatureSection {...item} />
           </div>
         ))}

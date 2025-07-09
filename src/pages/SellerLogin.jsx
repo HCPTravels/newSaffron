@@ -4,7 +4,7 @@ import { motion } from "framer-motion";
 import { LogIn, CheckCircle, Store } from "lucide-react";
 import { FcGoogle } from "react-icons/fc";
 import { toast, Toaster } from "sonner";
-import Saffron from "../assets/saffron.png";
+import Saffron from "../assets/newsaffron.png";
 import SaffronIcon from "../assets/icons8-saffron-64 (1).png";
 import { useAuth } from '../context/AuthContext';
 
@@ -175,18 +175,18 @@ const SellerLogin = () => {
     justify-center p-4 
     bg-gradient-to-br from-[#fe6522] to-[#e55a1d]"
         >
-          <motion.img
-            src={Saffron}
-            alt="Saffron background"
-            className="w-80 h-80 object-contain opacity-90"
-            initial={{ opacity: 0, scale: 0.8 }}
-            animate={{ opacity: 0.9, scale: 1 }}
-            transition={{
-              duration: 0.8,
-              ease: "easeOut",
-              delay: 0.2
-            }}
-          />
+     <motion.img
+  src={Saffron}
+  alt="Saffron background"
+  className="w-[500px] h-[500px] object-contain opacity-90"
+  initial={{ opacity: 0, scale: 0.8 }}
+  animate={{ opacity: 0.9, scale: 1 }}
+  transition={{
+    duration: 0.8,
+    ease: "easeOut",
+    delay: 0.2
+  }}
+/>
         </motion.div>
 
         {/* Right side login form */}

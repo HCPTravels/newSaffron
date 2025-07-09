@@ -26,9 +26,9 @@ import AdminProductPanel from './components/Adminpannel';
 import AdminRoute from "./components/AdminRoute"
 
 function App() {
-  const location = useLocation(); // ✅ Now it's safe
+  const location = useLocation();
 
-  const hideNavbarRoutes = ['/profile'];
+  const hideNavbarRoutes = ['/profile', '/adminpanel'];
   const hideNavbar = hideNavbarRoutes.includes(location.pathname);
 
   return (
@@ -36,16 +36,16 @@ function App() {
       {!hideNavbar && <Navbar />}
 
       <Routes>
-        <Route
-          path="/"
-          element={
-            <>
-              <HeroSection />
-              <AllProducts />
-              <Contact />
-            </>
-          }
-        />
+      <Route
+  path="/"
+  element={
+    <>
+      <HeroSection />
+      <AllProducts />
+      <Contact />
+    </>
+  }
+/>
         <Route path="/login" element={<LoginPage />} />
         <Route path="/signup" element={<Signup />} />
         <Route path="/otpverify" element={<OtpVerificationPage />} />
@@ -55,7 +55,14 @@ function App() {
         <Route path="/contact" element={<ContactUs />} />
         <Route path="/partners" element={<OurPartners />} />
         <Route path="/sellersignup" element={<SellerSignupPage />} />
-        <Route path="/sellerdashboard" element={<SellerDashboard />} />
+        <Route 
+          path="/sellerdashboard" 
+          element={
+            <ProtectedRoute>
+              <SellerDashboard />
+            </ProtectedRoute>
+          } 
+        />
         <Route path="/sellerlogin" element={<SellerLogin />} />
         <Route path="/productlisting" element={<SaffronProductListing />} />
         <Route
@@ -74,10 +81,38 @@ function App() {
             </ProtectedRoute>
           }
         />
-        <Route path='homepage' element={<Home />} />
-        <Route path='categories' element={<Categories />} />
-        <Route path='cart' element={<Cart />} />
-        <Route path='account' element={<Account />} />
+        <Route 
+          path="/homepage" 
+          element={
+            <ProtectedRoute>
+              <Home />
+            </ProtectedRoute>
+          } 
+        />
+        <Route 
+          path="/categories" 
+          element={
+            <ProtectedRoute>
+              <Categories />
+            </ProtectedRoute>
+          } 
+        />
+        <Route 
+          path="/cart" 
+          element={
+            <ProtectedRoute>
+              <Cart />
+            </ProtectedRoute>
+          } 
+        />
+        <Route 
+          path="/account" 
+          element={
+            <ProtectedRoute>
+              <Account />
+            </ProtectedRoute>
+          } 
+        />
       </Routes>
     </AuthProvider>
   );

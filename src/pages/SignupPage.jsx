@@ -493,7 +493,7 @@ const Signup = () => {
 
               <motion.button
                 type="submit"
-                className="w-full flex items-center justify-center gap-2 px-4 py-2 rounded-lg bg-gradient-to-r from-[#fe6522] to-[#e55a1d] text-white font-medium shadow-sm"
+                className="w-full flex items-center justify-center gap-2 px-4 py-3 rounded-lg bg-gradient-to-r from-[#fe6522] to-[#e55a1d] text-white font-medium shadow-sm"
                 whileTap={{ scale: 0.98 }}
                 disabled={isLoading}
                 initial={{ opacity: 0, y: 15 }}
@@ -536,7 +536,7 @@ const Signup = () => {
                   <motion.button
                     type="button"
                     onClick={handleGoogleLogin}
-                    className="w-full flex items-center justify-center gap-2 px-4 py-2 rounded-lg border border-gray-300 bg-white text-gray-700 font-medium shadow-sm transition-all"
+                    className="w-full flex items-center justify-center gap-2 px-4 py-3 rounded-lg border border-gray-300 bg-white text-gray-700 font-medium shadow-sm transition-all"
                     whileTap={{ scale: 0.98 }}
                     initial={{ opacity: 0, y: 15 }}
                     animate={{ opacity: 1, y: 0 }}

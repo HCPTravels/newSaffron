@@ -7,6 +7,7 @@ import { toast, Toaster } from "sonner";
 import Saffron from "../assets/bowlSaffron.png";
 import SaffronIcon from "../assets/icons8-saffron-64 (1).png";
 import { useAuth } from '../context/AuthContext';
+import loaderimage from '../assets/loader1.png';
 
 const LoginPage = () => {
   const { logIn } = useAuth();
@@ -21,8 +22,6 @@ const LoginPage = () => {
   
     try {
       const response = await logIn({ email, password });
-      
-    
       
       if (!response || !response.success) {
         throw new Error("Login failed - unsuccessful response");
@@ -78,6 +77,7 @@ const LoginPage = () => {
       setIsLoading(false);
     }
   };
+
   const handleGoogleLogin = () => {
     window.location.href = `${import.meta.env.VITE_BACKEND_URL}/api/auth/google`;
   };
@@ -186,10 +186,10 @@ const LoginPage = () => {
         <motion.div 
           variants={imageVariants}
           className="hidden md:flex w-1/2 items-center 
-    border-t-2 border-b-2 border-l-2 border-black 
-    rounded-tl-xl rounded-bl-xl 
-    justify-center p-4 
-    bg-gradient-to-br from-[#fe6522] to-[#e55a1d]"
+            border-t-2 border-b-2 border-l-2 border-black 
+            rounded-tl-xl rounded-bl-xl 
+            justify-center p-4 
+            bg-gradient-to-br from-[#fe6522] to-[#e55a1d]"
         >
           <motion.img
             src={Saffron}
@@ -209,9 +209,9 @@ const LoginPage = () => {
         <motion.div 
           variants={formVariants}
           className="w-full md:w-1/2 
-    border-2 md:border-l-0 border-black 
-    rounded-xl md:rounded-tr-xl md:rounded-br-xl md:rounded-tl-none md:rounded-bl-none 
-    shadow-lg bg-white p-6"
+            border-2 md:border-l-0 border-black 
+            rounded-xl md:rounded-tr-xl md:rounded-br-xl md:rounded-tl-none md:rounded-bl-none 
+            shadow-lg bg-white p-6"
         >
           <motion.div
             variants={containerVariants}
@@ -271,7 +271,7 @@ const LoginPage = () => {
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   placeholder="Enter your email"
-                  className="w-full px-3 py-2 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-[#fe6522]/50 focus:border-transparent transition-all"
+                  className="w-full px-3 py-2 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-[#fe6522]/50 focus:border-transparent transition-all h-12"
                   required
                   initial={{ opacity: 0, y: 10 }}
                   animate={{ opacity: 1, y: 0 }}
@@ -299,7 +299,7 @@ const LoginPage = () => {
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   placeholder="Enter your password"
-                  className="w-full px-3 py-2 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-[#fe6522]/50 focus:border-transparent transition-all"
+                  className="w-full px-3 py-2 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-[#fe6522]/50 focus:border-transparent transition-all h-12"
                   required
                   initial={{ opacity: 0, y: 10 }}
                   animate={{ opacity: 1, y: 0 }}
@@ -313,7 +313,7 @@ const LoginPage = () => {
 
               <motion.button
                 type="submit"
-                className="w-full flex items-center justify-center gap-2 px-4 py-2 rounded-lg bg-gradient-to-r from-[#fe6522] to-[#e55a1d] text-white font-medium shadow-sm"
+                className="w-full flex items-center justify-center gap-2 px-4 py-3 rounded-lg bg-gradient-to-r from-[#fe6522] to-[#e55a1d] text-white font-medium shadow-sm h-12"
                 whileTap={{ scale: 0.98 }}
                 disabled={isLoading}
                 initial={{ opacity: 0, y: 15 }}
@@ -326,12 +326,22 @@ const LoginPage = () => {
               >
                 {isLoading ? (
                   <div className="flex items-center gap-2">
-                    <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                    <motion.img
+                      src={loaderimage}
+                      alt="Loading"
+                      className="h-8 w-8"
+                      animate={{ rotate: 360 }}
+                      transition={{
+                        repeat: Infinity,
+                        duration: 1,
+                        ease: "linear"
+                      }}
+                    />
                     <span>Logging in...</span>
                   </div>
                 ) : (
                   <>
-                    <LogIn className="h-4 w-4" />
+                    <LogIn className="h-5 w-5" />
                     <span>Log In</span>
                   </>
                 )}
@@ -354,7 +364,7 @@ const LoginPage = () => {
               <motion.button
                 type="button"
                 onClick={handleGoogleLogin}
-                className="w-full flex items-center justify-center gap-2 px-4 py-2 rounded-lg border border-gray-300 bg-white text-gray-700 font-medium shadow-sm transition-all"
+                className="w-full flex items-center justify-center gap-2 px-4 py-3 rounded-lg border border-gray-300 bg-white text-gray-700 font-medium shadow-sm transition-all h-12"
                 whileTap={{ scale: 0.98 }}
                 initial={{ opacity: 0, y: 15 }}
                 animate={{ opacity: 1, y: 0 }}
@@ -418,7 +428,6 @@ const LoginPage = () => {
 };
 
 export default LoginPage;
-
 
 
 

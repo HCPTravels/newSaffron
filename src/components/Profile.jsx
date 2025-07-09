@@ -263,7 +263,7 @@ const Profile = () => {
         </div>
       </div>
 
-      {/* Decorative Images */}
+      {/* Decorative Images - Fixed Z-Index */}
       <img
         src={SaffronHome}
         alt="Saffron Home"
@@ -272,9 +272,9 @@ const Profile = () => {
                    sm:w-[300px] sm:h-[300px]
                    md:w-[400px] md:h-[400px]
                    lg:w-[500px] lg:h-[500px]
-                   xl:w-[700px] xl:h-[700px]
+                   xl:w-[550px] xl:h-[550px]
                    2xl:w-[767px] 2xl:h-[767px]
-                   object-cover z-30 transition-transform duration-700 ease-out"
+                   object-cover z-11 transition-transform duration-700 ease-out pointer-events-none"
         style={{ transform: `translateX(-50%) translateY(${scrollY * 0.3}px)` }}
       />
 
@@ -283,7 +283,7 @@ const Profile = () => {
         alt="Decorative Saffron"
         className="fixed bottom-[-75px] left-[-75px] w-[150px] h-[150px]
                md:top-[586px] md:left-[-154px] md:w-[375px] md:h-[375px]
-               object-cover pointer-events-none opacity-30 z-200 transition-transform duration-700 ease-out"
+               object-cover pointer-events-none opacity-30 z-11 transition-transform duration-700 ease-out"
         style={{
           transform: `translateY(${scrollY * -0.2}px) rotate(${scrollY * 0.1}deg)`,
         }}
