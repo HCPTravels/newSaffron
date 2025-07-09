@@ -9,9 +9,9 @@ const Home = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [isHovered, setIsHovered] = useState(false);
   const [products, setProducts] = useState([]);
-  const [loadingProductId, setLoadingProductId] = useState(null); // Track which product is being added to cart
+  const [loadingProductId, setLoadingProductId] = useState(null);
   const backendUrl = import.meta.env.VITE_BACKEND_URL;
-  const {token} = useAuth()
+  const { token } = useAuth();
 
   useEffect(() => {
     const fetchApprovedProducts = async () => {
@@ -20,7 +20,6 @@ const Home = () => {
         const response = await axios.get(`${backendUrl}/api/product/approved/product`);
         if (response.data) {
           setProducts(response.data);
-         
         }
       } catch (err) {
         console.error(err);
@@ -31,7 +30,7 @@ const Home = () => {
     };
   
     fetchApprovedProducts();
-  }, [backendUrl]); // Add backendUrl to dependency array
+  }, [backendUrl]);
 
   const handleAddToCart = async (product) => {
     if (!token) {
@@ -51,100 +50,177 @@ const Home = () => {
     setLoadingProductId(product._id);
     
     try {
-      // Match your backend expectations - only send productId and quantity
       const cartData = {
         productId: product._id,
-        quantity: 1, // Make sure this is a number, not string
+        quantity: 1,
       };
   
       console.log('=== Adding to Cart ===');
-      console.log('Cart Data:', cartData);
-      console.log('User ID from token:', token); // Your backend extracts user ID from token
+      console.log('Backend URL:', backendUrl);
+      console.log('Full URL:', `${backendUrl}/api/cart/add`);
+      console.log('Product ID:', product._id);
+      console.log('Token exists:', !!token);
+      console.log('Token preview:', token?.substring(0, 20) + '...');
+      console.log('Cart data:', cartData);
   
-      const response = await axios.post(`${backendUrl}/api/cart/add`, cartData, {
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}`,
+      // Try different possible cart endpoints
+      const possibleEndpoints = [
+        '/api/cart/add',
+        '/api/cart',
+        '/api/carts/add',
+        '/api/user/cart/add'
+      ];
+      
+      let success = false;
+      let lastError = null;
+      
+      for (const endpoint of possibleEndpoints) {
+        try {
+          console.log(`Trying endpoint: ${backendUrl}${endpoint}`);
+          
+          const response = await axios.post(`${backendUrl}${endpoint}`, cartData, {
+            headers: {
+              'Content-Type': 'application/json',
+              'Authorization': `Bearer ${token}`,
+            },
+            timeout: 10000, // Reduced timeout to 10 seconds
+          });
+          
+          console.log(`Success with endpoint ${endpoint}:`, response.data);
+          success = true;
+          break;
+          
+        } catch (error) {
+          console.log(`Failed with endpoint ${endpoint}:`, error.response?.status || error.code);
+          lastError = error;
+          
+          // If we get a 404, try the next endpoint
+          if (error.response?.status === 404) {
+            continue;
+          }
+          
+          // If it's not a 404, this might be the right endpoint with a different issue
+          if (error.response?.status !== 404) {
+            throw error;
+          }
+        }
+      }
+      
+      if (!success) {
+        throw lastError || new Error('All cart endpoints failed');
+      }
+  
+      toast.success("Added to cart", {
+        description: `${product.name} has been added to your cart.`,
+        duration: 3000,
+        position: "top-center",
+        style: {
+          background: "#16a34a",
+          border: "1px solid #16a34a",
+          color: "white",
         },
       });
   
-      console.log('=== Add to Cart Response ===');
-      console.log('Status:', response.status);
-      console.log('Full Response:', response.data);
-      
-      // Log the cart object specifically
-      if (response.data.cart) {
-        console.log('Cart Object:', response.data.cart);
-        console.log('Cart Items:', response.data.cart.items);
-        console.log('Cart ID:', response.data.cart._id);
-        console.log('User ID:', response.data.cart.userId);
-      }
-  
-      if (response.status === 200 || response.status === 201) {
-        toast.success("Added to cart", {
-          description: `${product.name} has been added to your cart.`,
-          duration: 3000,
-          position: "top-center",
-          style: {
-            background: "#16a34a",
-            border: "1px solid #16a34a",
-            color: "white",
-          },
-        });
-        
-        // Verify the cart data after adding
-        // setTimeout(() => {
-        //   verifyCartData();
-        // }, 1000);
-      }
-  
     } catch (error) {
       console.error('Error adding to cart:', error);
+      console.error('Error details:', {
+        message: error.message,
+        code: error.code,
+        response: error.response?.data,
+        status: error.response?.status,
+      });
       
-      if (error.response) {
-        const status = error.response.status;
-        const errorMessage = error.response.data?.message || 'Failed to add item to cart';
+      // Better error handling
+      let errorMessage = "Failed to add item to cart";
+      let errorDetails = "";
+      
+      if (error.code === 'ECONNABORTED') {
+        errorMessage = "Server is taking too long to respond";
+        errorDetails = "The cart API might be hanging. Please check your backend logs.";
+      } else if (error.code === 'ECONNREFUSED' || error.code === 'ERR_NETWORK') {
+        errorMessage = "Cannot connect to server";
+        errorDetails = "Please make sure your backend server is running on http://localhost:5001";
+      } else if (error.response) {
+        console.log('Error response status:', error.response.status);
+        console.log('Error response data:', error.response.data);
         
-        console.log('Backend Error Response:', error.response.data);
-        
-        toast.error("Error", {
-          description: `${status}: ${errorMessage}`,
-          duration: 3000,
-          position: "top-center",
-          style: {
-            background: "#dc2626",
-            border: "1px solid #dc2626",
-            color: "white",
-          },
-        });
+        if (error.response.status === 401) {
+          errorMessage = "Authentication failed";
+          errorDetails = "Please login again";
+        } else if (error.response.status === 404) {
+          errorMessage = "Cart API not found";
+          errorDetails = "Please check if the cart API endpoint exists in your backend";
+        } else if (error.response.status === 400) {
+          errorMessage = error.response.data?.message || "Invalid request";
+          errorDetails = "Please check the request data format";
+        } else if (error.response.status >= 500) {
+          errorMessage = "Server error";
+          errorDetails = "Please check your backend logs for details";
+        }
       } else if (error.request) {
-        toast.error("Network Error", {
-          description: "Unable to connect to server.",
-          duration: 3000,
-          position: "top-center",
-          style: {
-            background: "#dc2626",
-            border: "1px solid #dc2626",
-            color: "white",
-          },
-        });
-      } else {
-        toast.error("Error", {
-          description: "Something went wrong. Please try again.",
-          duration: 3000,
-          position: "top-center",
-          style: {
-            background: "#dc2626",
-            border: "1px solid #dc2626",
-            color: "white",
-          },
-        });
+        errorMessage = "Network error";
+        errorDetails = "Please check your internet connection and backend server";
       }
+      
+      toast.error(errorMessage, {
+        description: errorDetails,
+        duration: 5000,
+        position: "top-center",
+        style: {
+          background: "#dc2626",
+          border: "1px solid #dc2626",
+          color: "white",
+        },
+      });
     } finally {
       setLoadingProductId(null);
     }
   };
-  
+
+  // Add a function to test backend connectivity
+  const testBackendConnection = async () => {
+    try {
+      console.log('Testing backend connection with products endpoint...');
+      // Since /api/health doesn't exist, let's test with the products endpoint that works
+      const response = await axios.get(`${backendUrl}/api/product/approved/product`, {
+        timeout: 5000,
+      });
+      console.log('Backend is reachable via products endpoint');
+      return true;
+    } catch (error) {
+      console.error('Backend is not reachable:', error.message);
+      return false;
+    }
+  };
+
+  // Test if cart endpoint exists
+  const testCartEndpoint = async () => {
+    try {
+      console.log('Testing cart endpoint...');
+      // Make a test request to see if endpoint exists
+      const response = await axios.get(`${backendUrl}/api/cart`, {
+        headers: {
+          'Authorization': `Bearer ${token}`,
+        },
+        timeout: 5000,
+      });
+      console.log('Cart endpoint is reachable');
+      return true;
+    } catch (error) {
+      console.error('Cart endpoint test failed:', error.response?.status, error.message);
+      return false;
+    }
+  };
+
+  // Test connection on component mount
+  useEffect(() => {
+    if (backendUrl) {
+      testBackendConnection();
+      if (token) {
+        testCartEndpoint();
+      }
+    }
+  }, [backendUrl, token]);
   
   const LoadingState = () => (
     <motion.div 
@@ -202,7 +278,6 @@ const Home = () => {
       
       {/* Enhanced Hero Section */}
       <div className="relative pt-24 pb-16 px-4 overflow-hidden z-10">
-        {/* Decorative elements */}
         <div className="absolute inset-0 opacity-10">
           <div className="absolute top-0 left-0 w-32 h-32 bg-white rounded-full mix-blend-overlay blur-xl"></div>
           <div className="absolute bottom-0 right-0 w-64 h-64 bg-white rounded-full mix-blend-overlay blur-xl"></div>
@@ -264,9 +339,7 @@ const Home = () => {
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.3 }}
               >
-                {/* Enhanced Product Image Area */}
                 <div className="relative h-48 bg-gradient-to-br from-amber-50 via-orange-50 to-amber-100 overflow-hidden">
-                  {/* Large Origin Letter with subtle animation */}
                   <motion.div 
                     className="absolute inset-0 flex items-center justify-center"
                     initial={{ opacity: 0.1 }}
@@ -277,7 +350,6 @@ const Home = () => {
                     </div>
                   </motion.div>
                   
-                  {/* Grade Badge with improved styling */}
                   <div className="absolute top-4 right-4">
                     <motion.span 
                       className={`inline-flex items-center px-3 py-1 rounded-full text-xs font-bold ${
@@ -298,7 +370,6 @@ const Home = () => {
                     </motion.span>
                   </div>
 
-                  {/* Rating Badge with animation */}
                   {product.rating && (
                     <motion.div 
                       className="absolute bottom-4 left-4 flex items-center gap-1 bg-white/90 backdrop-blur-sm px-3 py-1 rounded-full shadow-sm"
@@ -310,7 +381,6 @@ const Home = () => {
                   )}
                 </div>
 
-                {/* Enhanced Product Info */}
                 <div className="p-6">
                   <div className="mb-4">
                     <h3 className="text-lg font-bold text-gray-900 mb-2 group-hover:text-[#ff6523] transition-colors duration-300">
@@ -332,17 +402,20 @@ const Home = () => {
                       <div className="text-sm text-gray-500">per gram</div>
                     </div>
                     <motion.button 
-                      className="px-4 py-2 bg-gradient-to-r from-[#ff6523] to-[#e55a1d] text-white text-sm font-semibold rounded-lg transition-all duration-300 shadow-md hover:shadow-lg relative z-50"
+                      className="px-4 py-2 bg-gradient-to-r from-[#ff6523] to-[#e55a1d] text-white text-sm font-semibold rounded-lg transition-all duration-300 shadow-md hover:shadow-lg relative z-50 disabled:opacity-50 disabled:cursor-not-allowed"
                       onClick={(e) => {
-                        e.stopPropagation(); // Prevent event bubbling
+                        e.stopPropagation();
                         handleAddToCart(product);
                       }}
-                      whileHover={{ scale: 1.05 }}
-                      whileTap={{ scale: 0.95 }}
-                      disabled={loadingProductId === product._id} // Disable only for this specific product
+                      whileHover={{ scale: loadingProductId === product._id ? 1 : 1.05 }}
+                      whileTap={{ scale: loadingProductId === product._id ? 1 : 0.95 }}
+                      disabled={loadingProductId === product._id}
                     >
                       {loadingProductId === product._id ? (
-                        <Loader2 className="h-4 w-4 animate-spin" />
+                        <div className="flex items-center gap-2">
+                          <Loader2 className="h-4 w-4 animate-spin" />
+                          <span>Adding...</span>
+                        </div>
                       ) : (
                         "Add to Cart"
                       )}
