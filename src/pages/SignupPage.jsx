@@ -4,7 +4,7 @@ import { motion } from "framer-motion";
 import { LogIn, CheckCircle, Mail, AlertCircle } from "lucide-react";
 import { FcGoogle } from "react-icons/fc";
 import { toast, Toaster } from "sonner";
-import Saffron from "../assets/driedsaffron.png";
+import Saffron from "../assets/newsaffron.png";
 import SaffronIcon from "../assets/icons8-saffron-64 (1).png";
 import { useAuth } from '../context/AuthContext';
 

@@ -24,6 +24,11 @@ import SellerDashboard from './components/SellerDashboard';
 import SellerLogin from './pages/SellerLogin';
 import AdminProductPanel from './components/Adminpannel';
 import AdminRoute from "./components/AdminRoute"
+import SaffronPackaging from './components/SaffronPackaging';
+import SaffronComponent from './components/SaffronLuxury';
+import SaffronQuality from './components/SaffronComponent';
+import SellerProtectedRoute from './components/SellerProtected'
+
 
 function App() {
   const location = useLocation();
@@ -55,12 +60,17 @@ function App() {
         <Route path="/contact" element={<ContactUs />} />
         <Route path="/partners" element={<OurPartners />} />
         <Route path="/sellersignup" element={<SellerSignupPage />} />
+        <Route path="/saffronpackaging" element={<SaffronPackaging />} />
+        <Route path="/precioussaffron" element={<SaffronComponent/>}/>
+        <Route path="/naturalsaffron" element={<SaffronQuality/>}/>
+        <Route path="/aboutus" element={<About/>}/>
+        <Route path="/ourpartners" element={<OurPartners />}/>
         <Route 
           path="/sellerdashboard" 
           element={
-            <ProtectedRoute>
+            <SellerProtectedRoute>
               <SellerDashboard />
-            </ProtectedRoute>
+            </SellerProtectedRoute>
           } 
         />
         <Route path="/sellerlogin" element={<SellerLogin />} />

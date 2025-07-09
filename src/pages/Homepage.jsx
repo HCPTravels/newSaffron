@@ -3,6 +3,7 @@ import { Search, Filter, ChevronDown, Star, Zap, Loader2 } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { toast, Toaster } from 'sonner';
 import axios from 'axios';
+import { useAuth } from '../context/AuthContext';
 
 const Home = () => {
   const [isLoading, setIsLoading] = useState(false);
@@ -10,6 +11,7 @@ const Home = () => {
   const [products, setProducts] = useState([]);
   const [loadingProductId, setLoadingProductId] = useState(null); // Track which product is being added to cart
   const backendUrl = import.meta.env.VITE_BACKEND_URL;
+  const {token} = useAuth()
 
   useEffect(() => {
     const fetchApprovedProducts = async () => {
@@ -18,7 +20,7 @@ const Home = () => {
         const response = await axios.get(`${backendUrl}/api/product/approved/product`);
         if (response.data) {
           setProducts(response.data);
-          console.log(response.data);
+         
         }
       } catch (err) {
         console.error(err);
@@ -31,25 +33,119 @@ const Home = () => {
     fetchApprovedProducts();
   }, [backendUrl]); // Add backendUrl to dependency array
 
-  const handleAddToCart = (product) => {
-    setLoadingProductId(product._id); // Set loading for specific product
-    // Simulate API call
-    setTimeout(() => {
-      toast.success("Added to cart", {
-        description: `${product.name} has been added to your cart.`,
+  const handleAddToCart = async (product) => {
+    if (!token) {
+      toast.error("Authentication Required", {
+        description: "Please login to add items to your cart.",
         duration: 3000,
         position: "top-center",
         style: {
-          background: "green",
-          border: "1px solid #c2410c",
+          background: "#dc2626",
+          border: "1px solid #dc2626",
           color: "white",
         },
       });
-      setLoadingProductId(null); // Clear loading state
-    }, 1000);
+      return;
+    }
+  
+    setLoadingProductId(product._id);
+    
+    try {
+      // Match your backend expectations - only send productId and quantity
+      const cartData = {
+        productId: product._id,
+        quantity: 1, // Make sure this is a number, not string
+      };
+  
+      console.log('=== Adding to Cart ===');
+      console.log('Cart Data:', cartData);
+      console.log('User ID from token:', token); // Your backend extracts user ID from token
+  
+      const response = await axios.post(`${backendUrl}/api/cart/add`, cartData, {
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`,
+        },
+      });
+  
+      console.log('=== Add to Cart Response ===');
+      console.log('Status:', response.status);
+      console.log('Full Response:', response.data);
+      
+      // Log the cart object specifically
+      if (response.data.cart) {
+        console.log('Cart Object:', response.data.cart);
+        console.log('Cart Items:', response.data.cart.items);
+        console.log('Cart ID:', response.data.cart._id);
+        console.log('User ID:', response.data.cart.userId);
+      }
+  
+      if (response.status === 200 || response.status === 201) {
+        toast.success("Added to cart", {
+          description: `${product.name} has been added to your cart.`,
+          duration: 3000,
+          position: "top-center",
+          style: {
+            background: "#16a34a",
+            border: "1px solid #16a34a",
+            color: "white",
+          },
+        });
+        
+        // Verify the cart data after adding
+        // setTimeout(() => {
+        //   verifyCartData();
+        // }, 1000);
+      }
+  
+    } catch (error) {
+      console.error('Error adding to cart:', error);
+      
+      if (error.response) {
+        const status = error.response.status;
+        const errorMessage = error.response.data?.message || 'Failed to add item to cart';
+        
+        console.log('Backend Error Response:', error.response.data);
+        
+        toast.error("Error", {
+          description: `${status}: ${errorMessage}`,
+          duration: 3000,
+          position: "top-center",
+          style: {
+            background: "#dc2626",
+            border: "1px solid #dc2626",
+            color: "white",
+          },
+        });
+      } else if (error.request) {
+        toast.error("Network Error", {
+          description: "Unable to connect to server.",
+          duration: 3000,
+          position: "top-center",
+          style: {
+            background: "#dc2626",
+            border: "1px solid #dc2626",
+            color: "white",
+          },
+        });
+      } else {
+        toast.error("Error", {
+          description: "Something went wrong. Please try again.",
+          duration: 3000,
+          position: "top-center",
+          style: {
+            background: "#dc2626",
+            border: "1px solid #dc2626",
+            color: "white",
+          },
+        });
+      }
+    } finally {
+      setLoadingProductId(null);
+    }
   };
-
-  // Enhanced loading component
+  
+  
   const LoadingState = () => (
     <motion.div 
       className="flex flex-col items-center justify-center py-20"

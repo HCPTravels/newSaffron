@@ -48,23 +48,30 @@ const ProductFeatureSection = ({
           </div>
 
           <div className="md:block">
-            {features.map((feature, index) => (
-              <div
-                key={index}
-                className="flex items-start gap-1 md:gap-3 space-y-2"
-              >
-                <div className="flex-shrink-0 mt-0.5">
-                  {feature.icon === 'link' ? (
-                    <Link className="text-black w-2 h-2 md:w-4 md:h-4" />
-                  ) : (
-                    <MoveRight className="text-black w-2 h-2 md:w-4 md:h-4" />
-                  )}
-                </div>
-                <p className="md:text-[16px] text-[8px] text-black leading-snug break-words">
-                  {feature.text}
-                </p>
-              </div>
-            ))}
+          {features.map((feature, index) => (
+  <div
+    key={index}
+    className="flex items-start gap-1 md:gap-3 space-y-2"
+  >
+    <div 
+      className="flex-shrink-0 mt-0.5 cursor-pointer"
+      onClick={feature.onClick}
+    >
+      {feature.icon === 'link' ? (
+        <Link className="text-black w-2 h-2 md:w-4 md:h-4" />
+      ) : (
+        <MoveRight className="text-black w-2 h-2 md:w-4 md:h-4" />
+      )}
+    </div>
+
+    <p
+      className="md:text-[16px] text-[8px] text-black leading-snug break-words cursor-pointer"
+      onClick={feature.onClick} // ✅ Make the text clickable too
+    >
+      {feature.text}
+    </p>
+  </div>
+))}
           </div>
         </div>
 
