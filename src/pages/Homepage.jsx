@@ -1,9 +1,9 @@
-import React, { useState, useEffect } from 'react';
-import { Search, Filter, ChevronDown, Star, Zap, Loader2 } from 'lucide-react';
-import { motion } from 'framer-motion';
-import { toast, Toaster } from 'sonner';
-import axios from 'axios';
-import { useAuth } from '../context/AuthContext';
+import React, { useState, useEffect } from "react";
+import { Search, Filter, ChevronDown, Star, Zap, Loader2 } from "lucide-react";
+import { motion } from "framer-motion";
+import { toast, Toaster } from "sonner";
+import axios from "axios";
+import { useAuth } from "../context/AuthContext";
 
 const Home = () => {
   const [isLoading, setIsLoading] = useState(false);
@@ -17,7 +17,9 @@ const Home = () => {
     const fetchApprovedProducts = async () => {
       try {
         setIsLoading(true);
-        const response = await axios.get(`${backendUrl}/api/product/approved/product`);
+        const response = await axios.get(
+          `${backendUrl}/api/product/approved/product`
+        );
         if (response.data) {
           setProducts(response.data);
         }
@@ -28,7 +30,7 @@ const Home = () => {
         setIsLoading(false);
       }
     };
-  
+
     fetchApprovedProducts();
   }, [backendUrl]);
 
@@ -46,70 +48,76 @@ const Home = () => {
       });
       return;
     }
-  
+
     setLoadingProductId(product._id);
-    
+
     try {
       const cartData = {
         productId: product._id,
         quantity: 1,
       };
-  
-      console.log('=== Adding to Cart ===');
-      console.log('Backend URL:', backendUrl);
-      console.log('Full URL:', `${backendUrl}/api/cart/add`);
-      console.log('Product ID:', product._id);
-      console.log('Token exists:', !!token);
-      console.log('Token preview:', token?.substring(0, 20) + '...');
-      console.log('Cart data:', cartData);
-  
+
+      console.log("=== Adding to Cart ===");
+      console.log("Backend URL:", backendUrl);
+      console.log("Full URL:", `${backendUrl}/api/cart/add`);
+      console.log("Product ID:", product._id);
+      console.log("Token exists:", !!token);
+      console.log("Token preview:", token);
+      console.log("Cart data:", cartData);
+
       // Try different possible cart endpoints
       const possibleEndpoints = [
-        '/api/cart/add',
-        '/api/cart',
-        '/api/carts/add',
-        '/api/user/cart/add'
+        "/api/cart/add",
+        "/api/cart",
+        "/api/carts/add",
+        "/api/user/cart/add",
       ];
-      
+
       let success = false;
       let lastError = null;
-      
+
       for (const endpoint of possibleEndpoints) {
         try {
           console.log(`Trying endpoint: ${backendUrl}${endpoint}`);
-          
-          const response = await axios.post(`${backendUrl}${endpoint}`, cartData, {
-            headers: {
-              'Content-Type': 'application/json',
-              'Authorization': `Bearer ${token}`,
-            },
-            timeout: 10000, // Reduced timeout to 10 seconds
-          });
-          
+
+          const response = await axios.post(
+            `${backendUrl}${endpoint}`,
+            cartData,
+            {
+              headers: {
+                "Content-Type": "application/json",
+                Authorization: `Bearer ${token}`,
+              },
+              timeout: 10000, // Reduced timeout to 10 seconds
+            }
+          );
+
           console.log(`Success with endpoint ${endpoint}:`, response.data);
           success = true;
           break;
-          
         } catch (error) {
-          console.log(`Failed with endpoint ${endpoint}:`, error.response?.status || error.code);
+          console.log(
+            `Failed with endpoint ${endpoint}:`,
+            error.response?.status || error.code
+          );
           lastError = error;
-          
+
           // If we get a 404, try the next endpoint
           if (error.response?.status === 404) {
             continue;
           }
-          
+
           // If it's not a 404, this might be the right endpoint with a different issue
           if (error.response?.status !== 404) {
             throw error;
           }
         }
       }
-      
+
       if (!success) {
-        throw lastError || new Error('All cart endpoints failed');
+        throw lastError || new Error("All cart endpoints failed");
       }
-  
+
       toast.success("Added to cart", {
         description: `${product.name} has been added to your cart.`,
         duration: 3000,
@@ -120,36 +128,41 @@ const Home = () => {
           color: "white",
         },
       });
-  
     } catch (error) {
-      console.error('Error adding to cart:', error);
-      console.error('Error details:', {
+      console.error("Error adding to cart:", error);
+      console.error("Error details:", {
         message: error.message,
         code: error.code,
         response: error.response?.data,
         status: error.response?.status,
       });
-      
+
       // Better error handling
       let errorMessage = "Failed to add item to cart";
       let errorDetails = "";
-      
-      if (error.code === 'ECONNABORTED') {
+
+      if (error.code === "ECONNABORTED") {
         errorMessage = "Server is taking too long to respond";
-        errorDetails = "The cart API might be hanging. Please check your backend logs.";
-      } else if (error.code === 'ECONNREFUSED' || error.code === 'ERR_NETWORK') {
+        errorDetails =
+          "The cart API might be hanging. Please check your backend logs.";
+      } else if (
+        error.code === "ECONNREFUSED" ||
+        error.code === "ERR_NETWORK"
+      ) {
         errorMessage = "Cannot connect to server";
-        errorDetails = "Please make sure your backend server is running on http://localhost:5001";
+        errorDetails =
+          "Please make sure your backend server is running on http://localhost:5001";
       } else if (error.response) {
-        console.log('Error response status:', error.response.status);
-        console.log('Error response data:', error.response.data);
-        
+        console.log("Error response status:", error.response.status);
+        console.log("Error response data:", error.response.data);
+
         if (error.response.status === 401) {
           errorMessage = "Authentication failed";
           errorDetails = "Please login again";
         } else if (error.response.status === 404) {
           errorMessage = "Cart API not found";
-          errorDetails = "Please check if the cart API endpoint exists in your backend";
+          errorDetails =
+            "Please check if the cart API endpoint exists in your backend";
         } else if (error.response.status === 400) {
           errorMessage = error.response.data?.message || "Invalid request";
           errorDetails = "Please check the request data format";
@@ -159,9 +172,10 @@ const Home = () => {
         }
       } else if (error.request) {
         errorMessage = "Network error";
-        errorDetails = "Please check your internet connection and backend server";
+        errorDetails =
+          "Please check your internet connection and backend server";
       }
-      
+
       toast.error(errorMessage, {
         description: errorDetails,
         duration: 5000,
@@ -180,15 +194,18 @@ const Home = () => {
   // Add a function to test backend connectivity
   const testBackendConnection = async () => {
     try {
-      console.log('Testing backend connection with products endpoint...');
+      console.log("Testing backend connection with products endpoint...");
       // Since /api/health doesn't exist, let's test with the products endpoint that works
-      const response = await axios.get(`${backendUrl}/api/product/approved/product`, {
-        timeout: 5000,
-      });
-      console.log('Backend is reachable via products endpoint');
+      const response = await axios.get(
+        `${backendUrl}/api/product/approved/product`,
+        {
+          timeout: 5000,
+        }
+      );
+      console.log("Backend is reachable via products endpoint");
       return true;
     } catch (error) {
-      console.error('Backend is not reachable:', error.message);
+      console.error("Backend is not reachable:", error.message);
       return false;
     }
   };
@@ -196,18 +213,22 @@ const Home = () => {
   // Test if cart endpoint exists
   const testCartEndpoint = async () => {
     try {
-      console.log('Testing cart endpoint...');
+      console.log("Testing cart endpoint...");
       // Make a test request to see if endpoint exists
       const response = await axios.get(`${backendUrl}/api/cart`, {
         headers: {
-          'Authorization': `Bearer ${token}`,
+          Authorization: `Bearer ${token}`,
         },
         timeout: 5000,
       });
-      console.log('Cart endpoint is reachable');
+      console.log("Cart endpoint is reachable");
       return true;
     } catch (error) {
-      console.error('Cart endpoint test failed:', error.response?.status, error.message);
+      console.error(
+        "Cart endpoint test failed:",
+        error.response?.status,
+        error.message
+      );
       return false;
     }
   };
@@ -221,9 +242,9 @@ const Home = () => {
       }
     }
   }, [backendUrl, token]);
-  
+
   const LoadingState = () => (
-    <motion.div 
+    <motion.div
       className="flex flex-col items-center justify-center py-20"
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
@@ -246,19 +267,22 @@ const Home = () => {
         </div>
         <div className="absolute -inset-4 border-4 border-amber-200/30 rounded-full animate-ping"></div>
       </motion.div>
-      
+
       <motion.div
         initial={{ y: 20, opacity: 0 }}
         animate={{ y: 0, opacity: 1 }}
         transition={{ delay: 0.3 }}
         className="text-center max-w-md"
       >
-        <h3 className="text-2xl font-bold text-gray-900 mb-3">Harvesting the Finest Saffron</h3>
+        <h3 className="text-2xl font-bold text-gray-900 mb-3">
+          Harvesting the Finest Saffron
+        </h3>
         <p className="text-gray-600 mb-6">
-          We're carefully gathering the world's most precious saffron threads for you. Each strand is being hand-selected for quality.
+          We're carefully gathering the world's most precious saffron threads
+          for you. Each strand is being hand-selected for quality.
         </p>
         <div className="flex justify-center gap-2">
-          {['Kashmir', 'Iran', 'Spain'].map((origin) => (
+          {["Kashmir", "Iran", "Spain"].map((origin) => (
             <motion.span
               key={origin}
               className="px-3 py-1 bg-amber-50 text-amber-800 rounded-full text-sm font-medium"
@@ -275,21 +299,21 @@ const Home = () => {
   return (
     <div className="min-h-screen relative">
       <Toaster richColors closeButton />
-      
+
       {/* Enhanced Hero Section */}
       <div className="relative pt-24 pb-16 px-4 overflow-hidden z-10">
         <div className="absolute inset-0 opacity-10">
           <div className="absolute top-0 left-0 w-32 h-32 bg-white rounded-full mix-blend-overlay blur-xl"></div>
           <div className="absolute bottom-0 right-0 w-64 h-64 bg-white rounded-full mix-blend-overlay blur-xl"></div>
         </div>
-        
-        <motion.div 
+
+        <motion.div
           className="max-w-4xl mx-auto text-center relative z-10"
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5 }}
         >
-          <motion.h1 
+          <motion.h1
             className="text-4xl md:text-6xl font-bold text-white mb-6 leading-tight"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
@@ -297,15 +321,16 @@ const Home = () => {
           >
             World's Finest <span className="text-amber-100">Saffron</span>
           </motion.h1>
-          <motion.p 
+          <motion.p
             className="text-lg md:text-xl text-white/90 max-w-2xl mx-auto mb-8 leading-relaxed"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ delay: 0.3 }}
           >
-            Discover premium saffron from Kashmir, Iran, and Spain. Each thread carefully selected for exceptional quality and flavor.
+            Discover premium saffron from Kashmir, Iran, and Spain. Each thread
+            carefully selected for exceptional quality and flavor.
           </motion.p>
-          
+
           <motion.div
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
@@ -313,7 +338,9 @@ const Home = () => {
             className="inline-flex items-center gap-2 px-6 py-3 bg-white/10 backdrop-blur-sm border border-white/20 rounded-full"
           >
             <Star className="w-5 h-5 text-amber-200 fill-current" />
-            <span className="text-amber-100 font-medium">Trusted by chefs worldwide</span>
+            <span className="text-amber-100 font-medium">
+              Trusted by chefs worldwide
+            </span>
           </motion.div>
         </motion.div>
       </div>
@@ -323,15 +350,15 @@ const Home = () => {
         {isLoading ? (
           <LoadingState />
         ) : products.length > 0 ? (
-          <motion.div 
+          <motion.div
             className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ delay: 0.3 }}
           >
             {products.map((product) => (
-              <motion.div 
-                key={product._id} 
+              <motion.div
+                key={product._id}
                 className="group bg-white border-2 border-black rounded-xl overflow-hidden hover:shadow-lg transition-all duration-300 hover:-translate-y-1 cursor-pointer relative z-40"
                 whileHover={{ scale: 1.02 }}
                 whileTap={{ scale: 0.98 }}
@@ -340,43 +367,47 @@ const Home = () => {
                 transition={{ duration: 0.3 }}
               >
                 <div className="relative h-48 bg-gradient-to-br from-amber-50 via-orange-50 to-amber-100 overflow-hidden">
-                  <motion.div 
+                  <motion.div
                     className="absolute inset-0 flex items-center justify-center"
                     initial={{ opacity: 0.1 }}
                     whileHover={{ opacity: 0.15 }}
                   >
                     <div className="text-7xl font-black text-amber-400/20 transition-colors duration-300">
-                      {product.origin?.charAt(0) || 'S'}
+                      {product.origin?.charAt(0) || "S"}
                     </div>
                   </motion.div>
-                  
+
                   <div className="absolute top-4 right-4">
-                    <motion.span 
+                    <motion.span
                       className={`inline-flex items-center px-3 py-1 rounded-full text-xs font-bold ${
-                        product.grade === 'premium' 
-                          ? 'bg-gradient-to-r from-amber-500 to-[#ff6523] text-white shadow-md' 
-                          : product.grade === 'category1' 
-                          ? 'bg-gradient-to-r from-[#ff6523] to-orange-500 text-white' 
-                          : 'bg-gray-200 text-gray-800'
+                        product.grade === "premium"
+                          ? "bg-gradient-to-r from-amber-500 to-[#ff6523] text-white shadow-md"
+                          : product.grade === "category1"
+                          ? "bg-gradient-to-r from-[#ff6523] to-orange-500 text-white"
+                          : "bg-gray-200 text-gray-800"
                       }`}
                       whileHover={{ scale: 1.05 }}
                     >
-                      {product.grade === 'premium' && <Zap className="w-3 h-3 mr-1" />}
-                      {product.grade === 'premium' && 'Premium'}
-                      {product.grade === 'category1' && 'Category I'}
-                      {product.grade === 'category2' && 'Category II'}
-                      {product.grade === 'category3' && 'Category III'}
-                      {product.grade === 'bunch' && 'Bunch'}
+                      {product.grade === "premium" && (
+                        <Zap className="w-3 h-3 mr-1" />
+                      )}
+                      {product.grade === "premium" && "Premium"}
+                      {product.grade === "category1" && "Category I"}
+                      {product.grade === "category2" && "Category II"}
+                      {product.grade === "category3" && "Category III"}
+                      {product.grade === "bunch" && "Bunch"}
                     </motion.span>
                   </div>
 
                   {product.rating && (
-                    <motion.div 
+                    <motion.div
                       className="absolute bottom-4 left-4 flex items-center gap-1 bg-white/90 backdrop-blur-sm px-3 py-1 rounded-full shadow-sm"
                       whileHover={{ scale: 1.05 }}
                     >
                       <Star className="w-3 h-3 text-yellow-500 fill-current" />
-                      <span className="text-xs text-gray-800 font-semibold">{product.rating}</span>
+                      <span className="text-xs text-gray-800 font-semibold">
+                        {product.rating}
+                      </span>
                     </motion.div>
                   )}
                 </div>
@@ -387,7 +418,9 @@ const Home = () => {
                       {product.name}
                     </h3>
                     <div className="flex items-center justify-between mb-2">
-                      <span className="text-sm text-gray-600 font-medium">{product.origin}</span>
+                      <span className="text-sm text-gray-600 font-medium">
+                        {product.origin}
+                      </span>
                       {product.crocin && (
                         <span className="text-xs bg-gray-100 text-gray-600 px-2 py-1 rounded-full font-medium">
                           {product.crocin} Crocin
@@ -395,20 +428,26 @@ const Home = () => {
                       )}
                     </div>
                   </div>
-                  
+
                   <div className="flex items-center justify-between">
                     <div>
-                      <span className="text-2xl font-bold text-gray-900">₹{product.price}</span>
+                      <span className="text-2xl font-bold text-gray-900">
+                        ₹{product.price}
+                      </span>
                       <div className="text-sm text-gray-500">per gram</div>
                     </div>
-                    <motion.button 
+                    <motion.button
                       className="px-4 py-2 bg-gradient-to-r from-[#ff6523] to-[#e55a1d] text-white text-sm font-semibold rounded-lg transition-all duration-300 shadow-md hover:shadow-lg relative z-50 disabled:opacity-50 disabled:cursor-not-allowed"
                       onClick={(e) => {
                         e.stopPropagation();
                         handleAddToCart(product);
                       }}
-                      whileHover={{ scale: loadingProductId === product._id ? 1 : 1.05 }}
-                      whileTap={{ scale: loadingProductId === product._id ? 1 : 0.95 }}
+                      whileHover={{
+                        scale: loadingProductId === product._id ? 1 : 1.05,
+                      }}
+                      whileTap={{
+                        scale: loadingProductId === product._id ? 1 : 0.95,
+                      }}
                       disabled={loadingProductId === product._id}
                     >
                       {loadingProductId === product._id ? (
@@ -426,22 +465,26 @@ const Home = () => {
             ))}
           </motion.div>
         ) : (
-          <motion.div 
+          <motion.div
             className="text-center py-20"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ delay: 0.3 }}
           >
             <div className="max-w-md mx-auto">
-              <motion.div 
+              <motion.div
                 className="w-16 h-16 bg-gradient-to-r from-[#ff6523] to-[#e55a1d] rounded-full flex items-center justify-center mx-auto mb-6"
                 animate={{ rotate: 360 }}
                 transition={{ duration: 2, repeat: Infinity, ease: "linear" }}
               >
                 <Search className="w-8 h-8 text-white" />
               </motion.div>
-              <h3 className="text-xl font-bold text-gray-900 mb-4">No products available</h3>
-              <p className="text-gray-600 mb-8">We couldn't find any saffron products at the moment.</p>
+              <h3 className="text-xl font-bold text-gray-900 mb-4">
+                No products available
+              </h3>
+              <p className="text-gray-600 mb-8">
+                We couldn't find any saffron products at the moment.
+              </p>
             </div>
           </motion.div>
         )}
