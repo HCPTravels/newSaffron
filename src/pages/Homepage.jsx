@@ -5,7 +5,7 @@ import { toast, Toaster } from "sonner";
 import axios from "axios";
 import { useAuth } from "../context/AuthContext";
 
-const Home = () => {
+const Home = ({ onSelectProduct }) => {
   const [isLoading, setIsLoading] = useState(false);
   const [isHovered, setIsHovered] = useState(false);
   const [products, setProducts] = useState([]);
@@ -359,6 +359,9 @@ const Home = () => {
             {products.map((product) => (
               <motion.div
                 key={product._id}
+                onClick={() => {
+                  onSelectProduct(product._id);
+                }}
                 className="group bg-white border-2 border-black rounded-xl overflow-hidden hover:shadow-lg transition-all duration-300 hover:-translate-y-1 cursor-pointer relative z-40"
                 whileHover={{ scale: 1.02 }}
                 whileTap={{ scale: 0.98 }}
