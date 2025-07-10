@@ -51,8 +51,13 @@ const ProductFeatureSection = ({
             {features.map((feature, index) => (
               <div
                 key={index}
-                className="group inline-flex items-center gap-3 md:gap-4 px-3 py-2 rounded-full hover:bg-[#fef3ec] transition-all duration-200 cursor-pointer"
+                className="group inline-flex items-center gap-3 md:gap-4 px-3 py-2 rounded-full hover:bg-[#fef3ec] transition-all duration-200 cursor-pointer relative z-30"
                 onClick={feature.onClick}
+                style={{
+                  position: 'relative',
+                  zIndex: 30, // Higher than bee canvas z-index (20)
+                  pointerEvents: 'auto', // Explicitly enable pointer events
+                }}
               >
                 {/* Icon */}
                 <div className="flex items-center justify-center w-6 h-6 md:w-9 md:h-9 bg-[#ffe1d2] group-hover:bg-[#ffc8a8] rounded-full transition-all">

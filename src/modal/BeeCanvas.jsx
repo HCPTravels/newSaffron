@@ -234,35 +234,15 @@ export default function BeeCanvas() {
         left: `${finalX}px`,
         width: `${canvasWidth}px`,
         height: `${canvasHeight}px`,
-        pointerEvents: 'none',
-        zIndex: 20,
-        // Ensure completely transparent background
+        pointerEvents: 'none', // This ensures the entire div doesn't capture clicks
+        zIndex: 20, // Keep original z-index
         background: 'transparent',
         backgroundColor: 'transparent',
         opacity: canvasReady ? 1 : 0,
         transition: 'opacity 0.5s ease-in-out',
-        // Prevent any white background bleeding
         overflow: 'hidden',
-      }}
-      // Additional safety to ensure clicks pass through
-      onMouseDown={(e) => e.stopPropagation()}
-      onMouseUp={(e) => e.stopPropagation()}
-      onClick={(e) => {
-        e.stopPropagation();
-        // Find element behind the canvas and trigger click
-        const elementBehind = document.elementFromPoint(
-          e.clientX, 
-          e.clientY - canvasHeight
-        );
-        if (elementBehind && elementBehind !== e.target) {
-          const clickEvent = new MouseEvent('click', {
-            bubbles: true,
-            cancelable: true,
-            clientX: e.clientX,
-            clientY: e.clientY
-          });
-          elementBehind.dispatchEvent(clickEvent);
-        }
+        // Remove the red border for production
+        // border: '4px solid red'
       }}
     >
       <Canvas
@@ -270,30 +250,28 @@ export default function BeeCanvas() {
           alpha: true, 
           antialias: true, 
           powerPreference: 'high-performance',
-          preserveDrawingBuffer: false, // Prevent white flash
-          premultipliedAlpha: false, // Better transparency handling
-          clearColor: [0, 0, 0, 0], // Fully transparent clear color
+          preserveDrawingBuffer: false,
+          premultipliedAlpha: false,
+          clearColor: [0, 0, 0, 0],
         }}
         style={{ 
           background: 'transparent',
           backgroundColor: 'transparent', 
           width: '100%', 
           height: '100%',
-          pointerEvents: 'none', // Double ensure no pointer events
-          opacity: 'inherit', // Inherit opacity from parent
+          pointerEvents: 'none', // Also disable pointer events on canvas
+          opacity: 'inherit',
         }}
         camera={{
           position: [0, 0, 5],
           fov: screenSize.isMobile ? 70 : screenSize.isTablet ? 60 : 45,
         }}
-        // Prevent context menu and other interactions
         onContextMenu={(e) => e.preventDefault()}
         onSelectStart={(e) => e.preventDefault()}
         onDragStart={(e) => e.preventDefault()}
-        // Ensure canvas is created properly
         onCreated={({ gl, scene }) => {
-          gl.setClearColor(0x000000, 0); // Set transparent clear color
-          scene.background = null; // Ensure no background
+          gl.setClearColor(0x000000, 0);
+          scene.background = null;
         }}
       >
         <AnimatedCamera scrollY={scrollYRef} />
