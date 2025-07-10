@@ -1,5 +1,14 @@
 import React, { useState, useEffect, useRef } from "react";
-import { Home, Grid, User, ShoppingCart, Search, Heart, ChevronDown, Globe } from "lucide-react";
+import {
+  Home,
+  Grid,
+  User,
+  ShoppingCart,
+  Search,
+  Heart,
+  ChevronDown,
+  Globe,
+} from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 import saffronLogo from "../assets/saffron logo.png";
@@ -169,7 +178,7 @@ const Profile = () => {
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
               />
-              <button 
+              <button
                 type="submit"
                 className="absolute right-2 top-1/2 transform -translate-y-1/2 bg-[#ff6523] text-white px-3 py-1 rounded-full text-sm font-medium hover:bg-[#e55b1f] transition-colors"
               >
@@ -188,18 +197,28 @@ const Profile = () => {
               >
                 <Globe className="h-5 w-5" />
                 <span className="text-sm font-medium">{selectedCurrency}</span>
-                <ChevronDown className={`h-4 w-4 transition-transform ${isCurrencyOpen ? 'transform rotate-180' : ''}`} />
+                <ChevronDown
+                  className={`h-4 w-4 transition-transform ${
+                    isCurrencyOpen ? "transform rotate-180" : ""
+                  }`}
+                />
               </button>
-              
+
               {isCurrencyOpen && (
                 <div className="absolute right-0 mt-2 w-48 bg-white rounded-lg shadow-lg z-50 py-1">
                   {currencies.map((currency) => (
                     <button
                       key={currency.code}
-                      className={`w-full text-left px-4 py-2 hover:bg-[#ff6523]/10 flex items-center ${selectedCurrency === currency.code ? 'bg-[#ff6523]/10 text-[#ff6523]' : 'text-gray-800'}`}
+                      className={`w-full text-left px-4 py-2 hover:bg-[#ff6523]/10 flex items-center ${
+                        selectedCurrency === currency.code
+                          ? "bg-[#ff6523]/10 text-[#ff6523]"
+                          : "text-gray-800"
+                      }`}
                       onClick={() => handleCurrencySelect(currency)}
                     >
-                      <span className="font-medium mr-2">{currency.symbol}</span>
+                      <span className="font-medium mr-2">
+                        {currency.symbol}
+                      </span>
                       <span>{currency.name}</span>
                     </button>
                   ))}
@@ -208,9 +227,9 @@ const Profile = () => {
             </div>
 
             {/* Wishlist */}
-            <button 
+            <button
               className="p-2 text-black transition-colors relative group"
-              onClick={() => navigate('/wishlist')}
+              onClick={() => navigate("/wishlist")}
             >
               <Heart className="h-6 w-6 transition-colors" />
               <span className="absolute -top-1 -right-1 text-white bg-[#ff6523] text-xs rounded-full h-5 w-5 flex items-center justify-center">
@@ -221,30 +240,31 @@ const Profile = () => {
             {/* Cart */}
             <button
               className="p-2 text-black transition-colors relative"
-              onClick={() => setActiveTab("Cart")}
+              // onClick={() => setActiveTab("Cart")}
+              onClick={() => navigate("/cart")}
             >
               <ShoppingCart className="h-6 w-6" />
               <span className="absolute -top-1 -right-1 text-white bg-[#ff6523] text-xs rounded-full h-5 w-5 flex items-center justify-center">
                 3
               </span>
             </button>
-            
+
             {/* Profile */}
-            <div 
-              className="relative" 
+            <div
+              className="relative"
               ref={profileButtonRef}
               onMouseEnter={handleProfileMouseEnter}
               onMouseLeave={handleProfileMouseLeave}
             >
               <button
                 className={`p-2 text-black transition-colors rounded-lg ${
-                  isProfileVisible ? 'bg-black/10' : 'hover:bg-black/10'
+                  isProfileVisible ? "bg-black/10" : "hover:bg-black/10"
                 }`}
                 onClick={handleProfileClick}
               >
                 <User className="h-6 w-6" />
               </button>
-              
+
               {!isMobile && isProfileVisible && (
                 <div
                   ref={dropdownRef}
@@ -285,7 +305,9 @@ const Profile = () => {
                md:top-[586px] md:left-[-154px] md:w-[375px] md:h-[375px]
                object-cover pointer-events-none opacity-30 z-11 transition-transform duration-700 ease-out"
         style={{
-          transform: `translateY(${scrollY * -0.2}px) rotate(${scrollY * 0.1}deg)`,
+          transform: `translateY(${scrollY * -0.2}px) rotate(${
+            scrollY * 0.1
+          }deg)`,
         }}
       />
 
@@ -300,7 +322,9 @@ const Profile = () => {
           <div
             className="absolute top-2 bottom-2 bg-gradient-to-r from-[#ff6523]/20 to-[#ff6523]/30 rounded-xl transition-all duration-500 ease-out"
             style={{
-              left: `${mobileTabs.findIndex((tab) => tab.label === activeTab) * 25 + 2}%`,
+              left: `${
+                mobileTabs.findIndex((tab) => tab.label === activeTab) * 25 + 2
+              }%`,
               width: "21%",
               transform: `translateY(${Math.sin(Date.now() * 0.001) * 1}px)`,
             }}
