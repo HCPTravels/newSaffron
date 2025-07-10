@@ -1,11 +1,11 @@
 import React, { useRef } from 'react';
-import { 
-  Crown, 
-  Flower, 
-  Sparkles, 
-  MapPin, 
-  Clock, 
-  Star, 
+import {
+  Crown,
+  Flower,
+  Sparkles,
+  MapPin,
+  Clock,
+  Star,
   Droplets,
   ShieldCheck,
   Award,
@@ -18,12 +18,16 @@ import {
 // Image imports (replace with your actual image paths)
 import saffronField from '../assets/crocus.jpg';
 import saffronCloseup from '../assets/stigma.jpg';
-import saffronDishes from '../assets/bowl.jpg';
-import saffronHarvest from '../assets/tea.jpg';
-import saffronSpice from '../assets/saffronharvesting.jpg';
-import saffronTips from '../assets/weighingh.png';
+import liquid from '../assets/liquid.jpg'
 import thread from '../assets/thread.jpg'
 import inused from '../assets/inused.jpg'
+import icecream from '../assets/icecream.jpg'
+import persian from '../assets/persian.jpg'
+import biryani from '../assets/biryani.jpg'
+import tea from '../assets/tea1.jpg'
+import saffronHarvesting from '../assets/harvesting.jpg'
+import luxuary from '../assets/luxuary.jpg'
+
 
 const SaffronComponent = () => {
   const sectionRefs = {
@@ -46,12 +50,12 @@ const SaffronComponent = () => {
       {/* Hero Section */}
       <section className="relative h-screen flex items-center justify-center overflow-hidden">
         <div className="absolute inset-0 bg-black/30 z-0"></div>
-        <img 
-          src={saffronField} 
+        <img
+          src={saffronField}
           alt="Saffron field with purple flowers"
           className="absolute inset-0 w-full h-full object-cover object-center"
         />
-        
+
         <div className="relative z-10 text-center px-6 max-w-4xl">
           <div className="inline-flex items-center gap-3 mb-6">
             <Crown className="h-8 w-8 text-yellow-300" />
@@ -63,8 +67,8 @@ const SaffronComponent = () => {
           <p className="text-xl md:text-2xl text-white/90 font-medium mb-8 drop-shadow-md">
             The World's Most Luxurious Spice
           </p>
-          
-          <button 
+
+          <button
             onClick={scrollToNextSection}
             className="mt-4 animate-bounce flex flex-col items-center text-white hover:text-yellow-200 transition-colors"
           >
@@ -77,20 +81,20 @@ const SaffronComponent = () => {
       {/* Main Content */}
       <main className="container mx-auto px-6 pb-20 relative z-10 space-y-32">
         {/* Overview Section */}
-        <section 
-          id="overview" 
+        <section
+          id="overview"
           ref={sectionRefs.overview}
           className="grid md:grid-cols-2 gap-12 items-center mt-20"
         >
           <div className="relative rounded-3xl overflow-hidden shadow-2xl h-96">
-            <img 
-              src={saffronCloseup} 
+            <img
+              src={saffronCloseup}
               alt="Closeup of saffron threads"
               className="absolute inset-0 w-full h-full object-cover"
             />
             <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent"></div>
           </div>
-          
+
           <div>
             <div className="flex items-center gap-2 mb-4">
               <div className="w-8 h-0.5 bg-orange-500"></div>
@@ -100,9 +104,9 @@ const SaffronComponent = () => {
               The Red Gold of Spices
             </h2>
             <p className="text-lg text-gray-600 mb-6 leading-relaxed">
-              Saffron, often referred to as "red gold," is the world's most precious spice. Each delicate thread is 
-              hand-harvested from the Crocus sativus flower, with approximately 75,000 blossoms needed to produce 
-              just one pound of saffron. This labor-intensive process contributes to its status as a symbol of luxury 
+              Saffron, often referred to as "red gold," is the world's most precious spice. Each delicate thread is
+              hand-harvested from the Crocus sativus flower, with approximately 75,000 blossoms needed to produce
+              just one pound of saffron. This labor-intensive process contributes to its status as a symbol of luxury
               and culinary excellence across cultures.
             </p>
             <div className="flex items-center gap-4">
@@ -119,8 +123,8 @@ const SaffronComponent = () => {
         </section>
 
         {/* Characteristics Section */}
-        <section 
-          id="characteristics" 
+        <section
+          id="characteristics"
           ref={sectionRefs.characteristics}
           className="grid md:grid-cols-2 gap-12 items-center"
         >
@@ -128,8 +132,8 @@ const SaffronComponent = () => {
             <div className="grid grid-cols-3 gap-2 h-96">
               {/* Color Panel */}
               <div className="relative rounded-l-2xl overflow-hidden">
-                <img 
-                  src={saffronCloseup} 
+                <img
+                  src={saffronCloseup}
                   alt="Saffron threads macro view"
                   className="absolute inset-0 w-full h-full object-cover"
                 />
@@ -137,11 +141,11 @@ const SaffronComponent = () => {
                   <span className="text-white font-medium">Color</span>
                 </div>
               </div>
-              
+
               {/* Aroma Panel */}
               <div className="relative">
-                <img 
-                  src={thread} 
+                <img
+                  src={thread}
                   alt="Saffron steeping in liquid"
                   className="absolute inset-0 w-full h-full object-cover"
                 />
@@ -149,11 +153,11 @@ const SaffronComponent = () => {
                   <span className="text-white font-medium">Aroma</span>
                 </div>
               </div>
-              
+
               {/* Flavor Panel */}
               <div className="relative rounded-r-2xl overflow-hidden">
-                <img 
-                  src={inused} 
+                <img
+                  src={inused}
                   alt="Golden saffron rice dish"
                   className="absolute inset-0 w-full h-full object-cover"
                 />
@@ -163,7 +167,7 @@ const SaffronComponent = () => {
               </div>
             </div>
           </div>
-          
+
           <div className="order-2 md:order-1">
             <div className="flex items-center gap-2 mb-4">
               <div className="w-8 h-0.5 bg-orange-500"></div>
@@ -172,7 +176,7 @@ const SaffronComponent = () => {
             <h2 className="text-4xl font-bold text-gray-800 mb-6">
               Unique Characteristics
             </h2>
-            
+
             <div className="space-y-6">
               <div className="flex items-start gap-4">
                 <div className="flex-shrink-0 mt-1">
@@ -183,12 +187,12 @@ const SaffronComponent = () => {
                 <div>
                   <h3 className="text-xl font-bold text-gray-800 mb-2">Vibrant Color</h3>
                   <p className="text-gray-600">
-                    Saffron's intense golden hue comes from crocin, a natural carotenoid dye that infuses dishes with 
+                    Saffron's intense golden hue comes from crocin, a natural carotenoid dye that infuses dishes with
                     its signature color.
                   </p>
                 </div>
               </div>
-              
+
               <div className="flex items-start gap-4">
                 <div className="flex-shrink-0 mt-1">
                   <div className="w-10 h-10 bg-orange-100 rounded-full flex items-center justify-center">
@@ -202,7 +206,7 @@ const SaffronComponent = () => {
                   </p>
                 </div>
               </div>
-              
+
               <div className="flex items-start gap-4">
                 <div className="flex-shrink-0 mt-1">
                   <div className="w-10 h-10 bg-orange-100 rounded-full flex items-center justify-center">
@@ -220,9 +224,9 @@ const SaffronComponent = () => {
           </div>
         </section>
 
-        {/* Culinary Section */}
-        <section 
-          id="culinary" 
+        {/* Culinary Section - Updated with Collage */}
+        <section
+          id="culinary"
           ref={sectionRefs.culinary}
           className="bg-gradient-to-br from-orange-50 to-amber-50 rounded-3xl p-12 shadow-lg"
         >
@@ -236,10 +240,10 @@ const SaffronComponent = () => {
                 Culinary Masterpieces
               </h2>
               <p className="text-lg text-gray-600 mb-8 leading-relaxed">
-                Saffron elevates both sweet and savory dishes across global cuisines. Its versatility makes it 
+                Saffron elevates both sweet and savory dishes across global cuisines. Its versatility makes it
                 indispensable in gourmet cooking, from Spanish paella to Persian tahdig and Indian biryanis.
               </p>
-              
+
               <div className="grid grid-cols-2 gap-4">
                 <div className="bg-white p-4 rounded-xl shadow-sm">
                   <ChefHat className="h-6 w-6 text-orange-500 mb-2" />
@@ -251,43 +255,76 @@ const SaffronComponent = () => {
                   <h4 className="font-bold text-gray-800">Desserts</h4>
                   <p className="text-sm text-gray-600">Ice cream, cakes, puddings</p>
                 </div>
-                <div className="bg-white p-4 rounded-xl shadow-sm">
-                  <Droplets className="h-6 w-6 text-orange-500 mb-2" />
-                  <h4 className="font-bold text-gray-800">Beverages</h4>
-                  <p className="text-sm text-gray-600">Teas, lattes, cocktails</p>
-                </div>
-                <div className="bg-white p-4 rounded-xl shadow-sm">
-                  <ShieldCheck className="h-6 w-6 text-orange-500 mb-2" />
-                  <h4 className="font-bold text-gray-800">Health Benefits</h4>
-                  <p className="text-sm text-gray-600">Antioxidant properties</p>
-                </div>
               </div>
             </div>
-            
-            <div className="relative rounded-2xl overflow-hidden shadow-xl h-96">
-              <img 
-                src={saffronDishes} 
-                alt="Various dishes with saffron"
-                className="absolute inset-0 w-full h-full object-cover"
-              />
+
+            {/* Collage Grid */}
+            <div className="grid grid-cols-2 grid-rows-2 gap-3 h-96">
+              {/* Paella (Top Left) */}
+              <div className="relative rounded-tl-2xl overflow-hidden">
+                <img
+                  src={tea}
+                  alt="Saffron Tea"
+                  className="absolute inset-0 w-full h-full object-cover"
+                />
+                <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/60 to-transparent p-3">
+                  <p className="text-white font-medium text-sm">Saffron Tea</p>
+                </div>
+              </div>
+
+              {/* Tahdig (Top Right) */}
+              <div className="relative rounded-tr-2xl overflow-hidden">
+                <img
+                  src={persian}
+                  alt="Persian tahdig"
+                  className="absolute inset-0 w-full h-full object-cover"
+                />
+                <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/60 to-transparent p-3">
+                  <p className="text-white font-medium text-sm">Persian Tahdig</p>
+                </div>
+              </div>
+
+              {/* Biryani (Bottom Left) */}
+              <div className="relative rounded-bl-2xl overflow-hidden">
+                <img
+                  src={biryani}
+                  alt="Indian biryani"
+                  className="absolute inset-0 w-full h-full object-cover"
+                />
+                <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/60 to-transparent p-3">
+                  <p className="text-white font-medium text-sm">Indian Biryani</p>
+                </div>
+              </div>
+
+              {/* Ice Cream (Bottom Right) */}
+              <div className="relative rounded-br-2xl overflow-hidden">
+                <img
+                  src={icecream}
+                  alt="Persian saffron ice cream"
+                  className="absolute inset-0 w-full h-full object-cover"
+                />
+                <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/60 to-transparent p-3">
+                  <p className="text-white font-medium text-sm">Saffron Ice Cream</p>
+                </div>
+              </div>
             </div>
           </div>
         </section>
 
         {/* Cultivation Section */}
-        <section 
-          id="cultivation" 
+        <section
+          id="cultivation"
           ref={sectionRefs.cultivation}
           className="grid md:grid-cols-2 gap-12 items-center"
         >
           <div className="relative rounded-3xl overflow-hidden shadow-2xl h-96">
-            <img 
-              src={saffronHarvest} 
+            <img
+              src={saffronHarvesting}
               alt="Harvesting saffron flowers"
               className="absolute inset-0 w-full h-full object-cover"
             />
           </div>
-          
+
           <div>
             <div className="flex items-center gap-2 mb-4">
               <div className="w-8 h-0.5 bg-orange-500"></div>
@@ -296,7 +333,7 @@ const SaffronComponent = () => {
             <h2 className="text-4xl font-bold text-gray-800 mb-6">
               The Art of Harvesting
             </h2>
-            
+
             <div className="space-y-6">
               <div className="flex items-start gap-4">
                 <div className="flex-shrink-0 mt-1">
@@ -311,7 +348,7 @@ const SaffronComponent = () => {
                   </p>
                 </div>
               </div>
-              
+
               <div className="flex items-start gap-4">
                 <div className="flex-shrink-0 mt-1">
                   <div className="w-10 h-10 bg-orange-100 rounded-full flex items-center justify-center">
@@ -325,7 +362,7 @@ const SaffronComponent = () => {
                   </p>
                 </div>
               </div>
-              
+
               <div className="flex items-start gap-4">
                 <div className="flex-shrink-0 mt-1">
                   <div className="w-10 h-10 bg-orange-100 rounded-full flex items-center justify-center">
@@ -344,8 +381,8 @@ const SaffronComponent = () => {
         </section>
 
         {/* Luxury Section */}
-        <section 
-          id="luxury" 
+        <section
+          id="luxury"
           ref={sectionRefs.luxury}
           className="bg-gradient-to-br from-orange-900 to-amber-900 rounded-3xl p-12 shadow-xl text-white"
         >
@@ -359,10 +396,10 @@ const SaffronComponent = () => {
                 The Spice of Kings
               </h2>
               <p className="text-lg text-orange-100 mb-8 leading-relaxed">
-                Saffron's rarity and exquisite qualities have made it a symbol of wealth and status throughout history. 
+                Saffron's rarity and exquisite qualities have made it a symbol of wealth and status throughout history.
                 Ancient rulers used it to perfume their baths, dye royal garments, and enhance their feasts.
               </p>
-              
+
               <div className="grid grid-cols-2 gap-4">
                 <div className="bg-white/10 p-4 rounded-xl backdrop-blur-sm">
                   <Crown className="h-6 w-6 text-orange-300 mb-2" />
@@ -386,11 +423,11 @@ const SaffronComponent = () => {
                 </div>
               </div>
             </div>
-            
+
             <div className="relative rounded-2xl overflow-hidden shadow-xl h-96">
               <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent"></div>
-              <img 
-                src={saffronTips}
+              <img
+                src={luxuary}
                 alt="Saffron threads being measured"
                 className="absolute inset-0 w-full h-full object-cover"
               />
@@ -400,72 +437,104 @@ const SaffronComponent = () => {
 
         {/* Tips Section */}
         <section 
-          id="tips" 
-          ref={sectionRefs.tips}
-          className="grid md:grid-cols-2 gap-12 items-center"
-        >
-          <div className="relative rounded-3xl overflow-hidden shadow-2xl h-96">
-            <img 
-              src={saffronHarvest} 
-              alt="Using saffron in cooking"
-              className="absolute inset-0 w-full h-full object-cover"
-            />
+  id="tips"
+  ref={sectionRefs.tips}
+  className="grid md:grid-cols-2 gap-12 items-center"
+>
+  {/* Image Collage - Now showing all three key steps */}
+  <div className="grid grid-cols-3 gap-3 h-96">
+    {/* Activation Step */}
+    <div className="relative rounded-l-2xl overflow-hidden">
+      <img
+        src={liquid} // Replace with your activation image
+        alt="Saffron steeping in liquid"
+        className="absolute inset-0 w-full h-full object-cover"
+      />
+      <div className="absolute inset-0 bg-gradient-to-t from-black/40 to-transparent flex items-end p-3">
+        <span className="text-white text-sm font-medium">Activation</span>
+      </div>
+    </div>
+
+    {/* Storage Step */}
+    <div className="relative">
+      <img
+        src="/images/saffron-storage.jpg" // Replace with your storage image
+        alt="Proper saffron storage"
+        className="absolute inset-0 w-full h-full object-cover"
+      />
+      <div className="absolute inset-0 bg-gradient-to-t from-black/40 to-transparent flex items-end p-3">
+        <span className="text-white text-sm font-medium">Storage</span>
+      </div>
+    </div>
+
+    {/* Dosage Step */}
+    <div className="relative rounded-r-2xl overflow-hidden">
+      <img
+        src="/images/saffron-dosage.jpg" // Replace with your dosage image
+        alt="Measuring saffron threads"
+        className="absolute inset-0 w-full h-full object-cover"
+      />
+      <div className="absolute inset-0 bg-gradient-to-t from-black/40 to-transparent flex items-end p-3">
+        <span className="text-white text-sm font-medium">Dosage</span>
+      </div>
+    </div>
+  </div>
+
+  {/* Text Content */}
+  <div>
+    <div className="flex items-center gap-2 mb-4">
+      <div className="w-8 h-0.5 bg-orange-500"></div>
+      <span className="text-orange-500 font-medium">Guide</span>
+    </div>
+    <h2 className="text-4xl font-bold text-gray-800 mb-6">
+      Using Saffron Like a Chef
+    </h2>
+
+    <div className="space-y-6">
+      <div className="flex items-start gap-4 group">
+        <div className="flex-shrink-0 mt-1">
+          <div className="w-10 h-10 bg-orange-100 rounded-full flex items-center justify-center group-hover:bg-orange-200 transition-colors">
+            <Lightbulb className="h-5 w-5 text-orange-500" />
           </div>
-          
-          <div>
-            <div className="flex items-center gap-2 mb-4">
-              <div className="w-8 h-0.5 bg-orange-500"></div>
-              <span className="text-orange-500 font-medium">Guide</span>
-            </div>
-            <h2 className="text-4xl font-bold text-gray-800 mb-6">
-              Using Saffron Like a Chef
-            </h2>
-            
-            <div className="space-y-6">
-              <div className="flex items-start gap-4">
-                <div className="flex-shrink-0 mt-1">
-                  <div className="w-10 h-10 bg-orange-100 rounded-full flex items-center justify-center">
-                    <Lightbulb className="h-5 w-5 text-orange-500" />
-                  </div>
-                </div>
-                <div>
-                  <h3 className="text-xl font-bold text-gray-800 mb-2">Activation</h3>
-                  <p className="text-gray-600">
-                    Crush threads and soak in warm liquid (water, milk, or stock) for 15-20 minutes to release full flavor.
-                  </p>
-                </div>
-              </div>
-              
-              <div className="flex items-start gap-4">
-                <div className="flex-shrink-0 mt-1">
-                  <div className="w-10 h-10 bg-orange-100 rounded-full flex items-center justify-center">
-                    <ShieldCheck className="h-5 w-5 text-orange-500" />
-                  </div>
-                </div>
-                <div>
-                  <h3 className="text-xl font-bold text-gray-800 mb-2">Storage</h3>
-                  <p className="text-gray-600">
-                    Keep in an airtight container away from light and heat. Properly stored saffron lasts 2-3 years.
-                  </p>
-                </div>
-              </div>
-              
-              <div className="flex items-start gap-4">
-                <div className="flex-shrink-0 mt-1">
-                  <div className="w-10 h-10 bg-orange-100 rounded-full flex items-center justify-center">
-                    <Star className="h-5 w-5 text-orange-500" />
-                  </div>
-                </div>
-                <div>
-                  <h3 className="text-xl font-bold text-gray-800 mb-2">Dosage</h3>
-                  <p className="text-gray-600">
-                    A few threads (5-7) typically suffice for 4-6 servings. More doesn't always mean better flavor.
-                  </p>
-                </div>
-              </div>
-            </div>
+        </div>
+        <div>
+          <h3 className="text-xl font-bold text-gray-800 mb-2 group-hover:text-orange-600 transition-colors">Activation</h3>
+          <p className="text-gray-600">
+            Crush threads and soak in warm liquid (water, milk, or stock) for 15-20 minutes to release full flavor.
+          </p>
+        </div>
+      </div>
+
+      <div className="flex items-start gap-4 group">
+        <div className="flex-shrink-0 mt-1">
+          <div className="w-10 h-10 bg-orange-100 rounded-full flex items-center justify-center group-hover:bg-orange-200 transition-colors">
+            <ShieldCheck className="h-5 w-5 text-orange-500" />
           </div>
-        </section>
+        </div>
+        <div>
+          <h3 className="text-xl font-bold text-gray-800 mb-2 group-hover:text-orange-600 transition-colors">Storage</h3>
+          <p className="text-gray-600">
+            Keep in an airtight container away from light and heat. Properly stored saffron lasts 2-3 years.
+          </p>
+        </div>
+      </div>
+
+      <div className="flex items-start gap-4 group">
+        <div className="flex-shrink-0 mt-1">
+          <div className="w-10 h-10 bg-orange-100 rounded-full flex items-center justify-center group-hover:bg-orange-200 transition-colors">
+            <Star className="h-5 w-5 text-orange-500" />
+          </div>
+        </div>
+        <div>
+          <h3 className="text-xl font-bold text-gray-800 mb-2 group-hover:text-orange-600 transition-colors">Dosage</h3>
+          <p className="text-gray-600">
+            A few threads (5-7) typically suffice for 4-6 servings. More doesn't always mean better flavor.
+          </p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
       </main>
 
       {/* Footer */}
