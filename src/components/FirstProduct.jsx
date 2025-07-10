@@ -20,7 +20,7 @@ const ProductFeatureSection = ({
         <div
           className={`w-full space-y-4 text-[#ffc1a7] ${isEven
             ? 'order-1 md:order-1 text-left md:text-left items-start'
-            : 'order-2 md:order-2 text-right md:text-left items-start'
+            : 'order-2 md:order-2 text-left md:text-left items-start'
             }`}
         >
           <h2 className="text-sm sm:text-3xl md:text-5xl font-bold leading-tight">
@@ -31,10 +31,10 @@ const ProductFeatureSection = ({
             <div className="absolute top-[40px] left-[40px] w-24 h-24 bg-white/70 rounded-full blur-[70px]" />
             <div className="whitespace-pre-wrap">
               {description.split('&').map((paragraph, index) => (
-                <p 
-                  key={index} 
-                  className="text-left mb-4 last:mb-0"
-                  style={{ 
+                <p
+                  key={index}
+                  className="text-left mb-4 line-clamp-7 md:line-clamp-none last:mb-0"
+                  style={{
                     wordBreak: 'break-word',
                     hyphens: 'auto',
                     lineHeight: '1.6',
@@ -48,30 +48,27 @@ const ProductFeatureSection = ({
           </div>
 
           <div className="md:block">
-          {features.map((feature, index) => (
-  <div
-    key={index}
-    className="flex items-start gap-1 md:gap-3 space-y-2"
-  >
-    <div 
-      className="flex-shrink-0 mt-0.5 cursor-pointer"
-      onClick={feature.onClick}
-    >
-      {feature.icon === 'link' ? (
-        <Link className="text-black w-2 h-2 md:w-4 md:h-4" />
-      ) : (
-        <MoveRight className="text-black w-2 h-2 md:w-4 md:h-4" />
-      )}
-    </div>
-
-    <p
-      className="md:text-[16px] text-[8px] text-black leading-snug break-words cursor-pointer"
-      onClick={feature.onClick} // ✅ Make the text clickable too
-    >
-      {feature.text}
-    </p>
-  </div>
-))}
+            {features.map((feature, index) => (
+              <div
+                key={index}
+                className="group inline-flex items-center gap-3 md:gap-4 px-3 py-2 rounded-full hover:bg-[#fef3ec] transition-all duration-200 cursor-pointer"
+                onClick={feature.onClick}
+              >
+                {/* Icon */}
+                <div className="flex items-center justify-center w-6 h-6 md:w-9 md:h-9 bg-[#ffe1d2] group-hover:bg-[#ffc8a8] rounded-full transition-all">
+                  {feature.icon === 'link' ? (
+                    <Link className="text-[#E55A1D] w-4 h-4 md:w-5 md:h-5" />
+                  ) : (
+                    <MoveRight className="text-[#E55A1D] w-4 h-4 md:w-5 md:h-5" />
+                  )}
+                </div>
+              
+                {/* Text */}
+                <p className="text-sm md:text-base text-[#333] font-medium group-hover:text-[#E55A1D] transition-all">
+                  {feature.text}
+                </p>
+              </div>
+            ))}
           </div>
         </div>
 

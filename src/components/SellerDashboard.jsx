@@ -120,7 +120,7 @@ const SellerDashboard = () => {
   };
 
   return (
-    <div className="flex h-screen mt-30 bg-gray-50">
+    <div className="flex h-screen ">
       <Toaster
         richColors
         closeButton
@@ -139,33 +139,38 @@ const SellerDashboard = () => {
 
       {/* Sidebar */}
       <div className="hidden md:flex md:flex-shrink-0">
-        <div className="flex flex-col w-64 bg-white border-r border-gray-200">
-          <div className="flex items-center justify-center h-16 px-4 bg-gradient-to-r from-[#fe6522] to-[#e55a1d]">
-            <h1 className="text-white font-bold text-xl">Saffron Seller</h1>
+        <div className="flex flex-col w-64 bg-white border-r border-gray-200 shadow-lg">
+          {/* Logo/Brand section */}
+          <div className="flex items-center justify-center h-20 px-4 bg-[#ff6523] flex-shrink-0">
+            <h1 className="text-white font-bold text-2xl tracking-tight">Saffron<span className="font-light">Seller</span></h1>
           </div>
-          <div className="flex flex-col flex-grow px-4 py-4 overflow-y-auto">
-            <nav className="flex-1 space-y-2">
+          
+          {/* Navigation - Made scrollable with flex-1 */}
+          <div className="flex flex-col flex-1 px-4 py-6 overflow-y-auto">
+            <nav className="flex-1 space-y-1">
+              {/* Dashboard */}
               <Link
                 to="/seller/dashboard"
-                className="flex items-center px-4 py-2 text-gray-700 rounded-lg hover:bg-orange-50 hover:text-orange-600"
+                className="flex items-center px-4 py-3 text-gray-700 rounded-xl hover:bg-[#ff6523]/10 hover:text-[#ff6523] transition-colors duration-200 group"
               >
-                <Home className="h-5 w-5" />
-                <span className="ml-3">Dashboard</span>
+                <Home className="h-5 w-5 text-gray-500 group-hover:text-[#ff6523]" />
+                <span className="ml-3 font-medium">Dashboard</span>
               </Link>
 
+              {/* Products dropdown */}
               <div>
                 <button
                   onClick={toggleProductsDropdown}
-                  className="flex items-center justify-between w-full px-4 py-2 text-gray-700 rounded-lg hover:bg-orange-50 hover:text-orange-600"
+                  className="flex items-center justify-between w-full px-4 py-3 text-gray-700 rounded-xl hover:bg-[#ff6523]/10 hover:text-[#ff6523] transition-colors duration-200 group"
                 >
                   <div className="flex items-center">
-                    <Package className="h-5 w-5" />
-                    <span className="ml-3">Products</span>
+                    <Package className="h-5 w-5 text-gray-500 group-hover:text-[#ff6523]" />
+                    <span className="ml-3 font-medium">Products</span>
                   </div>
                   {isProductsDropdownOpen ? (
-                    <ChevronUp className="h-5 w-5" />
+                    <ChevronUp className="h-5 w-5 text-gray-500 group-hover:text-[#ff6523]" />
                   ) : (
-                    <ChevronDown className="h-5 w-5" />
+                    <ChevronDown className="h-5 w-5 text-gray-500 group-hover:text-[#ff6523]" />
                   )}
                 </button>
 
@@ -173,56 +178,60 @@ const SellerDashboard = () => {
                   <div className="pl-12 mt-1 space-y-1">
                     <Link
                       to="/productlisting"
-                      className="flex items-center px-4 py-2 text-sm text-gray-600 rounded-lg hover:bg-orange-50 hover:text-orange-600"
+                      className="flex items-center px-4 py-2 text-sm text-gray-600 rounded-lg hover:bg-[#ff6523]/10 hover:text-[#ff6523] transition-colors duration-200"
                     >
-                      <PlusCircle className="h-4 w-4" />
-                      <span className="ml-2">Add Product</span>
+                      <PlusCircle className="h-4 w-4 mr-2" />
+                      <span>Add Product</span>
                     </Link>
                     <Link
                       to="/seller/products"
-                      className="flex items-center px-4 py-2 text-sm text-gray-600 rounded-lg hover:bg-orange-50 hover:text-orange-600"
+                      className="flex items-center px-4 py-2 text-sm text-gray-600 rounded-lg hover:bg-[#ff6523]/10 hover:text-[#ff6523] transition-colors duration-200"
                     >
-                      <List className="h-4 w-4" />
-                      <span className="ml-2">View All</span>
+                      <List className="h-4 w-4 mr-2" />
+                      <span>View All</span>
                     </Link>
                   </div>
                 )}
               </div>
 
+              {/* Orders */}
               <Link
                 to="/seller/orders"
-                className="flex items-center px-4 py-2 text-gray-700 rounded-lg hover:bg-orange-50 hover:text-orange-600"
+                className="flex items-center px-4 py-3 text-gray-700 rounded-xl hover:bg-[#ff6523]/10 hover:text-[#ff6523] transition-colors duration-200 group"
               >
-                <ShoppingCart className="h-5 w-5" />
-                <span className="ml-3">Orders</span>
+                <ShoppingCart className="h-5 w-5 text-gray-500 group-hover:text-[#ff6523]" />
+                <span className="ml-3 font-medium">Orders</span>
               </Link>
 
+              {/* Customers */}
               <Link
                 to="/seller/customers"
-                className="flex items-center px-4 py-2 text-gray-700 rounded-lg hover:bg-orange-50 hover:text-orange-600"
+                className="flex items-center px-4 py-3 text-gray-700 rounded-xl hover:bg-[#ff6523]/10 hover:text-[#ff6523] transition-colors duration-200 group"
               >
-                <Users className="h-5 w-5" />
-                <span className="ml-3">Customers</span>
+                <Users className="h-5 w-5 text-gray-500 group-hover:text-[#ff6523]" />
+                <span className="ml-3 font-medium">Customers</span>
               </Link>
 
+              {/* Settings */}
               <Link
                 to="/seller/settings"
-                className="flex items-center px-4 py-2 text-gray-700 rounded-lg hover:bg-orange-50 hover:text-orange-600"
+                className="flex items-center px-4 py-3 text-gray-700 rounded-xl hover:bg-[#ff6523]/10 hover:text-[#ff6523] transition-colors duration-200 group"
               >
-                <Settings className="h-5 w-5" />
-                <span className="ml-3">Settings</span>
+                <Settings className="h-5 w-5 text-gray-500 group-hover:text-[#ff6523]" />
+                <span className="ml-3 font-medium">Settings</span>
               </Link>
             </nav>
+          </div>
 
-            <div className="mt-auto pb-4">
-              <button
-                onClick={handleLogout}
-                className="flex items-center w-full px-4 py-2 text-gray-700 rounded-lg hover:bg-orange-50 hover:text-orange-600"
-              >
-                <LogOut className="h-5 w-5" />
-                <span className="ml-3">Logout</span>
-              </button>
-            </div>
+          {/* Logout - Always visible at bottom */}
+          <div className="flex-shrink-0 p-4 border-t border-gray-200 bg-white">
+            <button
+              onClick={handleLogout}
+              className="flex items-center w-full px-4 py-3 text-gray-700 rounded-xl hover:bg-[#ff6523]/10 hover:text-[#ff6523] transition-colors duration-200 group"
+            >
+              <LogOut className="h-5 w-5 text-gray-500 group-hover:text-[#ff6523]" />
+              <span className="ml-3 font-medium">Logout</span>
+            </button>
           </div>
         </div>
       </div>
@@ -231,11 +240,12 @@ const SellerDashboard = () => {
       {isMobileMenuOpen && (
         <div className="fixed inset-0 z-40 md:hidden">
           <div className="fixed inset-0 bg-gray-600 bg-opacity-75" onClick={() => setIsMobileMenuOpen(false)}></div>
-          <div className="relative flex flex-col w-full max-w-xs bg-white">
-            <div className="flex items-center justify-center h-16 px-4 bg-gradient-to-r from-[#fe6522] to-[#e55a1d]">
+          <div className="relative flex flex-col w-full max-w-xs bg-white h-full">
+            <div className="flex items-center justify-center h-16 px-4 bg-gradient-to-r from-[#fe6522] to-[#e55a1d] flex-shrink-0">
               <h1 className="text-white font-bold text-xl">Saffron Seller</h1>
             </div>
-            <div className="flex flex-col flex-grow px-4 py-4 overflow-y-auto">
+            
+            <div className="flex flex-col flex-1 px-4 py-4 overflow-y-auto">
               <nav className="flex-1 space-y-2">
                 <Link
                   to="/seller/dashboard"
@@ -311,16 +321,17 @@ const SellerDashboard = () => {
                   <span className="ml-3">Settings</span>
                 </Link>
               </nav>
+            </div>
 
-              <div className="mt-auto pb-4">
-                <button
-                  onClick={handleLogout}
-                  className="flex items-center w-full px-4 py-2 text-gray-700 rounded-lg hover:bg-orange-50 hover:text-orange-600"
-                >
-                  <LogOut className="h-5 w-5" />
-                  <span className="ml-3">Logout</span>
-                </button>
-              </div>
+            {/* Mobile Logout - Always visible at bottom */}
+            <div className="flex-shrink-0 p-4 border-t border-gray-200 bg-white">
+              <button
+                onClick={handleLogout}
+                className="flex items-center w-full px-4 py-2 text-gray-700 rounded-lg hover:bg-orange-50 hover:text-orange-600"
+              >
+                <LogOut className="h-5 w-5" />
+                <span className="ml-3">Logout</span>
+              </button>
             </div>
           </div>
         </div>
@@ -353,7 +364,8 @@ const SellerDashboard = () => {
                   src="https://via.placeholder.com/32"
                   alt="User profile"
                 />
-                <h1>{seller?.firstName || "Loading..."}</h1>               </button>
+                <h1>{seller?.firstName || "Loading..."}</h1>
+              </button>
 
               {isMenuOpen && (
                 <div className="absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg py-1 z-10">
@@ -463,7 +475,7 @@ const SellerDashboard = () => {
                       <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                         Grade
                       </th>
-                      <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-yello-500 uppercase tracking-wider">
+                      <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                         Status
                       </th>
                       <th scope="col" className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
@@ -504,7 +516,8 @@ const SellerDashboard = () => {
                               {typeof product.price === "number"
                                 ? `$${product.price.toFixed(2)}`
                                 : `$${Number(product.price || 0).toFixed(2)}`}
-                            </div>                          </td>
+                            </div>
+                          </td>
                           <td className="px-6 py-4 whitespace-nowrap">
                             <div className="text-sm text-gray-900">{product.stock}</div>
                           </td>
@@ -517,20 +530,20 @@ const SellerDashboard = () => {
                             </span>
                           </td>
                           <td className="px-6 py-4 whitespace-nowrap">
-  <span
-    className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${
-      product.status === "pending"
-        ? "bg-yellow-100 text-yellow-800"
-        : product.status === "approved"
-        ? "bg-green-100 text-green-800"
-        : product.status === "rejected"
-        ? "bg-red-100 text-red-800"
-       :''
-    }`}
-  >
-    {product.status}
-  </span>
-</td>
+                            <span
+                              className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${
+                                product.status === "pending"
+                                  ? "bg-yellow-100 text-yellow-800"
+                                  : product.status === "approved"
+                                  ? "bg-green-100 text-green-800"
+                                  : product.status === "rejected"
+                                  ? "bg-red-100 text-red-800"
+                                 :''
+                              }`}
+                            >
+                              {product.status}
+                            </span>
+                          </td>
                           <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
                             <button
                               onClick={() => handleDeleteProduct(product._id)}
