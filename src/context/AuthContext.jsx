@@ -7,7 +7,7 @@ const backendUrl = import.meta.env.VITE_BACKEND_URL;
 const AuthContext = createContext();
 
 export const AuthProvider = ({ children }) => {
-  const navigate = useNavigate()
+  const navigate = useNavigate();
   const [user, setUser] = useState(null);
   const [token, setToken] = useState(() => localStorage.getItem("token"));
   const [isLoading, setIsLoading] = useState(true);
@@ -20,17 +20,24 @@ export const AuthProvider = ({ children }) => {
     const storedToken = localStorage.getItem("token");
 
     if (storedUser && storedToken) {
-      const userData = JSON.parse(storedUser);
-      setUser(userData);
-      
-      // ✅ Check if user is already logged in and redirect appropriately
-      if (userData.role === 'admin') {
-        navigate('/adminpanel', { replace: true });
-      } else if (window.location.pathname === '/login') {
-        navigate('/profile', { replace: true });
+      let userData = null;
+      try {
+        userData = JSON.parse(storedUser);
+      } catch (e) {
+        userData = null;
+      }
+      if (userData) {
+        setUser(userData);
+
+        // ✅ Check if user is already logged in and redirect appropriately
+        if (userData.role === "admin") {
+          navigate("/adminpanel", { replace: true });
+        } else if (window.location.pathname === "/login") {
+          navigate("/profile", { replace: true });
+        }
       }
     }
-    
+
     if (storedSeller && storedToken) setSeller(JSON.parse(storedSeller));
     if (storedToken) {
       setToken(storedToken);
@@ -42,7 +49,9 @@ export const AuthProvider = ({ children }) => {
 
   const emailOtp = async (email) => {
     try {
-      const res = await axios.post(`${backendUrl}/api/email/send-otp`, { email });
+      const res = await axios.post(`${backendUrl}/api/email/send-otp`, {
+        email,
+      });
       console.log("Email OTP response:", res.data);
       return res.data;
     } catch (error) {
@@ -60,16 +69,24 @@ export const AuthProvider = ({ children }) => {
       } else if (error.response?.status === 500) {
         throw new Error("Server error. Please try again later.");
       } else if (error.code === "ECONNREFUSED") {
-        throw new Error("Cannot connect to server. Please check if the server is running.");
+        throw new Error(
+          "Cannot connect to server. Please check if the server is running."
+        );
       } else {
-        throw new Error(error.response?.data?.message || "Failed to send OTP. Please try again.");
+        throw new Error(
+          error.response?.data?.message ||
+            "Failed to send OTP. Please try again."
+        );
       }
     }
   };
 
   const verifyOtp = async ({ email, otp }) => {
     try {
-      const res = await axios.post(`${backendUrl}/api/email/verify-otp`, { email, otp });
+      const res = await axios.post(`${backendUrl}/api/email/verify-otp`, {
+        email,
+        otp,
+      });
       if (res.data.success) {
         const { token, email: verifiedEmail } = res.data;
         if (token && verifiedEmail) {
@@ -86,13 +103,17 @@ export const AuthProvider = ({ children }) => {
       if (error.response?.status === 500) {
         throw new Error("Server error occurred. Please try again.");
       } else if (error.response?.status === 400) {
-        throw new Error(error.response?.data?.message || "Invalid OTP or email");
+        throw new Error(
+          error.response?.data?.message || "Invalid OTP or email"
+        );
       } else if (error.response?.status === 404) {
         throw new Error("OTP not found or expired. Please request a new OTP.");
       } else if (error.response?.status === 401) {
         throw new Error("OTP verification failed. Please check your OTP.");
       } else {
-        throw new Error(error.response?.data?.message || "OTP verification failed.");
+        throw new Error(
+          error.response?.data?.message || "OTP verification failed."
+        );
       }
     }
   };
@@ -106,9 +127,9 @@ export const AuthProvider = ({ children }) => {
         setToken(token);
         localStorage.setItem("token", token);
         localStorage.setItem("user", JSON.stringify(user));
-        
+
         // ✅ Use replace to avoid going back to signup
-        navigate('/profile', { replace: true });
+        navigate("/profile", { replace: true });
       }
       return res.data;
     } catch (error) {
@@ -124,36 +145,39 @@ export const AuthProvider = ({ children }) => {
 
   const logIn = async ({ email, password }) => {
     try {
-      const res = await axios.post(`${backendUrl}/api/user/login`, { email, password });
-      
+      const res = await axios.post(`${backendUrl}/api/user/login`, {
+        email,
+        password,
+      });
+
       console.log("Backend response:", res.data);
-      
+
       if (res.data.success) {
         const { user, token } = res.data;
-        
+
         if (!user) {
           throw new Error("No user data received from server");
         }
-        
+
         setUser(user);
         setToken(token);
         localStorage.setItem("token", token);
         localStorage.setItem("user", JSON.stringify(user));
-        
+
         console.log("User set in context:", user);
-        
+
         // ✅ Navigate immediately with replace to remove login from history
-        if (user.role === 'admin') {
-          navigate('/adminpanel', { replace: true });
+        if (user.role === "admin") {
+          navigate("/adminpanel", { replace: true });
         } else {
-          navigate('/profile', { replace: true });
+          navigate("/profile", { replace: true });
         }
       }
-      
+
       return res.data;
     } catch (error) {
       console.error("Login failed:", error);
-      
+
       if (error.response?.data?.message) {
         throw new Error(error.response.data.message);
       } else if (error.message) {
@@ -163,7 +187,7 @@ export const AuthProvider = ({ children }) => {
       }
     }
   };
-  
+
   const logout = () => {
     setUser(null);
     setSeller(null);
@@ -172,9 +196,9 @@ export const AuthProvider = ({ children }) => {
     localStorage.removeItem("user");
     localStorage.removeItem("seller");
     localStorage.removeItem("email");
-    
+
     // ✅ Use replace to avoid going back to protected pages
-    navigate('/login', { replace: true });
+    navigate("/login", { replace: true });
     console.log("User/seller logged out successfully");
   };
 
@@ -189,9 +213,9 @@ export const AuthProvider = ({ children }) => {
         setToken(token);
         localStorage.setItem("token", token);
         localStorage.setItem("user", JSON.stringify(user));
-        
+
         // ✅ Navigate with replace
-        navigate('/profile', { replace: true });
+        navigate("/profile", { replace: true });
       }
       return res.data;
     } catch (error) {
@@ -210,9 +234,9 @@ export const AuthProvider = ({ children }) => {
         setToken(token);
         localStorage.setItem("token", token);
         localStorage.setItem("seller", JSON.stringify(seller));
-        
+
         // ✅ Navigate to seller dashboard
-        navigate('/sellerdashboard', { replace: true });
+        navigate("/sellerdashboard", { replace: true });
       }
       return res.data;
     } catch (error) {
@@ -224,7 +248,10 @@ export const AuthProvider = ({ children }) => {
 
   const sellerLogin = async ({ email, password }) => {
     try {
-      const res = await axios.post(`${backendUrl}/api/seller/login`, { email, password });
+      const res = await axios.post(`${backendUrl}/api/seller/login`, {
+        email,
+        password,
+      });
 
       if (res.data.success) {
         const { seller, token } = res.data;
@@ -233,9 +260,9 @@ export const AuthProvider = ({ children }) => {
           setToken(token);
           localStorage.setItem("token", token);
           localStorage.setItem("seller", JSON.stringify(seller));
-          
+
           // ✅ Navigate to seller dashboard
-          navigate('/sellerdashboard', { replace: true });
+          navigate("/sellerdashboard", { replace: true });
           return res.data;
         } else {
           alert("Login failed - incomplete response data");
@@ -254,11 +281,15 @@ export const AuthProvider = ({ children }) => {
 
   const createProduct = async (productData) => {
     try {
-      const res = await axios.post(`${backendUrl}/api/product/create`, productData, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      });
+      const res = await axios.post(
+        `${backendUrl}/api/product/create`,
+        productData,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
       return res.data;
     } catch (error) {
       console.error("Product creation failed:", error);
@@ -267,23 +298,26 @@ export const AuthProvider = ({ children }) => {
   };
 
   const deleteProduct = async (productId) => {
-    try{
-      const res = await axios.delete(`${backendUrl}/api/product/delete/${productId}`, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      });
+    try {
+      const res = await axios.delete(
+        `${backendUrl}/api/product/delete/${productId}`,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
       if (res.data.success) {
         console.log("Product deleted successfully");
         return res.data;
       } else {
         throw new Error("Failed to delete product");
       }
-    }catch (error) {
+    } catch (error) {
       console.error("Product deletion failed:", error);
       throw error;
     }
-  }
+  };
 
   return (
     <AuthContext.Provider
