@@ -67,7 +67,7 @@ const HeroSection = () => {
         </div>
 
         {/* Feature badges - UPDATED to look more informative */}
-        <div className="absolute md:hidden bottom-40 left-1/2 transform -translate-x-1/2 z-0">
+        <div className="absolute md:hidden bottom-60 left-1/2 transform -translate-x-1/2 z-0">
           <div className="flex flex-col gap-3 items-center px-4">
             {/* First row - two informative badges */}
             <div className="flex gap-6">
@@ -91,7 +91,7 @@ const HeroSection = () => {
         </div>
         
         {/* Bottom right description - unchanged */}
-        <div className="absolute mt-112 ml-50  xs:bottom-10 xs:right-10
+        <div className="absolute mt-105 ml-54  xs:bottom-10 xs:right-10
                         sm:bottom-15 sm:right-10 md:bottom-40 md:right-20
                         text-black font-poppins text-left
                         max-w-[120px] xs:max-w-[150px] sm:max-w-[180px] md:max-w-[200px] lg:max-w-[250px]
