@@ -1,6 +1,6 @@
 import React, { useState } from "react";
-import { motion } from "framer-motion";
-import { ImagePlus, Trash2, Loader2, Save, ChevronDown } from "lucide-react";
+import { motion, AnimatePresence } from "framer-motion";
+import { ImagePlus, Trash2, Loader2, Save, ChevronDown, Plus } from "lucide-react";
 import { toast, Toaster } from "sonner";
 import axios from "axios";
 
@@ -8,7 +8,6 @@ const SaffronProductListing = () => {
   const backendUrl = import.meta.env.VITE_BACKEND_URL;
   const [products, setProducts] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
-  const [isHovered, setIsHovered] = useState(false);
   const [showFullDescription, setShowFullDescription] = useState(false);
   const [currentProduct, setCurrentProduct] = useState({
     name: "",
@@ -61,34 +60,33 @@ const SaffronProductListing = () => {
     setIsLoading(true);
   
     try {
-      // Prepare images (if needed as base64 or multipart, modify here)
-      const payload = {
-        name: currentProduct.name,
-        grade: currentProduct.grade,
-        price: currentProduct.price,
-        description: currentProduct.description,
-        images: currentProduct.images.map(img => img.preview), // you may need to upload to Cloudinary separately
-        stock: currentProduct.stock,
-        origin: currentProduct.origin,
-      };
+      const formData = new FormData();
+      formData.append("name", currentProduct.name);
+      formData.append("grade", currentProduct.grade);
+      formData.append("price", currentProduct.price);
+      formData.append("description", currentProduct.description);
+      formData.append("stock", currentProduct.stock);
+      formData.append("origin", currentProduct.origin);
   
-      // Replace with your backend endpoint
-      const res = await axios.post(`${backendUrl}/api/product/create`, payload, {
-        headers: {
-          Authorization: `Bearer ${localStorage.getItem("token")}`, // or from context
-        }
+      currentProduct.images.forEach((imgObj) => {
+        formData.append("images", imgObj.file); // ✅ real file
       });
   
-      // Ensure the returned product has the images property
+      const res = await axios.post(`${backendUrl}/api/product/create`, formData, {
+        headers: {
+          "Content-Type": "multipart/form-data",
+          Authorization: `Bearer ${localStorage.getItem("token")}`,
+        },
+      });
+  
       const newProduct = {
         ...res.data,
-        images: res.data.images || currentProduct.images // fallback to current images if API doesn't return them
+        images: res.data.images || currentProduct.images,
       };
-      
-      setProducts([...products, newProduct]);
-      toast.success("Product added!");
   
-      // Reset form
+      setProducts([...products, newProduct]);
+      toast.success("Product listed successfully!");
+  
       setCurrentProduct({
         name: "",
         grade: "",
@@ -96,20 +94,19 @@ const SaffronProductListing = () => {
         description: "",
         images: [],
         stock: "",
-        origin: ""
+        origin: "",
       });
       setShowFullDescription(false);
   
     } catch (error) {
       console.error(error);
-      toast.error("Failed to add product", {
+      toast.error("Failed to list product", {
         description: error?.response?.data?.message || error.message,
       });
     } finally {
       setIsLoading(false);
     }
   };
-
   const saffronGrades = [
     { value: "premium", label: "Premium (Sargol)" },
     { value: "category1", label: "Category I (Pushal)" },
@@ -119,68 +116,75 @@ const SaffronProductListing = () => {
   ];
 
   return (
-    <div className="mt-20 p-4 md:p-6 min-h-screen bg-white">
-      <Toaster richColors closeButton />
+    <div className="min-h-screen bg-gradient-to-b from-gray-50 to-gray-100">
+      <Toaster richColors closeButton position="top-center" />
       
-      <motion.div 
-        className="w-full max-w-6xl mx-auto"
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.5 }}
-      >
-        {/* Header */}
-        <div className="p-6 bg-gradient-to-r from-[#fe6522] to-[#e55a1d] rounded-t-2xl">
-          <h2 className="text-white text-2xl lg:text-3xl font-bold">List Your Saffron Products</h2>
-          <p className="text-white/90 text-sm mt-1">
-            Add your saffron products with different grades and pricing
-          </p>
+      {/* Full-width header */}
+      <div className="bg-gradient-to-r from-[#ff6523] to-[#e55a1d] shadow-lg">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+          <motion.div
+            initial={{ opacity: 0, y: -20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5 }}
+          >
+            <h1 className="text-3xl md:text-4xl font-bold text-white">Saffron Product Listing</h1>
+            <p className="mt-2 text-white/90 max-w-3xl">
+              Showcase your premium saffron products with detailed information and high-quality images
+            </p>
+          </motion.div>
         </div>
+      </div>
 
-        {/* Main Content */}
-        <div className="bg-white rounded-b-2xl shadow-xl overflow-hidden border border-gray-200">
-          <form onSubmit={handleSubmit} className="p-4 sm:p-6">
-            <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-              {/* Left Column - Product Details */}
+      {/* Main content container */}
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 -mt-8">
+        <motion.div
+          className="bg-white rounded-xl shadow-xl overflow-hidden"
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5, delay: 0.1 }}
+        >
+          {/* Form section */}
+          <form onSubmit={handleSubmit} className="p-6 md:p-8">
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+              {/* Left column - Form inputs */}
               <div className="lg:col-span-2 space-y-6">
-                {/* Basic Information */}
-                <div className="bg-gray-50 p-4 rounded-xl border border-gray-200">
-                  <h3 className="text-lg font-semibold text-gray-800 mb-4">Product Information</h3>
+                {/* Product Information Card */}
+                <div className="bg-gray-50 p-6 rounded-lg border border-gray-200">
+                  <h3 className="text-xl font-semibold text-gray-800 mb-6 pb-2 border-b border-gray-200">
+                    <span className="border-b-2 border-[#ff6523] pb-2">Product Details</span>
+                  </h3>
                   
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <div>
                       <label htmlFor="name" className="block text-sm font-medium text-gray-700 mb-2">
-                        Product Name
+                        Product Name*
                       </label>
-                      <motion.input
+                      <input
                         type="text"
                         id="name"
                         name="name"
                         value={currentProduct.name}
                         onChange={handleChange}
-                        placeholder="e.g. Kashmiri Premium Saffron"
-                        className="w-full px-4 py-2 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-[#fe6522]/50 focus:border-transparent transition-all duration-200"
-                        whileHover={{ scale: 1.01 }}
+                        placeholder="Kashmiri Premium Saffron"
+                        className="w-full px-4 py-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-[#ff6523]/50 focus:border-transparent transition-all"
                         required
                       />
                     </div>
 
                     <div>
                       <label htmlFor="grade" className="block text-sm font-medium text-gray-700 mb-2">
-                        Saffron Grade
+                        Saffron Grade*
                       </label>
-                      <motion.div 
-                        className="relative"
-                        whileHover={{ scale: 1.01 }}
-                      >
+                      <div className="relative">
                         <select
                           id="grade"
                           name="grade"
                           value={currentProduct.grade}
                           onChange={handleChange}
-                          className="w-full px-4 py-2 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-[#fe6522]/50 focus:border-transparent transition-all duration-200 appearance-none"
+                          className="w-full px-4 py-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-[#ff6523]/50 focus:border-transparent appearance-none"
                           required
                         >
-                          <option value="">Select saffron grade</option>
+                          <option value="">Select grade</option>
                           {saffronGrades.map((grade) => (
                             <option key={grade.value} value={grade.value}>
                               {grade.label}
@@ -188,43 +192,42 @@ const SaffronProductListing = () => {
                           ))}
                         </select>
                         <div className="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none">
-                          <svg className="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-                          </svg>
+                          <ChevronDown className="h-5 w-5 text-gray-400" />
                         </div>
-                      </motion.div>
+                      </div>
                     </div>
                   </div>
 
-                  <div className="mt-4">
+                  <div className="mt-6">
                     <label htmlFor="description" className="block text-sm font-medium text-gray-700 mb-2">
                       Description
                     </label>
-                    <motion.textarea
+                    <textarea
                       id="description"
                       name="description"
                       value={currentProduct.description}
                       onChange={handleChange}
-                      rows="3"
-                      placeholder="Describe your saffron (quality, aroma, uses, etc.)"
-                      className="w-full px-4 py-2 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-[#fe6522]/50 focus:border-transparent transition-all duration-200"
-                      whileHover={{ scale: 1.01 }}
+                      rows={4}
+                      placeholder="Describe the quality, aroma, and uses of your saffron..."
+                      className="w-full px-4 py-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-[#ff6523]/50 focus:border-transparent transition-all"
                     />
                   </div>
                 </div>
 
-                {/* Pricing & Stock */}
-                <div className="bg-gray-50 p-4 rounded-xl border border-gray-200">
-                  <h3 className="text-lg font-semibold text-gray-800 mb-4">Pricing & Inventory</h3>
+                {/* Pricing & Inventory Card */}
+                <div className="bg-gray-50 p-6 rounded-lg border border-gray-200">
+                  <h3 className="text-xl font-semibold text-gray-800 mb-6 pb-2 border-b border-gray-200">
+                    <span className="border-b-2 border-[#ff6523] pb-2">Pricing & Inventory</span>
+                  </h3>
                   
-                  <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                  <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                     <div>
                       <label htmlFor="price" className="block text-sm font-medium text-gray-700 mb-2">
-                        Price (per gram)
+                        Price (₹/gram)*
                       </label>
                       <div className="relative">
-                        <span className="absolute left-3 top-2 text-gray-500">₹</span>
-                        <motion.input
+                        <span className="absolute left-3 top-3 text-gray-500">₹</span>
+                        <input
                           type="number"
                           id="price"
                           name="price"
@@ -233,8 +236,7 @@ const SaffronProductListing = () => {
                           placeholder="0.00"
                           min="0"
                           step="0.01"
-                          className="w-full pl-8 pr-4 py-2 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-[#fe6522]/50 focus:border-transparent transition-all duration-200"
-                          whileHover={{ scale: 1.01 }}
+                          className="w-full pl-8 pr-4 py-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-[#ff6523]/50 focus:border-transparent"
                           required
                         />
                       </div>
@@ -242,9 +244,9 @@ const SaffronProductListing = () => {
 
                     <div>
                       <label htmlFor="stock" className="block text-sm font-medium text-gray-700 mb-2">
-                        Available Stock (grams)
+                        Stock (grams)*
                       </label>
-                      <motion.input
+                      <input
                         type="number"
                         id="stock"
                         name="stock"
@@ -252,40 +254,39 @@ const SaffronProductListing = () => {
                         onChange={handleChange}
                         placeholder="0"
                         min="0"
-                        className="w-full px-4 py-2 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-[#fe6522]/50 focus:border-transparent transition-all duration-200"
-                        whileHover={{ scale: 1.01 }}
+                        className="w-full px-4 py-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-[#ff6523]/50 focus:border-transparent"
                         required
                       />
                     </div>
 
                     <div>
                       <label htmlFor="origin" className="block text-sm font-medium text-gray-700 mb-2">
-                        Origin
+                        Origin*
                       </label>
-                      <motion.input
+                      <input
                         type="text"
                         id="origin"
                         name="origin"
                         value={currentProduct.origin}
                         onChange={handleChange}
-                        placeholder="e.g. Kashmir, Spain"
-                        className="w-full px-4 py-2 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-[#fe6522]/50 focus:border-transparent transition-all duration-200"
-                        whileHover={{ scale: 1.01 }}
+                        placeholder="Kashmir, Spain, etc."
+                        className="w-full px-4 py-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-[#ff6523]/50 focus:border-transparent"
                         required
                       />
                     </div>
                   </div>
                 </div>
 
-                {/* Image Upload */}
-                <div className="bg-gray-50 p-4 rounded-xl border border-gray-200">
-                  <h3 className="text-lg font-semibold text-gray-800 mb-4">Product Images</h3>
+                {/* Image Upload Card */}
+                <div className="bg-gray-50 p-6 rounded-lg border border-gray-200">
+                  <h3 className="text-xl font-semibold text-gray-800 mb-6 pb-2 border-b border-gray-200">
+                    <span className="border-b-2 border-[#ff6523] pb-2">Product Images</span>
+                  </h3>
                   
                   <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">
-                    {/* Image upload button */}
                     <motion.label 
                       htmlFor="product-images"
-                      className="flex flex-col items-center justify-center h-32 border-2 border-dashed border-gray-300 rounded-xl cursor-pointer hover:border-[#fe6522] transition-colors duration-200"
+                      className="flex flex-col items-center justify-center h-32 border-2 border-dashed border-gray-300 rounded-lg cursor-pointer hover:border-[#ff6523] transition-colors"
                       whileHover={{ scale: 1.02 }}
                       whileTap={{ scale: 0.98 }}
                     >
@@ -303,11 +304,10 @@ const SaffronProductListing = () => {
                       />
                     </motion.label>
 
-                    {/* Preview uploaded images */}
                     {currentProduct.images.map((image, index) => (
                       <motion.div 
                         key={index}
-                        className="relative h-32 rounded-xl overflow-hidden group"
+                        className="relative h-32 rounded-lg overflow-hidden group"
                         initial={{ opacity: 0 }}
                         animate={{ opacity: 1 }}
                         transition={{ duration: 0.3 }}
@@ -319,7 +319,7 @@ const SaffronProductListing = () => {
                         />
                         <motion.button
                           type="button"
-                          className="absolute top-2 right-2 p-1 bg-red-500/80 rounded-full text-white opacity-0 group-hover:opacity-100 transition-opacity duration-200"
+                          className="absolute top-2 right-2 p-1 bg-red-500/80 rounded-full text-white opacity-0 group-hover:opacity-100 transition-opacity"
                           onClick={() => removeImage(index)}
                           whileHover={{ scale: 1.1 }}
                         >
@@ -331,207 +331,208 @@ const SaffronProductListing = () => {
                 </div>
               </div>
 
-              {/* Right Column - Actions & Preview */}
+              {/* Right column - Preview & Submit */}
               <div className="lg:col-span-1">
-                <div className="bg-gray-50 rounded-xl p-6 border border-gray-200 sticky top-6">
-                  <h3 className="text-lg font-semibold text-gray-800 mb-4">Publish Product</h3>
-                  
-                  <motion.button
-                    type="submit"
-                    className="w-full flex items-center justify-center gap-3 px-6 py-3 rounded-lg bg-gradient-to-r from-[#fe6522] to-[#e55a1d] text-white font-medium shadow-sm hover:shadow-lg transition-all duration-300 mb-4"
-                    whileHover={{ 
-                      scale: 1.02,
-                      boxShadow: "0 8px 25px rgba(254, 101, 34, 0.3)"
-                    }}
-                    whileTap={{ scale: 0.98 }}
-                    onHoverStart={() => setIsHovered(true)}
-                    onHoverEnd={() => setIsHovered(false)}
-                    disabled={isLoading}
-                  >
-                    {isLoading ? (
-                      <div className="flex items-center gap-3">
-                        <Loader2 className="h-5 w-5 animate-spin" />
-                        <span>Saving...</span>
-                      </div>
-                    ) : (
-                      <>
-                        <motion.span
-                          animate={{ 
-                            x: isHovered ? 2 : 0,
-                            rotate: isHovered ? [0, -5, 5, 0] : 0
-                          }}
-                          transition={{ duration: 0.2 }}
-                        >
-                          <Save className="h-5 w-5" />
-                        </motion.span>
-                        <span>Save Product</span>
-                      </>
-                    )}
-                  </motion.button>
-
-                  {/* Enhanced Preview Section */}
-                  <div className="mt-6">
-                    <h4 className="text-sm font-medium text-gray-700 mb-2">Frontend Preview</h4>
-                    <div className="bg-white rounded-2xl overflow-hidden border border-gray-200 hover:shadow-lg transition-all duration-300">
-                      {/* Image Display */}
-                      <div className="h-48 relative bg-gradient-to-br from-amber-100 to-orange-100">
-                        {currentProduct.images.length > 0 ? (
-                          <img 
-                            src={currentProduct.images[0].preview} 
-                            alt="Preview" 
-                            className="w-full h-full object-cover"
-                          />
-                        ) : (
-                          <div className="absolute inset-0 flex items-center justify-center text-gray-400">
-                            <ImagePlus className="h-12 w-12" />
-                            <span className="sr-only">No image uploaded</span>
-                          </div>
-                        )}
-                        
-                        {/* Grade Badge */}
-                        {currentProduct.grade && (
-                          <div className="absolute top-4 right-4">
-                            <span className={`inline-flex items-center px-3 py-1 rounded-full text-xs font-bold ${
-                              currentProduct.grade === 'premium' 
-                                ? 'bg-gradient-to-r from-amber-500 to-orange-500 text-white' 
-                                : currentProduct.grade === 'category1' 
-                                ? 'bg-gradient-to-r from-orange-400 to-red-400 text-white' 
-                                : 'bg-gray-200 text-gray-800'
-                            }`}>
-                              {currentProduct.grade === 'premium' && 'Premium'}
-                              {currentProduct.grade === 'category1' && 'Category I'}
-                              {currentProduct.grade === 'category2' && 'Category II'}
-                              {currentProduct.grade === 'category3' && 'Category III'}
-                              {currentProduct.grade === 'bunch' && 'Bunch'}
-                            </span>
-                          </div>
-                        )}
-                      </div>
-
-                      {/* Product Info */}
-                      <div className="p-4">
-                        <h3 className="font-bold text-gray-900 mb-1">
-                          {currentProduct.name || "Your Saffron Product"}
-                        </h3>
-                        
-                        <div className="flex items-center justify-between mb-2">
-                          <span className="text-sm text-gray-600">
-                            {currentProduct.origin || "Origin"}
-                          </span>
-                          {currentProduct.stock && (
-                            <span className="text-xs bg-gray-100 text-gray-600 px-2 py-1 rounded-full">
-                              {currentProduct.stock}g in stock
-                            </span>
-                          )}
-                        </div>
-
-                        {/* Description with Show More */}
-                        {currentProduct.description && (
-                          <div className="mb-3">
-                            <p className={`text-sm text-gray-600 ${showFullDescription ? '' : 'line-clamp-2'}`}>
-                              {currentProduct.description}
-                            </p>
-                            {currentProduct.description.length > 100 && (
-                              <button 
-                                onClick={toggleDescription}
-                                className="text-sm font-medium text-[#fe6522] hover:text-[#e55a1d] mt-1 flex items-center"
-                              >
-                                {showFullDescription ? 'Show less' : 'Show more'}
-                                <ChevronDown className={`h-4 w-4 ml-1 transition-transform ${showFullDescription ? 'rotate-180' : ''}`} />
-                              </button>
-                            )}
-                          </div>
-                        )}
-                        
-                        <div className="flex items-center justify-between mt-3">
-                          {currentProduct.price ? (
-                            <div>
-                              <span className="text-xl font-bold text-[#fe6522]">
-                                ₹{parseFloat(currentProduct.price).toFixed(2)}
-                              </span>
-                              <span className="text-xs text-gray-500 ml-1">per gram</span>
-                            </div>
+                <div className="sticky top-8 space-y-6">
+                  {/* Preview Card */}
+                  <div className="bg-gray-50 rounded-lg border border-gray-200 overflow-hidden">
+                    <div className="p-4 border-b border-gray-200 bg-white">
+                      <h3 className="font-medium text-gray-800">Live Preview</h3>
+                    </div>
+                    <div className="p-4">
+                      <div className="bg-white rounded-lg overflow-hidden shadow-sm border border-gray-200">
+                        {/* Image */}
+                        <div className="h-48 relative bg-gradient-to-br from-amber-50 to-orange-50">
+                          {currentProduct.images.length > 0 ? (
+                            <img 
+                              src={currentProduct.images[0].preview} 
+                              alt="Preview" 
+                              className="w-full h-full object-cover"
+                            />
                           ) : (
-                            <div className="text-sm text-gray-400">Price not set</div>
+                            <div className="absolute inset-0 flex items-center justify-center text-gray-300">
+                              <ImagePlus className="h-12 w-12" />
+                            </div>
                           )}
                           
-                          <button 
-                            className="px-3 py-2 bg-gradient-to-r from-[#fe6522] to-[#e55a1d] text-white text-xs font-semibold rounded-lg hover:shadow-md transition-all"
-                            type="button"
-                          >
-                            View Product
-                          </button>
+                          {/* Grade badge */}
+                          {currentProduct.grade && (
+                            <div className="absolute top-3 right-3">
+                              <span className={`inline-flex items-center px-2.5 py-1 rounded-full text-xs font-bold ${
+                                currentProduct.grade === 'premium' 
+                                  ? 'bg-gradient-to-r from-amber-500 to-orange-500 text-white' 
+                                  : 'bg-gray-200 text-gray-800'
+                              }`}>
+                                {currentProduct.grade === 'premium' && 'Premium'}
+                                {currentProduct.grade === 'category1' && 'Category I'}
+                                {currentProduct.grade === 'category2' && 'Category II'}
+                                {currentProduct.grade === 'category3' && 'Category III'}
+                                {currentProduct.grade === 'bunch' && 'Bunch'}
+                              </span>
+                            </div>
+                          )}
+                        </div>
+
+                        {/* Product info */}
+                        <div className="p-4">
+                          <h3 className="font-bold text-gray-900 mb-1">
+                            {currentProduct.name || "Your Saffron Product"}
+                          </h3>
+                          
+                          <div className="flex items-center justify-between mb-2">
+                            <span className="text-sm text-gray-600">
+                              {currentProduct.origin || "Origin"}
+                            </span>
+                            {currentProduct.stock && (
+                              <span className="text-xs bg-gray-100 text-gray-600 px-2 py-1 rounded-full">
+                                {currentProduct.stock}g in stock
+                              </span>
+                            )}
+                          </div>
+
+                          {/* Description */}
+                          {currentProduct.description && (
+                            <div className="mb-3">
+                              <p className={`text-sm text-gray-600 ${showFullDescription ? '' : 'line-clamp-2'}`}>
+                                {currentProduct.description}
+                              </p>
+                              {currentProduct.description.length > 100 && (
+                                <button 
+                                  onClick={toggleDescription}
+                                  className="text-sm font-medium text-[#ff6523] hover:text-[#e55a1d] mt-1 flex items-center"
+                                >
+                                  {showFullDescription ? 'Show less' : 'Show more'}
+                                  <ChevronDown className={`h-4 w-4 ml-1 transition-transform ${showFullDescription ? 'rotate-180' : ''}`} />
+                                </button>
+                              )}
+                            </div>
+                          )}
+                          
+                          <div className="flex items-center justify-between mt-3">
+                            {currentProduct.price ? (
+                              <div>
+                                <span className="text-xl font-bold text-[#ff6523]">
+                                  ₹{parseFloat(currentProduct.price).toFixed(2)}
+                                </span>
+                                <span className="text-xs text-gray-500 ml-1">per gram</span>
+                              </div>
+                            ) : (
+                              <div className="text-sm text-gray-400">Price not set</div>
+                            )}
+                          </div>
                         </div>
                       </div>
+                    </div>
+                  </div>
+
+                  {/* Submit Card */}
+                  <div className="bg-gray-50 rounded-lg border border-gray-200 overflow-hidden">
+                    <div className="p-4 border-b border-gray-200 bg-white">
+                      <h3 className="font-medium text-gray-800">Publish Product</h3>
+                    </div>
+                    <div className="p-4">
+                      <motion.button
+                        type="submit"
+                        className="w-full flex items-center justify-center gap-2 px-6 py-3 rounded-lg bg-gradient-to-r from-[#ff6523] to-[#e55a1d] text-white font-medium shadow-sm hover:shadow-md transition-all"
+                        whileHover={{ scale: 1.02 }}
+                        whileTap={{ scale: 0.98 }}
+                        disabled={isLoading}
+                      >
+                        {isLoading ? (
+                          <>
+                            <Loader2 className="h-5 w-5 animate-spin" />
+                            <span>Processing...</span>
+                          </>
+                        ) : (
+                          <>
+                            <Save className="h-5 w-5" />
+                            <span>Publish Product</span>
+                          </>
+                        )}
+                      </motion.button>
                     </div>
                   </div>
                 </div>
               </div>
             </div>
           </form>
-        </div>
+        </motion.div>
 
         {/* Listed Products Section */}
         {products.length > 0 && (
-          <div className="mt-8">
-            <h3 className="text-xl font-semibold text-gray-800 mb-4">Your Listed Products</h3>
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {products.map((product) => (
-                <motion.div 
-                  key={product.id}
-                  className="bg-white rounded-2xl overflow-hidden border border-gray-200 hover:shadow-lg transition-all duration-300"
+          <motion.div 
+            className="mt-12"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ delay: 0.3 }}
+          >
+            <div className="flex items-center justify-between mb-6">
+              <h2 className="text-2xl font-bold text-gray-800">Your Listed Products</h2>
+              <span className="text-sm bg-[#ff6523]/10 text-[#ff6523] px-3 py-1 rounded-full">
+                {products.length} {products.length === 1 ? 'product' : 'products'}
+              </span>
+            </div>
+
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+              {products.map((product, index) => (
+                <motion.div
+                  key={index}
+                  className="bg-white rounded-xl overflow-hidden shadow-sm hover:shadow-md transition-all border border-gray-200"
                   initial={{ opacity: 0, y: 20 }}
                   animate={{ opacity: 1, y: 0 }}
-                  transition={{ duration: 0.3 }}
+                  transition={{ duration: 0.3, delay: index * 0.05 }}
+                  whileHover={{ y: -5 }}
                 >
-                  {/* Fixed: Added safety check for images */}
-                  {product.images && product.images.length > 0 ? (
-                    <div className="h-48 overflow-hidden">
+                  {/* Product image */}
+                  <div className="h-48 relative bg-gradient-to-br from-amber-50 to-orange-50">
+                    {product.images && product.images.length > 0 ? (
                       <img 
                         src={typeof product.images[0] === 'string' ? product.images[0] : product.images[0].preview} 
                         alt={product.name}
                         className="w-full h-full object-cover"
                       />
-                    </div>
-                  ) : (
-                    <div className="h-48 bg-gray-100 flex items-center justify-center">
-                      <span className="text-gray-400">No image</span>
-                    </div>
-                  )}
-                  
+                    ) : (
+                      <div className="absolute inset-0 flex items-center justify-center text-gray-300">
+                        <ImagePlus className="h-12 w-12" />
+                      </div>
+                    )}
+                  </div>
+
+                  {/* Product details */}
                   <div className="p-4">
-                    <div className="flex justify-between items-start">
-                      <h4 className="font-medium text-gray-800">{product.name}</h4>
-                      <span className={`px-2 py-1 text-xs font-medium rounded ${
+                    <div className="flex justify-between items-start mb-2">
+                      <h3 className="font-semibold text-gray-800 line-clamp-1">{product.name}</h3>
+                      <span className={`text-xs px-2 py-1 rounded-full ${
                         product.grade === 'premium' 
-                          ? 'bg-gradient-to-r from-amber-500 to-orange-500 text-white' 
-                          : product.grade === 'category1' 
-                          ? 'bg-gradient-to-r from-orange-400 to-red-400 text-white' 
-                          : 'bg-gray-200 text-gray-800'
+                          ? 'bg-[#ff6523]/10 text-[#ff6523]' 
+                          : 'bg-gray-100 text-gray-600'
                       }`}>
-                        {product.grade === 'premium' && 'Premium'}
-                        {product.grade === 'category1' && 'Category I'}
-                        {product.grade === 'category2' && 'Category II'}
-                        {product.grade === 'category3' && 'Category III'}
-                        {product.grade === 'bunch' && 'Bunch'}
+                        {product.grade || 'Standard'}
                       </span>
                     </div>
-                    
-                    <p className="text-lg font-bold text-[#fe6522] mt-2">
-                      ₹{parseFloat(product.price).toFixed(2)}/g
-                    </p>
-                    
-                    <div className="flex justify-between items-center mt-4 text-sm text-gray-600">
-                      <span>Stock: {product.stock}g</span>
-                      <span>{product.origin}</span>
+
+                    <div className="flex items-center justify-between mb-3">
+                      <span className="text-sm text-gray-500">{product.origin}</span>
+                      <span className="text-xs bg-gray-100 text-gray-600 px-2 py-1 rounded-full">
+                        {product.stock}g
+                      </span>
+                    </div>
+
+                    <div className="flex items-center justify-between">
+                      <span className="text-lg font-bold text-[#ff6523]">
+                        ₹{parseFloat(product.price).toFixed(2)}
+                      </span>
+                      <button className="text-xs text-[#ff6523] hover:text-[#e55a1d] font-medium">
+                        View Details
+                      </button>
                     </div>
                   </div>
                 </motion.div>
               ))}
             </div>
-          </div>
+          </motion.div>
         )}
-      </motion.div>
+      </div>
     </div>
   );
 };

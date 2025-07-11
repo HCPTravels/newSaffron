@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import { Search, Filter, ChevronDown, Star, Zap, Loader2 } from "lucide-react";
 import { motion } from "framer-motion";
 import { toast, Toaster } from "sonner";
@@ -10,29 +10,99 @@ const Home = ({ onSelectProduct }) => {
   const [isHovered, setIsHovered] = useState(false);
   const [products, setProducts] = useState([]);
   const [loadingProductId, setLoadingProductId] = useState(null);
+  const [imageErrors, setImageErrors] = useState({});
+  const [hasInitialized, setHasInitialized] = useState(false);
+  
   const backendUrl = import.meta.env.VITE_BACKEND_URL;
-  const { token } = useAuth();
+  const { token, isAuthLoading, isAuthenticated } = useAuth(); // Add isAuthLoading and isAuthenticated from your auth context
 
-  useEffect(() => {
-    const fetchApprovedProducts = async () => {
-      try {
-        setIsLoading(true);
-        const response = await axios.get(
-          `${backendUrl}/api/product/approved/product`
-        );
-        if (response.data) {
-          setProducts(response.data);
-        }
-      } catch (err) {
-        console.error(err);
-        toast.error("Failed to load products");
-      } finally {
-        setIsLoading(false);
+  // Memoized fetch function to prevent unnecessary re-renders
+  const fetchApprovedProducts = useCallback(async () => {
+    // Don't fetch if we're still loading auth state
+    if (isAuthLoading) {
+      console.log("Auth still loading, skipping product fetch");
+      return;
+    }
+
+    try {
+      setIsLoading(true);
+      
+      console.log("=== Fetching Approved Products ===");
+      console.log("Backend URL:", backendUrl);
+      console.log("Token exists:", !!token);
+      console.log("Is Authenticated:", isAuthenticated);
+      console.log("Token preview:", token?.substring(0, 20) + "...");
+      
+      // Create headers object - include auth if available
+      const headers = {};
+      if (token) {
+        headers.Authorization = `Bearer ${token}`;
       }
-    };
+      
+      console.log("Request headers:", headers);
+      
+      const response = await axios.get(
+        `${backendUrl}/api/product/approved/product`,
+        { 
+          headers,
+          timeout: 10000 // 10 second timeout
+        }
+      );
+      
+      console.log("Products fetch successful:", response.data?.length || 0, "products");
+      
+      if (response.data) {
+        setProducts(response.data);
+      }
+    } catch (err) {
+      console.error("Error fetching products:", err);
+      
+      // Better error handling
+      if (err.code === 'ECONNABORTED') {
+        toast.error("Request timeout - server is taking too long to respond");
+      } else if (err.response?.status === 401) {
+        toast.error("Authentication required");
+      } else if (err.response?.status === 403) {
+        toast.error("Access denied");
+      } else if (err.response?.status >= 500) {
+        toast.error("Server error - please try again later");
+      } else if (err.code === 'ERR_NETWORK') {
+        toast.error("Network error - check your connection");
+      } else {
+        toast.error("Failed to load products");
+      }
+    } finally {
+      setIsLoading(false);
+      setHasInitialized(true);
+    }
+  }, [backendUrl, token, isAuthLoading, isAuthenticated]);
 
+  // Effect to handle initial load and auth state changes
+  useEffect(() => {
+    console.log("=== Auth State Changed ===");
+    console.log("Auth Loading:", isAuthLoading);
+    console.log("Is Authenticated:", isAuthenticated);
+    console.log("Token exists:", !!token);
+    
+    // Only fetch products when:
+    // 1. Auth is not loading anymore
+    // 2. We have a backend URL
+    // 3. We haven't initialized yet OR auth state changed
+    if (!isAuthLoading && backendUrl && (!hasInitialized || isAuthenticated)) {
+      fetchApprovedProducts();
+    }
+  }, [fetchApprovedProducts, isAuthLoading, isAuthenticated, backendUrl, hasInitialized]);
+
+  // Retry mechanism for failed requests
+  const retryFetch = useCallback(() => {
+    console.log("Retrying product fetch...");
+    setHasInitialized(false);
     fetchApprovedProducts();
-  }, [backendUrl]);
+  }, [fetchApprovedProducts]);
+
+  const handleImageError = (productId) => {
+    setImageErrors(prev => ({ ...prev, [productId]: true }));
+  };
 
   const handleAddToCart = async (product) => {
     if (!token) {
@@ -58,11 +128,7 @@ const Home = ({ onSelectProduct }) => {
       };
 
       console.log("=== Adding to Cart ===");
-      console.log("Backend URL:", backendUrl);
-      console.log("Full URL:", `${backendUrl}/api/cart/add`);
       console.log("Product ID:", product._id);
-      console.log("Token exists:", !!token);
-      console.log("Token preview:", token);
       console.log("Cart data:", cartData);
 
       // Try different possible cart endpoints
@@ -88,7 +154,7 @@ const Home = ({ onSelectProduct }) => {
                 "Content-Type": "application/json",
                 Authorization: `Bearer ${token}`,
               },
-              timeout: 10000, // Reduced timeout to 10 seconds
+              timeout: 10000,
             }
           );
 
@@ -102,12 +168,10 @@ const Home = ({ onSelectProduct }) => {
           );
           lastError = error;
 
-          // If we get a 404, try the next endpoint
           if (error.response?.status === 404) {
             continue;
           }
 
-          // If it's not a 404, this might be the right endpoint with a different issue
           if (error.response?.status !== 404) {
             throw error;
           }
@@ -130,50 +194,28 @@ const Home = ({ onSelectProduct }) => {
       });
     } catch (error) {
       console.error("Error adding to cart:", error);
-      console.error("Error details:", {
-        message: error.message,
-        code: error.code,
-        response: error.response?.data,
-        status: error.response?.status,
-      });
 
-      // Better error handling
       let errorMessage = "Failed to add item to cart";
       let errorDetails = "";
 
       if (error.code === "ECONNABORTED") {
         errorMessage = "Server is taking too long to respond";
-        errorDetails =
-          "The cart API might be hanging. Please check your backend logs.";
-      } else if (
-        error.code === "ECONNREFUSED" ||
-        error.code === "ERR_NETWORK"
-      ) {
+        errorDetails = "Please try again or check your connection";
+      } else if (error.code === "ECONNREFUSED" || error.code === "ERR_NETWORK") {
         errorMessage = "Cannot connect to server";
-        errorDetails =
-          "Please make sure your backend server is running on http://localhost:5001";
-      } else if (error.response) {
-        console.log("Error response status:", error.response.status);
-        console.log("Error response data:", error.response.data);
-
-        if (error.response.status === 401) {
-          errorMessage = "Authentication failed";
-          errorDetails = "Please login again";
-        } else if (error.response.status === 404) {
-          errorMessage = "Cart API not found";
-          errorDetails =
-            "Please check if the cart API endpoint exists in your backend";
-        } else if (error.response.status === 400) {
-          errorMessage = error.response.data?.message || "Invalid request";
-          errorDetails = "Please check the request data format";
-        } else if (error.response.status >= 500) {
-          errorMessage = "Server error";
-          errorDetails = "Please check your backend logs for details";
-        }
-      } else if (error.request) {
-        errorMessage = "Network error";
-        errorDetails =
-          "Please check your internet connection and backend server";
+        errorDetails = "Please make sure your backend server is running";
+      } else if (error.response?.status === 401) {
+        errorMessage = "Authentication failed";
+        errorDetails = "Please login again";
+      } else if (error.response?.status === 404) {
+        errorMessage = "Cart API not found";
+        errorDetails = "Please check if the cart API endpoint exists";
+      } else if (error.response?.status === 400) {
+        errorMessage = error.response.data?.message || "Invalid request";
+        errorDetails = "Please check the request data format";
+      } else if (error.response?.status >= 500) {
+        errorMessage = "Server error";
+        errorDetails = "Please try again later";
       }
 
       toast.error(errorMessage, {
@@ -191,58 +233,7 @@ const Home = ({ onSelectProduct }) => {
     }
   };
 
-  // Add a function to test backend connectivity
-  const testBackendConnection = async () => {
-    try {
-      console.log("Testing backend connection with products endpoint...");
-      // Since /api/health doesn't exist, let's test with the products endpoint that works
-      const response = await axios.get(
-        `${backendUrl}/api/product/approved/product`,
-        {
-          timeout: 5000,
-        }
-      );
-      console.log("Backend is reachable via products endpoint");
-      return true;
-    } catch (error) {
-      console.error("Backend is not reachable:", error.message);
-      return false;
-    }
-  };
-
-  // Test if cart endpoint exists
-  const testCartEndpoint = async () => {
-    try {
-      console.log("Testing cart endpoint...");
-      // Make a test request to see if endpoint exists
-      const response = await axios.get(`${backendUrl}/api/cart`, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-        timeout: 5000,
-      });
-      console.log("Cart endpoint is reachable");
-      return true;
-    } catch (error) {
-      console.error(
-        "Cart endpoint test failed:",
-        error.response?.status,
-        error.message
-      );
-      return false;
-    }
-  };
-
-  // Test connection on component mount
-  useEffect(() => {
-    if (backendUrl) {
-      testBackendConnection();
-      if (token) {
-        testCartEndpoint();
-      }
-    }
-  }, [backendUrl, token]);
-
+  // Enhanced loading state that shows different messages based on auth state
   const LoadingState = () => (
     <motion.div
       className="flex flex-col items-center justify-center py-20"
@@ -275,11 +266,12 @@ const Home = ({ onSelectProduct }) => {
         className="text-center max-w-md"
       >
         <h3 className="text-2xl font-bold text-gray-900 mb-3">
-          Harvesting the Finest Saffron
+          {isAuthLoading ? "Authenticating..." : "Harvesting the Finest Saffron"}
         </h3>
         <p className="text-gray-600 mb-6">
-          We're carefully gathering the world's most precious saffron threads
-          for you. Each strand is being hand-selected for quality.
+          {isAuthLoading 
+            ? "Please wait while we verify your authentication..." 
+            : "We're carefully gathering the world's most precious saffron threads for you. Each strand is being hand-selected for quality."}
         </p>
         <div className="flex justify-center gap-2">
           {["Kashmir", "Iran", "Spain"].map((origin) => (
@@ -295,6 +287,16 @@ const Home = ({ onSelectProduct }) => {
       </motion.div>
     </motion.div>
   );
+
+  // Show loading while auth is being initialized
+  if (isAuthLoading && !hasInitialized) {
+    return (
+      <div className="min-h-screen relative">
+        <Toaster richColors closeButton />
+        <LoadingState />
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen relative">
@@ -370,16 +372,28 @@ const Home = ({ onSelectProduct }) => {
                 transition={{ duration: 0.3 }}
               >
                 <div className="relative h-48 bg-gradient-to-br from-amber-50 via-orange-50 to-amber-100 overflow-hidden">
-                  <motion.div
-                    className="absolute inset-0 flex items-center justify-center"
-                    initial={{ opacity: 0.1 }}
-                    whileHover={{ opacity: 0.15 }}
-                  >
-                    <div className="text-7xl font-black text-amber-400/20 transition-colors duration-300">
-                      {product.origin?.charAt(0) || "S"}
-                    </div>
-                  </motion.div>
+                  {/* Product Image */}
+                  {product.images && product.images.length > 0 && !imageErrors[product._id] ? (
+                    <img
+                      src={product.images[0]}
+                      alt={product.name}
+                      className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                      onError={() => handleImageError(product._id)}
+                      loading="lazy"
+                    />
+                  ) : (
+                    <motion.div
+                      className="absolute inset-0 flex items-center justify-center"
+                      initial={{ opacity: 0.1 }}
+                      whileHover={{ opacity: 0.15 }}
+                    >
+                      <div className="text-7xl font-black text-amber-400/20 transition-colors duration-300">
+                        {product.origin?.charAt(0) || "S"}
+                      </div>
+                    </motion.div>
+                  )}
 
+                  {/* Grade Badge */}
                   <div className="absolute top-4 right-4">
                     <motion.span
                       className={`inline-flex items-center px-3 py-1 rounded-full text-xs font-bold ${
@@ -402,6 +416,7 @@ const Home = ({ onSelectProduct }) => {
                     </motion.span>
                   </div>
 
+                  {/* Rating Badge */}
                   {product.rating && (
                     <motion.div
                       className="absolute bottom-4 left-4 flex items-center gap-1 bg-white/90 backdrop-blur-sm px-3 py-1 rounded-full shadow-sm"
@@ -412,6 +427,11 @@ const Home = ({ onSelectProduct }) => {
                         {product.rating}
                       </span>
                     </motion.div>
+                  )}
+
+                  {/* Image overlay */}
+                  {product.images && product.images.length > 0 && !imageErrors[product._id] && (
+                    <div className="absolute inset-0 bg-black/10 group-hover:bg-black/20 transition-colors duration-300"></div>
                   )}
                 </div>
 
@@ -488,6 +508,14 @@ const Home = ({ onSelectProduct }) => {
               <p className="text-gray-600 mb-8">
                 We couldn't find any saffron products at the moment.
               </p>
+              <motion.button
+                onClick={retryFetch}
+                className="px-6 py-3 bg-gradient-to-r from-[#ff6523] to-[#e55a1d] text-white font-semibold rounded-lg hover:shadow-lg transition-all duration-300"
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
+              >
+                Retry Loading
+              </motion.button>
             </div>
           </motion.div>
         )}
