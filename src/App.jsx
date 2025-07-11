@@ -16,7 +16,7 @@ import Home from './pages/Homepage';
 import Categories from './pages/Categories';
 import Cart from './pages/Cart';
 import Account from './components/Account';
-import OtpVerificationPage from './pages/OtpverifyPage';
+// import OtpVerificationPage from './pages/OtpverifyPage';
 import SignupForm from './pages/SignupForm';
 import SellerSignupPage from './pages/SellerSignupPage';
 import SaffronProductListing from './components/ProductListing';
@@ -29,31 +29,30 @@ import SaffronComponent from './components/SaffronLuxury';
 import SaffronQuality from './components/SaffronComponent';
 import SellerProtectedRoute from './components/SellerProtected'
 
-
 function App() {
   const location = useLocation();
 
-  const hideNavbarRoutes = ['/profile', '/adminpanel', '/sellerdashboard','/productlisting' ];
-  const hideNavbar = hideNavbarRoutes.includes(location.pathname);
+  const hideNavbarRoutes = ['/profile', '/adminpanel', '/sellerdashboard','/productlisting'];
+  const hideNavbar = hideNavbarRoutes.some(route => location.pathname.startsWith(route));
 
   return (
     <AuthProvider>
       {!hideNavbar && <Navbar />}
 
       <Routes>
-      <Route
-  path="/"
-  element={
-    <>
-      <HeroSection />
-      <AllProducts />
-      <Contact />
-    </>
-  }
-/>
+        <Route
+          path="/"
+          element={
+            <>
+              <HeroSection />
+              <AllProducts />
+              <Contact />
+            </>
+          }
+        />
         <Route path="/login" element={<LoginPage />} />
         <Route path="/signup" element={<Signup />} />
-        <Route path="/otpverify" element={<OtpVerificationPage />} />
+        {/* <Route path="/otpverify" element={<OtpVerificationPage />} /> */}
         <Route path="/signupform" element={<SignupForm />} />
         <Route path="/blog" element={<Blog />} />
         <Route path="/about" element={<About />} />
@@ -83,14 +82,18 @@ function App() {
             </AdminRoute>
           }
         />
+        
+        {/* Profile routes with nested structure */}
         <Route
-          path="/profile"
+          path="/profile/*"
           element={
             <ProtectedRoute>
               <Profile />
             </ProtectedRoute>
           }
         />
+        
+        {/* Standalone routes (these will show main navbar) */}
         <Route 
           path="/homepage" 
           element={

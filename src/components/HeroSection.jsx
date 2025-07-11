@@ -1,6 +1,7 @@
 import React from 'react';
 import saffronHome from '../assets/saffronHome.png';
 import BeeCanvas from '../modal/BeeCanvas';
+import traceable from '../assets/traceable.png'
 
 const HeroSection = () => {
   return (
@@ -49,7 +50,7 @@ const HeroSection = () => {
               <img 
                 src={saffronHome} 
                 alt="Saffron Home" 
-                className="absolute left-full opacity-30 max-h-[90vh]
+                className="hidden md:block absolute left-full opacity-30 max-h-[90vh]
                   w-[200px] h-[200px] xs:w-[250px] xs:h-[250px]
                   sm:w-[300px] sm:h-[300px]
                   md:w-[400px] md:h-[400px]
@@ -66,7 +67,7 @@ const HeroSection = () => {
         </div>
 
         {/* Feature badges - UPDATED to look more informative */}
-        <div className="absolute bottom-32 left-1/2 transform -translate-x-1/2 z-20">
+        <div className="absolute md:hidden bottom-40 left-1/2 transform -translate-x-1/2 z-0">
           <div className="flex flex-col gap-3 items-center px-4">
             {/* First row - two informative badges */}
             <div className="flex gap-6">
@@ -90,16 +91,24 @@ const HeroSection = () => {
         </div>
         
         {/* Bottom right description - unchanged */}
-        <div className="absolute mt-100 right-5 xs:bottom-10 xs:right-10
-                        sm:bottom-15 sm:right-10 md:bottom-60 md:right-20
+        <div className="absolute mt-112 ml-50  xs:bottom-10 xs:right-10
+                        sm:bottom-15 sm:right-10 md:bottom-40 md:right-20
                         text-black font-poppins text-left
                         max-w-[120px] xs:max-w-[150px] sm:max-w-[180px] md:max-w-[200px] lg:max-w-[250px]
                         leading-relaxed
                         text-[12px] xs:text-[14px] sm:text-[16px] md:text-[18px] lg:text-[20px]
                         z-10">
           <div className="absolute top-30 right-20 w-32 h-32 bg-white/80 rounded-full blur-[80px]"></div>
-          <p>
-          Pure, traceable Kashmiri saffron.          </p>
+          <div className="text-right max-w-xs">
+  <div className="inline-block ">
+    <p className="text-sm md:text-xl whitespace-nowrap font-light text-white/90 tracking-[0.2em] uppercase">Pure • Traceable</p>
+    <p className="text-xl md:text-2xl whitespace-nowrap font-medium text-[#ffc1a7] tracking-tight mt-1 md:mt-2 leading-none">Kashmiri Saffron</p>
+    <div className="mt-2 md:mt-3 h-[1px] w-full bg-gradient-to-l from-[#ffc1a7]/70 via-[#ffc1a7]/30 to-transparent"></div>
+    <div>
+    <img src={traceable} className='ml-10 hidden md:block md:ml-30 h-15 w-15 md:h-30 md:w-30 rotate-15'/>
+    </div>
+  </div>
+</div>
         </div>
       </section>
     </div>

@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useRef } from "react";
+import { Routes, Route, useLocation, useNavigate } from 'react-router-dom';
 import {
   Home,
   Grid,
@@ -9,7 +10,6 @@ import {
   ChevronDown,
   Globe,
 } from "lucide-react";
-import { useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 import saffronLogo from "../assets/saffron logo.png";
 import HomePage from "../pages/Homepage";
@@ -17,13 +17,12 @@ import CartPage from "../pages/Cart";
 import Account from "./Account";
 import Categories from "../pages/Categories";
 import SaffronHome from "../assets/saffronHome.png";
-import { useLocation } from "react-router-dom";
 import ProductDetails from "./ProductDetails";
 
 const Profile = () => {
   const location = useLocation();
+  const navigate = useNavigate();
   const passedEmail = location.state?.email || "";
-  const [activeTab, setActiveTab] = useState("Home");
   const [scrollY, setScrollY] = useState(0);
   const [isProfileVisible, setIsProfileVisible] = useState(false);
   const [isMobile, setIsMobile] = useState(false);
@@ -33,9 +32,23 @@ const Profile = () => {
   const dropdownRef = useRef(null);
   const profileButtonRef = useRef(null);
   const currencyRef = useRef(null);
-  const navigate = useNavigate();
   const { user } = useAuth();
   const [selectedProductId, setSelectedProductId] = useState(null);
+
+  // Get current tab based on URL
+  const getCurrentTab = () => {
+    const path = location.pathname;
+    if (path.includes('/profile/cart')) return 'Cart';
+    if (path.includes('/profile/categories')) return 'Browse';
+    if (path.includes('/profile/account')) return 'Profile';
+    return 'Home'; // Default to Home
+  };
+
+  const [activeTab, setActiveTab] = useState(getCurrentTab());
+
+  useEffect(() => {
+    setActiveTab(getCurrentTab());
+  }, [location.pathname]);
 
   useEffect(() => {
     const checkScreenSize = () => {
@@ -73,10 +86,10 @@ const Profile = () => {
   }, [isProfileVisible, isMobile, isCurrencyOpen]);
 
   const mobileTabs = [
-    { icon: Home, label: "Home" },
-    { icon: Grid, label: "Browse" },
-    { icon: ShoppingCart, label: "Cart" },
-    { icon: User, label: "Profile" },
+    { icon: Home, label: "Home", path: "/profile" },
+    { icon: Grid, label: "Browse", path: "/profile/categories" },
+    { icon: ShoppingCart, label: "Cart", path: "/profile/cart" },
+    { icon: User, label: "Profile", path: "/profile/account" },
   ];
 
   const currencies = [
@@ -86,34 +99,9 @@ const Profile = () => {
     { code: "INR", symbol: "₹", name: "Indian Rupee" },
   ];
 
-  const renderActiveTabContent = () => {
-    if (selectedProductId) {
-      return (
-        <ProductDetails
-          id={selectedProductId}
-          onBack={() => setSelectedProductId(null)}
-        />
-      );
-    }
-    switch (activeTab) {
-      case "Home":
-        return <HomePage onSelectProduct={setSelectedProductId} />;
-      case "Browse":
-        return <Categories />;
-      case "Cart":
-        return <CartPage />;
-      case "Profile":
-        return isMobile ? (
-          <Account isVisible={true} onClose={() => setActiveTab("Home")} />
-        ) : null;
-      default:
-        return null;
-    }
-  };
-
   const handleProfileClick = () => {
     if (isMobile) {
-      setActiveTab("Profile");
+      navigate('/profile/account');
     } else {
       setIsProfileVisible(!isProfileVisible);
     }
@@ -158,6 +146,11 @@ const Profile = () => {
     console.log("Searching for:", searchQuery);
   };
 
+  const handleTabClick = (tab) => {
+    navigate(tab.path);
+    setActiveTab(tab.label);
+  };
+
   return (
     <>
       {/* Desktop Navbar */}
@@ -167,7 +160,7 @@ const Profile = () => {
           <div className="flex items-center space-x-6">
             <div
               className="text-2xl font-bold text-black cursor-pointer whitespace-nowrap"
-              onClick={() => setActiveTab("Home")}
+              onClick={() => navigate('/profile')}
             >
               <img
                 src={saffronLogo}
@@ -250,8 +243,7 @@ const Profile = () => {
             {/* Cart */}
             <button
               className="p-2 text-black transition-colors relative"
-              // onClick={() => setActiveTab("Cart")}
-              onClick={() => navigate("/cart")}
+              onClick={() => navigate("/profile/cart")}
             >
               <ShoppingCart className="h-6 w-6" />
               <span className="absolute -top-1 -right-1 text-white bg-[#ff6523] text-xs rounded-full h-5 w-5 flex items-center justify-center">
@@ -323,7 +315,13 @@ const Profile = () => {
 
       {/* Main Page Content */}
       <div className="min-h-screen bg-[#ff6523] pt-4 pb-24 px-4 relative z-10">
-        {renderActiveTabContent()}
+        <Routes>
+          <Route path="/" element={<HomePage onSelectProduct={setSelectedProductId} />} />
+          <Route path="/categories" element={<Categories />} />
+          <Route path="/cart" element={<CartPage />} />
+          <Route path="/account" element={<Account isVisible={true} />} />
+          <Route path="/product/:id" element={<ProductDetails onBack={() => navigate('/profile')} />} />
+        </Routes>
       </div>
 
       {/* Mobile Bottom Tab */}
@@ -343,7 +341,7 @@ const Profile = () => {
           {mobileTabs.map((tab, index) => (
             <button
               key={index}
-              onClick={() => setActiveTab(tab.label)}
+              onClick={() => handleTabClick(tab)}
               className={`flex-1 py-4 flex flex-col items-center justify-center transition-all duration-300 relative group ${
                 activeTab === tab.label
                   ? "text-[#ff6523] scale-105"

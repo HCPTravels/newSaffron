@@ -9,6 +9,8 @@ import saffronHome from "../assets/saffronHome.png";
 const ContactFormSection = () => {
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
+  const [phone, setPhone] = useState("");
+  const [pincode, setPincode] = useState("");
   const [message, setMessage] = useState("");
   const [isHovered, setIsHovered] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
@@ -32,6 +34,8 @@ const ContactFormSection = () => {
       });
       setName("");
       setEmail("");
+      setPhone("");
+      setPincode("");
       setMessage("");
     } catch (error) {
       toast.error("Failed to send", {
@@ -50,7 +54,7 @@ const ContactFormSection = () => {
   };
 
   return (
-    <div className="relative bg-gradient-to-br from-[#ff6523]/10 to-[#ff6523]/20">
+    <div className="relative bg-gradient-to-br from-[#ff6523]/10 to-[#ff6523]/20 h-screen flex items-center justify-center p-4">
       <Toaster 
         richColors 
         closeButton 
@@ -68,18 +72,18 @@ const ContactFormSection = () => {
       />
 
       {/* Background Elements */}
-      <div className="fixed inset-0 overflow-hidden z-0">
+      <div className="absolute inset-0 overflow-hidden z-0">
         <img
           src={saffronHome}
           alt="Decorative Saffron"
-          className="fixed bottom-[-75px] left-[-75px] w-[150px] h-[150px]
-                     md:top-[586px] md:left-[-154px] md:w-[375px] md:h-[375px]
+          className="absolute bottom-[-75px] left-[-75px] w-[150px] h-[150px]
+                     md:bottom-[-100px] md:left-[-100px] md:w-[200px] md:h-[200px]
                      object-cover pointer-events-none opacity-30 z-10"
         />
       </div>
 
       {/* Form Section */}
-      <div className="relative z-30 max-w-4xl mx-auto pt-20 pb-12 px-4 sm:px-6">
+      <div className="relative z-30 w-full max-w-2xl">
         <motion.div 
           className="w-full"
           initial={{ opacity: 0, y: 20 }}
@@ -92,7 +96,7 @@ const ContactFormSection = () => {
               <div className="relative z-10 flex flex-row justify-between items-center">
                 <div>
                   <h2 className="text-white text-2xl sm:text-3xl font-bold tracking-tight">Send Us a Message</h2>
-                  <p className="text-white/90 text-sm sm:text-base mt-2">We'll respond within 24 hours</p>
+                  <p className="text-white/90 text-sm sm:text-base mt-1">We'll respond within 24 hours</p>
                 </div>
                 <motion.div 
                   whileHover={{ rotate: 10, scale: 1.1 }}
@@ -101,7 +105,7 @@ const ContactFormSection = () => {
                   <img 
                     src={SaffronIcon}
                     alt="Saffron Icon"
-                    className="h-12 w-12 sm:h-16 sm:w-16 drop-shadow-lg"
+                    className="h-10 w-10 sm:h-12 sm:w-12 drop-shadow-lg"
                   />
                 </motion.div>
               </div>
@@ -109,54 +113,92 @@ const ContactFormSection = () => {
             </div>
 
             {/* Form Content */}
-            <div className="p-6 sm:p-8">
-              <form onSubmit={handleSubmit} className="space-y-6">
-                <div>
-                  <label htmlFor="name" className="block text-sm font-medium text-gray-700 mb-2">
-                    Your Name
-                  </label>
-                  <motion.div whileHover={{ scale: 1.01 }} whileTap={{ scale: 0.99 }}>
-                    <input
-                      type="text"
-                      id="name"
-                      value={name}
-                      onChange={(e) => setName(e.target.value)}
-                      placeholder="Enter your name"
-                      className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:ring-2 focus:ring-[#ff6523]/50 focus:border-transparent bg-white text-base placeholder-gray-400 transition-all duration-200"
-                      required
-                    />
-                  </motion.div>
+            <div className="p-6">
+              <form onSubmit={handleSubmit} className="space-y-4">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  <div>
+                    <label htmlFor="name" className="block text-sm font-medium text-gray-700 mb-1">
+                      Your Name
+                    </label>
+                    <motion.div whileHover={{ scale: 1.01 }} whileTap={{ scale: 0.99 }}>
+                      <input
+                        type="text"
+                        id="name"
+                        value={name}
+                        onChange={(e) => setName(e.target.value)}
+                        placeholder="Enter your name"
+                        className="w-full px-3 py-2 rounded-lg border-none focus:outline-none focus:ring-0 border border-gray-200 focus:ring-2 focus:ring-[#ff6523]/50 focus:border-transparent bg-white text-sm placeholder-gray-400 transition-all duration-200"
+                        required
+                      />
+                    </motion.div>
+                  </div>
+
+                  <div>
+                    <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-1">
+                      Email Address
+                    </label>
+                    <motion.div whileHover={{ scale: 1.01 }} whileTap={{ scale: 0.99 }}>
+                      <input
+                        type="email"
+                        id="email"
+                        value={email}
+                        onChange={(e) => setEmail(e.target.value)}
+                        placeholder="Enter your email"
+                        className="w-full px-3 py-2 rounded-lg border-none focus:outline-none focus:ring-0 border border-gray-200 focus:ring-2 focus:ring-[#ff6523]/50 focus:border-transparent bg-white text-sm placeholder-gray-400 transition-all duration-200"
+                        required
+                      />
+                    </motion.div>
+                  </div>
+                </div>
+
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  <div>
+                    <label htmlFor="phone" className="block text-sm font-medium text-gray-700 mb-1">
+                      Contact Number
+                    </label>
+                    <motion.div whileHover={{ scale: 1.01 }} whileTap={{ scale: 0.99 }}>
+                      <input
+                        type="tel"
+                        id="phone"
+                        value={phone}
+                        onChange={(e) => setPhone(e.target.value)}
+                        placeholder="Enter contact number"
+                        className="w-full px-3 py-2 border-none focus:outline-none focus:ring-0 rounded-lg border border-gray-200 focus:ring-2 focus:ring-[#ff6523]/50 focus:border-transparent bg-white text-sm placeholder-gray-400 transition-all duration-200"
+                        required
+                      />
+                    </motion.div>
+                  </div>
+
+                  <div>
+                    <label htmlFor="pincode" className="block text-sm font-medium text-gray-700 mb-1">
+                      Your Pincode
+                    </label>
+                    <motion.div whileHover={{ scale: 1.01 }} whileTap={{ scale: 0.99 }}>
+                      <input
+                        type="text"
+                        id="pincode"
+                        value={pincode}
+                        onChange={(e) => setPincode(e.target.value)}
+                        placeholder="Enter your pincode"
+                        className="w-full px-3 py-2 rounded-lg border-none focus:outline-none focus:ring-0 border border-gray-200 focus:ring-2 focus:ring-[#ff6523]/50 focus:border-transparent bg-white text-sm placeholder-gray-400 transition-all duration-200"
+                        required
+                      />
+                    </motion.div>
+                  </div>
                 </div>
 
                 <div>
-                  <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-2">
-                    Email Address
-                  </label>
-                  <motion.div whileHover={{ scale: 1.01 }} whileTap={{ scale: 0.99 }}>
-                    <input
-                      type="email"
-                      id="email"
-                      value={email}
-                      onChange={(e) => setEmail(e.target.value)}
-                      placeholder="Enter your email"
-                      className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:ring-2 focus:ring-[#ff6523]/50 focus:border-transparent bg-white text-base placeholder-gray-400 transition-all duration-200"
-                      required
-                    />
-                  </motion.div>
-                </div>
-
-                <div>
-                  <label htmlFor="message" className="block text-sm font-medium text-gray-700 mb-2">
+                  <label htmlFor="message" className="block text-sm font-medium text-gray-700 mb-1">
                     Your Message
                   </label>
                   <motion.div whileHover={{ scale: 1.01 }} whileTap={{ scale: 0.99 }}>
                     <textarea
                       id="message"
-                      rows="4"
+                      rows="3"
                       value={message}
                       onChange={(e) => setMessage(e.target.value)}
                       placeholder="How can we help you?"
-                      className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:ring-2 focus:ring-[#ff6523]/50 focus:border-transparent bg-white text-base placeholder-gray-400 transition-all duration-200"
+                      className="w-full px-3 py-2 rounded-lg border-none focus:outline-none focus:ring-0 border border-gray-200 focus:ring-2 focus:ring-[#ff6523]/50 focus:border-transparent bg-white text-sm placeholder-gray-400 transition-all duration-200"
                       required
                     ></textarea>
                   </motion.div>
@@ -164,7 +206,7 @@ const ContactFormSection = () => {
 
                 <motion.button
                   type="submit"
-                  className="w-full flex items-center justify-center gap-3 px-6 py-4 rounded-xl bg-gradient-to-r from-[#ff6523] to-[#e55a1d] text-white font-medium shadow-md hover:shadow-lg transition-all group"
+                  className="w-full flex items-center justify-center gap-2 px-4 py-3 rounded-xl bg-gradient-to-r from-[#ff6523] to-[#e55a1d] text-white font-medium shadow-md hover:shadow-lg transition-all group mt-2"
                   whileHover={{ scale: 1.02 }}
                   whileTap={{ scale: 0.98 }}
                   onHoverStart={() => setIsHovered(true)}
@@ -172,9 +214,9 @@ const ContactFormSection = () => {
                   disabled={isLoading}
                 >
                   {isLoading ? (
-                    <div className="flex items-center gap-3">
-                      <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
-                      <span className="text-sm sm:text-base">Sending...</span>
+                    <div className="flex items-center gap-2">
+                      <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                      <span className="text-sm">Sending...</span>
                     </div>
                   ) : (
                     <>
@@ -182,9 +224,9 @@ const ContactFormSection = () => {
                         animate={{ x: isHovered ? 5 : 0 }} 
                         transition={{ type: "spring", stiffness: 500 }}
                       >
-                        <Send className="h-5 w-5 group-hover:rotate-12 transition-transform" />
+                        <Send className="h-4 w-4 group-hover:rotate-12 transition-transform" />
                       </motion.span>
-                      <span className="text-sm sm:text-base">Send Message</span>
+                      <span className="text-sm">Send Message</span>
                     </>
                   )}
                 </motion.button>

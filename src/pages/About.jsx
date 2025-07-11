@@ -1,43 +1,30 @@
 import React from "react";
 import { motion } from "framer-motion";
-import SaffronFlower from "../assets/bowlSaffron.png";
-import saffronHome from "../assets/saffronHome.png";
+import { Instagram, Facebook, Twitter, Pin, Award, Heart, Leaf } from "lucide-react";
 
 // Animation variants
-const containerVariants = {
+const fadeIn = {
+  hidden: { opacity: 0, y: 20 },
+  visible: {
+    opacity: 1,
+    y: 0,
+    transition: { duration: 0.8, ease: "easeOut" }
+  }
+};
+
+const staggerContainer = {
   hidden: { opacity: 0 },
   visible: {
     opacity: 1,
     transition: {
-      staggerChildren: 0.2,
+      staggerChildren: 0.1,
       when: "beforeChildren"
     }
   }
 };
 
-const itemVariants = {
-  hidden: { y: 20, opacity: 0 },
-  visible: {
-    y: 0,
-    opacity: 1,
-    transition: {
-      type: "spring",
-      stiffness: 100,
-      damping: 10
-    }
-  }
-};
-
-const fadeIn = {
-  hidden: { opacity: 0 },
-  visible: {
-    opacity: 1,
-    transition: { duration: 0.8, ease: "easeOut" }
-  }
-};
-
-const scaleUp = {
-  hidden: { scale: 0.95, opacity: 0 },
+const scaleIn = {
+  hidden: { scale: 0.8, opacity: 0 },
   visible: {
     scale: 1,
     opacity: 1,
@@ -46,295 +33,209 @@ const scaleUp = {
 };
 
 const About = () => {
-    return (
-        <motion.div 
-            className="relative min-h-screen"
+  const socialLinks = [
+    { icon: Instagram, url: "https://www.instagram.com/kisansaffron/", label: "Instagram" },
+    { icon: Facebook, url: "https://www.facebook.com/profile.php?id=61577939271423", label: "Facebook" },
+    { icon: Twitter, url: "https://x.com/kisan_saffron", label: "Twitter" },
+    { icon: Pin, url: "https://in.pinterest.com/kisansaffron/", label: "Pinterest" }
+  ];
+
+  const stats = [
+    { value: "300+", label: "Crocin Level" },
+    { value: "0", label: "Additives" },
+    { value: "A++", label: "Quality Grade" },
+    { value: "24h", label: "Harvest to Seal" }
+  ];
+
+  const values = [
+    { icon: Leaf, title: "Purity", text: "100% pure Kashmir saffron with no additives or blending" },
+    { icon: Award, title: "Heritage", text: "Multi-generational family farms in Pampore valley" },
+    { icon: Heart, title: "Potency", text: "Peak season harvest for maximum medicinal properties" }
+  ];
+
+  return (
+    <div className="min-h-screen bg-gradient-to-br from-orange-50 via-white to-orange-50">
+      {/* Hero Section */}
+      <section className="relative py-32 px-6">
+        <div className="max-w-4xl mx-auto text-center">
+          <motion.h1 
+            className="text-6xl md:text-8xl font-light text-gray-900 mb-8 tracking-tight"
             initial="hidden"
             animate="visible"
-            variants={containerVariants}
-        >
-            {/* Decorative saffron images with animation */}
-            <motion.img
-                src={saffronHome}
-                alt="Decorative Saffron"
-                className="fixed bottom-[-75px] left-[-75px] w-[150px] h-[150px]
-                           md:top-[586px] md:left-[-154px] md:w-[375px] md:h-[375px]
-                           object-cover pointer-events-none opacity-30 z-30"
-                initial={{ x: -50, opacity: 0 }}
-                animate={{ x: 0, opacity: 0.3 }}
-                transition={{ delay: 0.5, duration: 1 }}
-            />
-            <motion.img
-                src={saffronHome}
-                alt="Decorative Saffron"
-                className="fixed bottom-[-75px] right-[-75px] w-[150px] h-[150px]
-                           top-[0px] md:left-[1250px] md:w-[375px] md:h-[375px]
-                           object-cover pointer-events-none opacity-30 z-30"
-                initial={{ x: 50, opacity: 0 }}
-                animate={{ x: 0, opacity: 0.3 }}
-                transition={{ delay: 0.5, duration: 1 }}
-            />
+            variants={fadeIn}
+          >
+            About Us
+          </motion.h1>
+          <motion.p 
+            className="text-xl md:text-2xl text-gray-600 font-light leading-relaxed max-w-3xl mx-auto mb-12"
+            initial="hidden"
+            animate="visible"
+            variants={fadeIn}
+            transition={{ delay: 0.2 }}
+          >
+            Bringing you the world's finest Kashmir saffron, where each strand tells a story of heritage and excellence.
+          </motion.p>
+          
+          {/* Social Media Links */}
+          <motion.div 
+            className="flex justify-center space-x-6 mb-16"
+            initial="hidden"
+            animate="visible"
+            variants={staggerContainer}
+            transition={{ delay: 0.4 }}
+          >
+            {socialLinks.map((social, index) => (
+              <motion.a
+                key={index}
+                href={social.url}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="w-12 h-12 bg-white rounded-full flex items-center justify-center text-[#ff6523] hover:bg-[#ff6523] hover:text-white transition-all duration-300 shadow-lg hover:shadow-xl"
+                variants={scaleIn}
+                whileHover={{ scale: 1.1 }}
+                whileTap={{ scale: 0.95 }}
+                aria-label={social.label}
+              >
+                <social.icon size={20} />
+              </motion.a>
+            ))}
+          </motion.div>
+        </div>
+      </section>
 
-            {/* Content Container */}
-            <div className="relative z-10">
-                {/* Hero Section */}
-                <section className="flex items-center justify-center px-4 sm:px-6 mt-50 md:mt-50 pb-16">
-                    <div className="max-w-7xl mx-auto text-center px-4">
-                        <motion.h1 
-                            className="text-5xl sm:text-6xl md:text-7xl lg:text-8xl xl:text-9xl font-bold text-white mb-6 sm:mb-8 leading-tight tracking-tight drop-shadow-lg"
-                            variants={itemVariants}
-                        >
-                            ABOUT US
-                        </motion.h1>
-                        <motion.div 
-                            className="max-w-2xl mx-auto"
-                            variants={itemVariants}
-                        >
-                            <motion.p 
-                                className="text-lg sm:text-xl md:text-2xl text-white/90 font-light leading-relaxed mb-8 sm:mb-12"
-                                variants={itemVariants}
-                            >
-                                Bringing you the world's finest Kashmir saffron, where each strand tells a story of heritage and excellence.
-                            </motion.p>
-                            <motion.button 
-                                className="bg-white text-[#ff6523] hover:bg-black hover:text-white px-6 sm:px-8 md:px-10 py-3 sm:py-4 rounded-full text-base sm:text-lg font-medium transition-all duration-300 transform hover:scale-105 shadow-xl sm:shadow-2xl"
-                                variants={itemVariants}
-                                whileHover={{ scale: 1.05 }}
-                                whileTap={{ scale: 0.95 }}
-                            >
-                                Discover Our Legacy
-                            </motion.button>
-                        </motion.div>
-                    </div>
-                </section>
+      {/* Main Content */}
+      <section className="py-24 px-6">
+        <div className="max-w-6xl mx-auto">
+          {/* Heritage & Quality Cards */}
+          <motion.div 
+            className="grid md:grid-cols-2 gap-12 mb-24"
+            initial="hidden"
+            whileInView="visible"
+            viewport={{ once: true }}
+            variants={staggerContainer}
+          >
+            <motion.div 
+              className="bg-white rounded-3xl p-12 shadow-sm border border-gray-100 hover:shadow-md transition-shadow duration-300"
+              variants={fadeIn}
+            >
+              <div className="w-16 h-16 bg-[#ff6523] rounded-2xl flex items-center justify-center mb-8">
+                <Award className="w-8 h-8 text-white" />
+              </div>
+              <h2 className="text-3xl font-light text-gray-900 mb-6">Our Heritage</h2>
+              <p className="text-gray-600 text-lg leading-relaxed">
+                For generations, our family has cultivated the rarest saffron in Kashmir's Pampore valley, 
+                where altitude and climate create the world's most potent strands.
+              </p>
+            </motion.div>
 
-                {/* Content Sections */}
-                <div className="bg-[#ff6523]/90 backdrop-blur-sm pb-12">
-                    {/* Premium Content Section */}
-                    <section className="py-16 sm:py-20 md:py-28 px-4 sm:px-6 max-w-7xl mx-auto">
-                        <motion.div 
-                            className="grid grid-cols-1 lg:grid-cols-2 gap-6 sm:gap-8 md:gap-12"
-                            variants={containerVariants}
-                        >
-                            {/* Heritage Card */}
-                            <motion.div 
-                                className="bg-white/95 rounded-2xl sm:rounded-3xl p-6 sm:p-8 md:p-12 border border-white/30 shadow-lg hover:shadow-xl sm:hover:shadow-3xl transition-all duration-500"
-                                variants={scaleUp}
-                                whileHover={{ y: -5 }}
-                            >
-                                <div className="flex flex-col sm:flex-row sm:items-start space-y-4 sm:space-y-0 sm:space-x-4 md:space-x-8">
-                                    <div className="flex-shrink-0">
-                                        <div className="w-16 h-16 sm:w-20 sm:h-20 bg-[#ff6523] rounded-full flex items-center justify-center">
-                                            <svg className="w-8 h-8 sm:w-10 sm:h-10 text-white" fill="currentColor" viewBox="0 0 20 20">
-                                                <path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
-                                            </svg>
-                                        </div>
-                                    </div>
-                                    <div>
-                                        <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold text-gray-900 mb-4 sm:mb-6">Our Heritage</h2>
-                                        <p className="text-gray-700 leading-relaxed text-base sm:text-lg md:text-xl">
-                                            For generations, our family has cultivated the rarest saffron in Kashmir's Pampore valley, 
-                                            where altitude and climate create the world's most potent strands.
-                                        </p>
-                                    </div>
-                                </div>
-                            </motion.div>
+            <motion.div 
+              className="bg-white rounded-3xl p-12 shadow-sm border border-gray-100 hover:shadow-md transition-shadow duration-300"
+              variants={fadeIn}
+            >
+              <div className="w-16 h-16 bg-[#ff6523] rounded-2xl flex items-center justify-center mb-8">
+                <Heart className="w-8 h-8 text-white" />
+              </div>
+              <h2 className="text-3xl font-light text-gray-900 mb-6">Unrivaled Quality</h2>
+              <p className="text-gray-600 text-lg leading-relaxed">
+                Each strand is hand-selected, with crocin levels exceeding 300+ for unparalleled color, 
+                aroma, and flavor that defines true Kashmiri saffron.
+              </p>
+            </motion.div>
+          </motion.div>
 
-                            {/* Quality Card */}
-                            <motion.div 
-                                className="bg-white/95 rounded-2xl sm:rounded-3xl p-6 sm:p-8 md:p-12 border border-white/30 shadow-lg hover:shadow-xl sm:hover:shadow-3xl transition-all duration-500"
-                                variants={scaleUp}
-                                transition={{ delay: 0.1 }}
-                                whileHover={{ y: -5 }}
-                            >
-                                <div className="flex flex-col sm:flex-row sm:items-start space-y-4 sm:space-y-0 sm:space-x-4 md:space-x-8">
-                                    <div className="flex-shrink-0">
-                                        <div className="w-16 h-16 sm:w-20 sm:h-20 bg-[#ff6523] rounded-full flex items-center justify-center">
-                                            <svg className="w-8 h-8 sm:w-10 sm:h-10 text-white" fill="currentColor" viewBox="0 0 20 20">
-                                                <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/>
-                                            </svg>
-                                        </div>
-                                    </div>
-                                    <div>
-                                        <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold text-gray-900 mb-4 sm:mb-6">Unrivaled Quality</h2>
-                                        <p className="text-gray-700 leading-relaxed text-base sm:text-lg md:text-xl">
-                                            Each strand is hand-selected, with crocin levels exceeding 300+ for unparalleled color, 
-                                            aroma, and flavor that defines true Kashmiri saffron.
-                                        </p>
-                                    </div>
-                                </div>
-                            </motion.div>
-                        </motion.div>
-                    </section>
+          {/* Stats Section */}
+          <motion.div 
+            className="grid grid-cols-2 md:grid-cols-4 gap-8 mb-32"
+            initial="hidden"
+            whileInView="visible"
+            viewport={{ once: true }}
+            variants={staggerContainer}
+          >
+            {stats.map((stat, index) => (
+              <motion.div 
+                key={index}
+                className="text-center"
+                variants={fadeIn}
+              >
+                <div className="text-5xl md:text-6xl font-light text-[#ff6523] mb-4">{stat.value}</div>
+                <div className="text-gray-600 text-lg font-medium">{stat.label}</div>
+              </motion.div>
+            ))}
+          </motion.div>
 
-                    {/* Stats Section */}
-                    <section className="py-16 sm:py-20 md:py-28 px-4 sm:px-6 max-w-7xl mx-auto">
-                        <motion.div 
-                            className="grid grid-cols-2 sm:grid-cols-4 gap-4 sm:gap-6 md:gap-8"
-                            initial="hidden"
-                            whileInView="visible"
-                            viewport={{ once: true, margin: "-100px" }}
-                            variants={{
-                                hidden: { opacity: 0 },
-                                visible: {
-                                    opacity: 1,
-                                    transition: {
-                                        staggerChildren: 0.1,
-                                        when: "beforeChildren"
-                                    }
-                                }
-                            }}
-                        >
-                            {[
-                                { value: "300+", label: "Crocin Level" },
-                                { value: "0", label: "Additives" },
-                                { value: "A++", label: "Quality Grade" },
-                                { value: "24h", label: "Harvest to Seal" }
-                            ].map((stat, index) => (
-                                <motion.div 
-                                    key={index} 
-                                    className="bg-white/95 rounded-xl sm:rounded-2xl p-4 sm:p-6 md:p-8 lg:p-10 text-center border border-white/30 shadow-md hover:shadow-lg sm:hover:shadow-2xl transition-all duration-300"
-                                    variants={{
-                                        hidden: { y: 30, opacity: 0 },
-                                        visible: { 
-                                            y: 0, 
-                                            opacity: 1,
-                                            transition: { type: "spring", stiffness: 100 }
-                                        }
-                                    }}
-                                    whileHover={{ y: -5 }}
-                                >
-                                    <div className="text-4xl sm:text-5xl md:text-6xl font-bold text-[#ff6523] mb-2 sm:mb-4">{stat.value}</div>
-                                    <div className="text-base sm:text-lg md:text-xl font-semibold text-gray-800">{stat.label}</div>
-                                </motion.div>
-                            ))}
-                        </motion.div>
-                    </section>
+          {/* Mission Section */}
+          <motion.div 
+            className="max-w-4xl mx-auto text-center mb-32"
+            initial="hidden"
+            whileInView="visible"
+            viewport={{ once: true }}
+            variants={fadeIn}
+          >
+            <h2 className="text-5xl font-light text-gray-900 mb-12">Our Sacred Promise</h2>
+            <p className="text-xl text-gray-600 leading-relaxed mb-12">
+              To honor centuries of tradition while innovating for the future, delivering saffron so pure 
+              it transforms every dish into a masterpiece and every moment into a celebration.
+            </p>
+            <motion.button 
+              className="bg-[#ff6523] hover:bg-gray-900 text-white px-12 py-4 rounded-full text-lg font-medium transition-all duration-300"
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
+            >
+              Experience the Gold Standard
+            </motion.button>
+          </motion.div>
 
-                    {/* Mission Section */}
-                    <section className="py-16 sm:py-20 md:py-28 px-4 sm:px-6 max-w-4xl mx-auto">
-                        <motion.div 
-                            className="bg-white/95 rounded-2xl sm:rounded-3xl p-8 sm:p-10 md:p-12 lg:p-16 border border-white/30 shadow-xl sm:shadow-2xl md:shadow-3xl text-center"
-                            initial="hidden"
-                            whileInView="visible"
-                            viewport={{ once: true }}
-                            variants={scaleUp}
-                        >
-                            <motion.h2 
-                                className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold text-gray-900 mb-6 sm:mb-8 md:mb-10"
-                                variants={fadeIn}
-                            >
-                                Our Sacred Promise
-                            </motion.h2>
-                            <motion.p 
-                                className="text-base sm:text-lg md:text-xl text-gray-700 leading-relaxed mb-8 sm:mb-10 md:mb-12"
-                                variants={fadeIn}
-                                transition={{ delay: 0.2 }}
-                            >
-                                To honor centuries of tradition while innovating for the future, delivering saffron so pure 
-                                it transforms every dish into a masterpiece and every moment into a celebration.
-                            </motion.p>
-                            <motion.button 
-                                className="bg-[#ff6523] hover:bg-gray-900 text-white px-8 sm:px-12 md:px-16 py-3 sm:py-4 md:py-5 rounded-full text-base sm:text-lg md:text-xl font-medium transition-all duration-300 transform hover:scale-105 shadow-lg sm:shadow-xl md:shadow-2xl"
-                                variants={fadeIn}
-                                transition={{ delay: 0.4 }}
-                                whileHover={{ scale: 1.05 }}
-                                whileTap={{ scale: 0.95 }}
-                            >
-                                Experience the Gold Standard
-                            </motion.button>
-                        </motion.div>
-                    </section>
-
-                    {/* Values Section */}
-                    <section className="py-16 sm:py-20 md:py-28 px-4 sm:px-6 max-w-7xl mx-auto">
-                        <motion.h2 
-                            className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold text-white text-center mb-12 sm:mb-16 md:mb-20 drop-shadow-lg"
-                            initial={{ opacity: 0, y: 20 }}
-                            whileInView={{ opacity: 1, y: 0 }}
-                            viewport={{ once: true }}
-                            transition={{ duration: 0.6 }}
-                        >
-                            Our Pillars of Excellence
-                        </motion.h2>
-                        <motion.div 
-                            className="grid grid-cols-1 md:grid-cols-3 gap-6 sm:gap-8 md:gap-10 lg:gap-12"
-                            initial="hidden"
-                            whileInView="visible"
-                            viewport={{ once: true, margin: "-100px" }}
-                            variants={{
-                                hidden: { opacity: 0 },
-                                visible: {
-                                    opacity: 1,
-                                    transition: {
-                                        staggerChildren: 0.2,
-                                        when: "beforeChildren"
-                                    }
-                                }
-                            }}
-                        >
-                            {[
-                                { icon: "🌿", title: "Purity", text: "Absolutely no blending or additives - just 100% pure Kashmir saffron" },
-                                { icon: "🤝", title: "Heritage", text: "Direct from multi-generational family farms in Pampore" },
-                                { icon: "✨", title: "Potency", text: "Harvested at peak season for maximum medicinal properties" }
-                            ].map((value, index) => (
-                                <motion.div 
-                                    key={index} 
-                                    className="bg-white/95 rounded-2xl sm:rounded-3xl p-6 sm:p-8 md:p-10 border border-white/30 shadow-lg hover:shadow-xl sm:hover:shadow-2xl transition-all duration-300 text-center"
-                                    variants={{
-                                        hidden: { y: 50, opacity: 0 },
-                                        visible: { 
-                                            y: 0, 
-                                            opacity: 1,
-                                            transition: { type: "spring", stiffness: 80 }
-                                        }
-                                    }}
-                                    whileHover={{ y: -10 }}
-                                >
-                                    <div className="w-16 h-16 sm:w-20 sm:h-20 md:w-24 md:h-24 bg-[#ff6523] rounded-full flex items-center justify-center mx-auto mb-4 sm:mb-6 text-3xl sm:text-4xl">
-                                        {value.icon}
-                                    </div>
-                                    <h3 className="text-xl sm:text-2xl md:text-3xl font-bold text-gray-900 mb-4 sm:mb-6">{value.title}</h3>
-                                    <p className="text-gray-700 text-base sm:text-lg md:text-xl leading-relaxed">{value.text}</p>
-                                </motion.div>
-                            ))}
-                        </motion.div>
-                    </section>
-
-                    {/* Final CTA */}
-                    <section className="py-16 sm:py-20 md:py-24 lg:py-32 px-4 sm:px-6 max-w-4xl mx-auto text-center">
-                        <motion.div
-                            initial="hidden"
-                            whileInView="visible"
-                            viewport={{ once: true }}
-                            variants={containerVariants}
-                        >
-                            <motion.h2 
-                                className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold text-white mb-6 sm:mb-8 md:mb-10 drop-shadow-lg"
-                                variants={itemVariants}
-                            >
-                                Ready for the Ultimate Saffron Experience?
-                            </motion.h2>
-                            <motion.p 
-                                className="text-base sm:text-lg md:text-xl text-white/90 mb-8 sm:mb-10 md:mb-12 leading-relaxed"
-                                variants={itemVariants}
-                            >
-                                Join chefs and connoisseurs worldwide who trust our saffron to elevate their craft.
-                            </motion.p>
-                            <motion.button 
-                                className="bg-white hover:bg-black text-[#ff6523] hover:text-white px-8 sm:px-12 md:px-16 py-3 sm:py-4 md:py-5 rounded-full text-base sm:text-lg md:text-xl font-medium transition-all duration-300 transform hover:scale-105 shadow-lg sm:shadow-xl md:shadow-2xl"
-                                variants={itemVariants}
-                                whileHover={{ scale: 1.05 }}
-                                whileTap={{ scale: 0.95 }}
-                            >
-                                Shop the Finest Strands
-                            </motion.button>
-                        </motion.div>
-                    </section>
-                </div>
+          {/* Values Section */}
+          <motion.div
+            initial="hidden"
+            whileInView="visible"
+            viewport={{ once: true }}
+            variants={staggerContainer}
+          >
+            <h2 className="text-5xl font-light text-gray-900 text-center mb-20">Our Pillars of Excellence</h2>
+            <div className="grid md:grid-cols-3 gap-12 mb-32">
+              {values.map((value, index) => (
+                <motion.div 
+                  key={index}
+                  className="text-center"
+                  variants={fadeIn}
+                >
+                  <div className="w-20 h-20 bg-[#ff6523] rounded-full flex items-center justify-center mx-auto mb-8">
+                    <value.icon className="w-10 h-10 text-white" />
+                  </div>
+                  <h3 className="text-2xl font-light text-gray-900 mb-6">{value.title}</h3>
+                  <p className="text-gray-600 text-lg leading-relaxed">{value.text}</p>
+                </motion.div>
+              ))}
             </div>
-        </motion.div>
-    );
+          </motion.div>
+
+          {/* Final CTA */}
+          <motion.div 
+            className="text-center"
+            initial="hidden"
+            whileInView="visible"
+            viewport={{ once: true }}
+            variants={fadeIn}
+          >
+            <h2 className="text-4xl md:text-5xl font-light text-gray-900 mb-8">
+              Ready for the Ultimate Saffron Experience?
+            </h2>
+            <p className="text-xl text-gray-600 mb-12 max-w-2xl mx-auto">
+              Join chefs and connoisseurs worldwide who trust our saffron to elevate their craft.
+            </p>
+            <motion.button 
+              className="bg-white hover:bg-[#ff6523] text-[#ff6523] hover:text-white border-2 border-[#ff6523] px-12 py-4 rounded-full text-lg font-medium transition-all duration-300 shadow-lg hover:shadow-xl"
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
+            >
+              Shop the Finest Strands
+            </motion.button>
+          </motion.div>
+        </div>
+      </section>
+    </div>
+  );
 };
 
 export default About;
