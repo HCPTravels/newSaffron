@@ -1,299 +1,627 @@
-import React, { useState } from "react";
-import { ShoppingCart, X, ChevronRight, Plus, Minus } from "lucide-react";
+import React, { useState, useEffect } from "react";
+import {
+  ShoppingCart,
+  Plus,
+  Minus,
+  Trash2,
+  ArrowRight,
+  Star,
+  Zap,
+  Loader2,
+  Heart,
+  Gift,
+  Shield,
+  Truck,
+  CheckCircle,
+  AlertCircle,
+  Package,
+} from "lucide-react";
+import { motion, AnimatePresence } from "framer-motion";
+import { toast, Toaster } from "sonner";
+import axios from "axios";
+import { useAuth } from "../context/AuthContext";
 import PaymentGateway from "../components/PaymentGateway";
 
 const Cart = () => {
-  const [cartItems, setCartItems] = useState([
-    {
-      id: 1,
-      name: "Premium Wireless Headphones",
-      price: 199.99,
-      quantity: 1,
-      image:
-        "https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=80&h=80&fit=crop&crop=center",
-      color: "Black",
-      inStock: true,
-    },
-    {
-      id: 2,
-      name: "Organic Cotton T-Shirt",
-      price: 29.99,
-      quantity: 2,
-      image:
-        "https://images.unsplash.com/photo-1521572163474-6864f9cf17ab?w=80&h=80&fit=crop&crop=center",
-      color: "White",
-      size: "M",
-      inStock: true,
-    },
-    {
-      id: 3,
-      name: "Smart Watch Series 5",
-      price: 249.99,
-      quantity: 1,
-      image:
-        "https://images.unsplash.com/photo-1523275335684-37898b6baf30?w=80&h=80&fit=crop&crop=center",
-      color: "Midnight Blue",
-      inStock: false,
-    },
-  ]);
-
-  const [couponCode, setCouponCode] = useState("");
-  const [appliedCoupon, setAppliedCoupon] = useState(null);
+  const [cartItems, setCartItems] = useState([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [updatingItem, setUpdatingItem] = useState(null);
+  const [removingItem, setRemovingItem] = useState(null);
+  const [promoCode, setPromoCode] = useState("");
+  const [promoApplied, setPromoApplied] = useState(false);
+  const [discount, setDiscount] = useState(0);
+  const [estimatedDelivery] = useState("3-5 business days");
   const [showPayment, setShowPayment] = useState(false);
 
-  const updateQuantity = (id, newQuantity) => {
-    if (newQuantity < 1) return;
-    setCartItems((items) =>
-      items.map((item) =>
-        item.id === id ? { ...item, quantity: newQuantity } : item
-      )
-    );
-  };
+  const backendUrl = import.meta.env.VITE_BACKEND_URL;
+  const { token } = useAuth();
 
-  const removeItem = (id) => {
-    setCartItems((items) => items.filter((item) => item.id !== id));
-  };
+  // Fetch cart items from backend
+  const fetchCartItems = async () => {
+    if (!token) {
+      setIsLoading(false);
+      return;
+    }
 
-  const applyCoupon = () => {
-    if (couponCode.toUpperCase() === "SAVE10") {
-      setAppliedCoupon({ code: "SAVE10", discount: 0.1 });
-      setCouponCode("");
-    } else if (couponCode.toUpperCase() === "FREESHIP") {
-      setAppliedCoupon({ code: "FREESHIP", freeShipping: true });
-      setCouponCode("");
-    } else {
-      alert("Invalid coupon code. Try SAVE10 or FREESHIP");
+    try {
+      const response = await axios.get(
+        `${backendUrl}/api/cart/getcartproduct`,
+        {
+          headers: { Authorization: `Bearer ${token}` },
+        }
+      );
+
+      if (response.data?.items) {
+        setCartItems(response.data.items);
+      }
+    } catch (error) {
+      console.error("Error fetching cart:", error);
+      toast.error("Failed to load cart items");
+    } finally {
+      setIsLoading(false);
     }
   };
 
-  const subtotal = cartItems.reduce(
-    (sum, item) => sum + item.price * item.quantity,
-    0
-  );
-  const discount = appliedCoupon?.discount
-    ? subtotal * appliedCoupon.discount
-    : 0;
-  const shipping = appliedCoupon?.freeShipping ? 0 : subtotal > 100 ? 0 : 9.99;
-  const tax = (subtotal - discount) * 0.08;
-  const total = subtotal - discount + shipping + tax;
+  // Initial data load
+  useEffect(() => {
+    fetchCartItems();
+  }, [token]);
 
-  const handlePayment = () => {
-    return <PaymentGateway totalPrice={total} />;
+  const updateQuantity = async (productId, newQuantity) => {
+    if (newQuantity < 1) {
+      toast.error("Quantity cannot be less than 1");
+      return;
+    }
+
+    setUpdatingItem(productId);
+    try {
+      setCartItems((prev) =>
+        prev.map((item) =>
+          item.productId._id === productId
+            ? { ...item, quantity: newQuantity }
+            : item
+        )
+      );
+
+      const response = await axios.patch(
+        `${backendUrl}/api/cart/updatequantity/${productId}`,
+        { quantity: newQuantity },
+        {
+          headers: { Authorization: `Bearer ${token}` },
+          timeout: 5000,
+        }
+      );
+
+      // 3. Verify and update with backend response
+      if (response.data?.success && response.data?.cart?.items) {
+        setCartItems(response.data.cart.items);
+        toast.success("Quantity updated");
+      } else {
+        throw new Error("Invalid response from server");
+      }
+    } catch (error) {
+      console.error("Update error:", error);
+
+      // Specific error messages
+      let errorMessage = "Failed to update quantity";
+      if (error.response) {
+        errorMessage = error.response.data?.message || errorMessage;
+      } else if (error.code === "ECONNABORTED") {
+        errorMessage = "Request timed out";
+      } else if (error.request) {
+        errorMessage = "No response from server";
+      }
+
+      toast.error(errorMessage);
+      fetchCartItems(); // Revert to server state
+    } finally {
+      setUpdatingItem(null);
+    }
   };
 
-  return (
-    <div className="min-h-screen bg-gray-50 pb-20">
-      {/* Header */}
-      <div className="sticky top-0 rounded-xl z-10 bg-white py-4 px-6 shadow-sm border-b border-gray-100">
-        <div className="max-w-6xl mx-auto flex justify-between items-center">
-          <h1 className="text-2xl font-bold text-gray-900">
-            Your Cart ({cartItems.length})
-          </h1>
-          <button className="text-gray-500 hover:text-gray-700 transition-colors">
-            <X size={24} />
+  // Remove item from cart
+  const removeFromCart = async (productId) => {
+    setRemovingItem(productId);
+    try {
+      // Optimistic UI update
+      setCartItems((prev) =>
+        prev.filter((item) => item.productId._id !== productId)
+      );
+
+      await axios.delete(`${backendUrl}/api/cart/removeitem/${productId}`, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+
+      toast.success("Item removed");
+    } catch (error) {
+      console.error("Remove error:", error);
+      toast.error("Failed to remove item");
+      fetchCartItems(); // Revert to actual data
+    } finally {
+      setRemovingItem(null);
+    }
+  };
+
+  // Apply promo code
+  const applyPromoCode = () => {
+    if (promoCode.toLowerCase() === "saffron10") {
+      setDiscount(10);
+      setPromoApplied(true);
+      toast.success("10% discount applied!");
+    } else if (promoCode.toLowerCase() === "premium20") {
+      setDiscount(20);
+      setPromoApplied(true);
+      toast.success("20% discount applied!");
+    } else {
+      toast.error("Invalid promo code");
+    }
+  };
+
+  // Calculate order totals
+  const subtotal = cartItems.reduce((total, item) => {
+    const price = item?.productId?.price || 0;
+    const quantity = item?.quantity || 0;
+    return total + price * quantity;
+  }, 0);
+
+  const discountAmount = (subtotal * discount) / 100;
+
+  // ✅ THIS IS THE MISSING LINE:
+  const shipping = subtotal > 2000 ? 0 : 150;
+
+  const total = subtotal - discountAmount + shipping;
+
+  // Get styling for product grade badges
+  const getGradeBadge = (grade) => {
+    const badges = {
+      premium: {
+        className: "bg-gradient-to-r from-amber-500 to-[#ff6523] text-white",
+        icon: <Zap className="w-3 h-3 mr-1" />,
+        text: "Premium",
+      },
+      category1: {
+        className: "bg-gradient-to-r from-[#ff6523] to-orange-500 text-white",
+        text: "Category I",
+      },
+      category2: {
+        className: "bg-gradient-to-r from-orange-400 to-amber-500 text-white",
+        text: "Category II",
+      },
+      category3: {
+        className: "bg-gradient-to-r from-amber-400 to-yellow-500 text-white",
+        text: "Category III",
+      },
+      default: {
+        className: "bg-gray-200 text-gray-800",
+        text: "Standard",
+      },
+    };
+
+    return badges[grade] || badges.default;
+  };
+
+  // Loading state component
+  const LoadingState = () => (
+    <motion.div
+      className="flex flex-col items-center justify-center py-20"
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+    >
+      <motion.div
+        animate={{ scale: [1, 1.1, 1], rotate: [0, 10, -10, 0] }}
+        transition={{ duration: 2, ease: "easeInOut", repeat: Infinity }}
+        className="relative mb-8"
+      >
+        <div className="w-20 h-20 rounded-full bg-gradient-to-r from-amber-100 to-[#ff6523] flex items-center justify-center shadow-lg">
+          <ShoppingCart className="w-10 h-10 text-white" />
+        </div>
+        <div className="absolute -inset-4 border-4 border-amber-200/30 rounded-full animate-ping"></div>
+      </motion.div>
+      <h3 className="text-xl font-bold text-gray-900 mb-2">
+        Loading your cart...
+      </h3>
+      <p className="text-gray-600">Gathering your precious saffron selection</p>
+    </motion.div>
+  );
+
+  // Empty cart state component
+  const EmptyCart = () => (
+    <motion.div
+      className="text-center py-20"
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+    >
+      <motion.div
+        className="w-24 h-24 bg-gradient-to-r from-amber-100 to-[#ff6523] rounded-full flex items-center justify-center mx-auto mb-8 shadow-lg"
+        animate={{ rotate: 360 }}
+        transition={{ duration: 20, repeat: Infinity, ease: "linear" }}
+      >
+        <ShoppingCart className="w-12 h-12 text-white" />
+      </motion.div>
+      <h2 className="text-2xl font-bold text-gray-900 mb-4">
+        Your cart is empty
+      </h2>
+      <p className="text-gray-600 mb-8 max-w-md mx-auto">
+        Discover our premium collection of saffron from Kashmir, Iran, and
+        Spain.
+      </p>
+      <motion.button
+        className="px-8 py-3 bg-gradient-to-r from-[#ff6523] to-[#e55a1d] text-white font-semibold rounded-lg hover:shadow-lg transition-all duration-300"
+        whileHover={{ scale: 1.05 }}
+        whileTap={{ scale: 0.95 }}
+        onClick={() => (window.location.href = "/")}
+      >
+        Start Shopping
+      </motion.button>
+    </motion.div>
+  );
+
+  // Render loading state
+  if (isLoading) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-amber-50 via-orange-50 to-red-50 pt-20">
+        <LoadingState />
+      </div>
+    );
+  }
+
+  // Render login prompt if not authenticated
+  if (!token) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-amber-50 via-orange-50 to-red-50 pt-20">
+        <div className="max-w-md mx-auto text-center py-20">
+          <AlertCircle className="w-16 h-16 text-[#ff6523] mx-auto mb-4" />
+          <h2 className="text-2xl font-bold text-gray-900 mb-4">
+            Please Sign In
+          </h2>
+          <p className="text-gray-600 mb-8">
+            You need to sign in to view your cart
+          </p>
+          <button className="px-8 py-3 bg-gradient-to-r from-[#ff6523] to-[#e55a1d] text-white font-semibold rounded-lg">
+            Sign In
           </button>
         </div>
       </div>
+    );
+  }
 
-      {/* Main Content */}
-      <div className="max-w-6xl mx-auto px-4 sm:px-6 py-8">
-        {cartItems.length > 0 ? (
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-            {/* Cart Items */}
-            <div className="lg:col-span-2 space-y-4">
-              {cartItems.map((item) => (
-                <div
-                  key={item.id}
-                  className="bg-white rounded-xl shadow-sm p-4 flex flex-col sm:flex-row gap-4 border border-gray-100"
-                >
-                  <div className="w-full sm:w-24 h-24 bg-gray-100 rounded-lg overflow-hidden">
-                    <img
-                      src={item.image}
-                      alt={item.name}
-                      className="w-full h-full object-cover"
-                    />
-                  </div>
-                  <div className="flex-1">
-                    <div className="flex justify-between">
-                      <h3 className="font-medium text-gray-900">{item.name}</h3>
-                      <button
-                        onClick={() => removeItem(item.id)}
-                        className="text-gray-400 hover:text-red-500 transition-colors"
-                      >
-                        <X size={18} />
-                      </button>
-                    </div>
+  // Render empty cart state
+  if (cartItems.length === 0) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-amber-50 via-orange-50 to-red-50 pt-20">
+        <EmptyCart />
+      </div>
+    );
+  }
 
-                    {item.color && (
-                      <p className="text-sm text-gray-500 mt-1">
-                        Color: {item.color}
-                      </p>
-                    )}
-                    {item.size && (
-                      <p className="text-sm text-gray-500">Size: {item.size}</p>
-                    )}
+  // Main cart UI
+  return (
+    <div className="min-h-screen bg-gradient-to-br from-amber-50 via-orange-50 to-red-50 pt-20">
+      <Toaster richColors closeButton />
 
-                    {!item.inStock && (
-                      <p className="text-sm text-red-500 mt-1 font-medium">
-                        Out of stock
-                      </p>
-                    )}
-                  </div>
-                  <div className="flex sm:flex-col justify-between sm:justify-center items-end sm:items-center gap-4">
-                    <div className="flex items-center border border-gray-200 rounded-full">
-                      <button
-                        onClick={() =>
-                          updateQuantity(item.id, item.quantity - 1)
-                        }
-                        className="px-3 py-1 text-gray-500 hover:text-gray-700 transition-colors"
-                        disabled={!item.inStock}
-                      >
-                        <Minus size={16} />
-                      </button>
-                      <span className="px-2 text-sm font-medium">
-                        {item.quantity}
-                      </span>
-                      <button
-                        onClick={() =>
-                          updateQuantity(item.id, item.quantity + 1)
-                        }
-                        className="px-3 py-1 text-gray-500 hover:text-gray-700 transition-colors"
-                        disabled={!item.inStock}
-                      >
-                        <Plus size={16} />
-                      </button>
-                    </div>
-                    <p className="font-medium text-gray-900">
-                      ${(item.price * item.quantity).toFixed(2)}
-                    </p>
-                  </div>
-                </div>
-              ))}
+      <div className="max-w-7xl mx-auto px-4 py-8">
+        {/* Header */}
+        <motion.div
+          className="text-center mb-12"
+          initial={{ opacity: 0, y: -20 }}
+          animate={{ opacity: 1, y: 0 }}
+        >
+          <h1 className="text-4xl font-bold text-gray-900 mb-4">
+            Your Saffron Collection
+          </h1>
+          <p className="text-gray-600 text-lg">
+            Premium saffron threads, carefully curated
+          </p>
+        </motion.div>
 
-              {/* Coupon Code */}
-              <div className="bg-white rounded-xl shadow-sm p-4 border border-gray-100">
-                <h3 className="font-medium text-gray-900 mb-2">
-                  Have a coupon code?
-                </h3>
-                {appliedCoupon && (
-                  <div className="mb-3 p-2 bg-green-50 border border-green-200 rounded-lg flex justify-between items-center">
-                    <span className="text-green-700 font-medium">
-                      ✓ {appliedCoupon.code} applied
-                    </span>
-                    <button
-                      onClick={() => setAppliedCoupon(null)}
-                      className="text-green-600 hover:text-green-800"
-                    >
-                      <X size={16} />
-                    </button>
-                  </div>
-                )}
-                <div className="flex gap-2">
-                  <input
-                    type="text"
-                    placeholder="Try SAVE10 or FREESHIP"
-                    value={couponCode}
-                    onChange={(e) => setCouponCode(e.target.value)}
-                    className="flex-1 px-4 py-2 border border-gray-200 rounded-full focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent"
-                  />
-                  <button
-                    onClick={applyCoupon}
-                    className="px-6 py-2 bg-gray-900 text-white font-medium rounded-full hover:bg-gray-800 transition-colors"
-                  >
-                    Apply
-                  </button>
-                </div>
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+          {/* Cart Items Section */}
+          <div className="lg:col-span-2">
+            <motion.div
+              className="bg-white rounded-2xl shadow-xl border-2 border-amber-100 overflow-hidden"
+              initial={{ opacity: 0, x: -20 }}
+              animate={{ opacity: 1, x: 0 }}
+            >
+              <div className="p-6 bg-gradient-to-r from-amber-100 to-orange-100 border-b-2 border-amber-200">
+                <h2 className="text-2xl font-bold text-gray-900 flex items-center gap-3">
+                  <ShoppingCart className="w-6 h-6 text-[#ff6523]" />
+                  Cart Items ({cartItems.length})
+                </h2>
               </div>
-            </div>
+
+              <div className="p-6 space-y-6">
+                <AnimatePresence>
+                  {cartItems.map((item) => {
+                    const product = item?.productId;
+
+                    if (!product) {
+                      return (
+                        <div
+                          key={item._id || Math.random()}
+                          className="p-6 bg-red-50 text-red-700 border border-red-300 rounded-lg"
+                        >
+                          ⚠️ Product details missing. Please try again later.
+                        </div>
+                      );
+                    }
+
+                    const gradeBadge = getGradeBadge(product.grade);
+
+                    return (
+                      <motion.div
+                        key={product._id}
+                        className="flex items-center gap-6 p-6 bg-gradient-to-r from-amber-50 to-orange-50 rounded-xl border-2 border-amber-200 hover:shadow-lg transition-all duration-300"
+                        initial={{ opacity: 0, y: 20 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        exit={{ opacity: 0, x: -100 }}
+                        whileHover={{ scale: 1.02 }}
+                      >
+                        {/* Product Image */}
+                        <div className="w-24 h-24 bg-gradient-to-br from-amber-100 to-orange-200 rounded-xl flex items-center justify-center relative overflow-hidden">
+                          <div className="text-4xl font-black text-amber-400/40">
+                            {product.origin?.charAt(0) || "S"}
+                          </div>
+                          <motion.span
+                            className={`absolute top-2 right-2 inline-flex items-center px-2 py-1 rounded-full text-xs font-bold ${gradeBadge.className}`}
+                            whileHover={{ scale: 1.1 }}
+                          >
+                            {gradeBadge.icon}
+                            {gradeBadge.text}
+                          </motion.span>
+                        </div>
+
+                        {/* Product Details */}
+                        <div className="flex-1">
+                          <h3 className="text-xl font-bold text-gray-900 mb-1">
+                            {product.name}
+                          </h3>
+                          <div className="flex items-center gap-4 mb-2">
+                            <span className="text-sm font-medium text-gray-600">
+                              Origin: {product.origin}
+                            </span>
+                            {product.crocin && (
+                              <span className="text-xs bg-amber-100 text-amber-800 px-2 py-1 rounded-full font-medium">
+                                {product.crocin} Crocin
+                              </span>
+                            )}
+                            {product.rating && (
+                              <div className="flex items-center gap-1">
+                                <Star className="w-4 h-4 text-yellow-500 fill-current" />
+                                <span className="text-sm font-medium text-gray-600">
+                                  {product.rating}
+                                </span>
+                              </div>
+                            )}
+                          </div>
+                          <div className="text-2xl font-bold text-[#ff6523]">
+                            ₹{product.price}
+                            <span className="text-sm text-gray-500 font-normal ml-1">
+                              per gram
+                            </span>
+                          </div>
+                        </div>
+
+                        {/* Quantity Controls */}
+                        <div className="flex items-center gap-3">
+                          <motion.button
+                            className="w-10 h-10 bg-white border-2 border-amber-200 rounded-full flex items-center justify-center hover:bg-amber-50 transition-colors"
+                            whileHover={{ scale: 1.1 }}
+                            whileTap={{ scale: 0.9 }}
+                            onClick={() => {
+                              const newQuantity = item.quantity - 1;
+                              if (newQuantity >= 1) {
+                                // Additional client-side validation
+                                updateQuantity(product._id, newQuantity);
+                              }
+                            }}
+                            disabled={
+                              item.quantity <= 1 || updatingItem === product._id
+                            }
+                          >
+                            {updatingItem === product._id ? (
+                              <Loader2 className="w-4 h-4 animate-spin" />
+                            ) : (
+                              <Minus className="w-4 h-4 text-gray-600" />
+                            )}
+                          </motion.button>
+
+                          <div className="w-16 h-10 bg-white border-2 border-amber-200 rounded-lg flex items-center justify-center font-bold text-gray-900">
+                            {updatingItem === product._id ? (
+                              <Loader2 className="w-4 h-4 animate-spin" />
+                            ) : (
+                              item.quantity
+                            )}
+                          </div>
+
+                          <motion.button
+                            className="w-10 h-10 bg-white border-2 border-amber-200 rounded-full flex items-center justify-center hover:bg-amber-50 transition-colors"
+                            whileHover={{ scale: 1.1 }}
+                            whileTap={{ scale: 0.9 }}
+                            onClick={() =>
+                              updateQuantity(product._id, item.quantity + 1)
+                            }
+                            disabled={updatingItem === product._id}
+                          >
+                            <Plus className="w-4 h-4 text-gray-600" />
+                          </motion.button>
+                        </div>
+
+                        {/* Item Total */}
+                        <div className="text-right">
+                          <div className="text-2xl font-bold text-gray-900">
+                            ₹{(product.price * item.quantity).toFixed(2)}
+                          </div>
+                          <div className="text-sm text-gray-500">
+                            {item.quantity} gram{item.quantity > 1 ? "s" : ""}
+                          </div>
+                        </div>
+
+                        {/* Remove Button */}
+                        <motion.button
+                          className="w-10 h-10 bg-red-50 border-2 border-red-200 rounded-full flex items-center justify-center hover:bg-red-100 transition-colors"
+                          whileHover={{ scale: 1.1 }}
+                          whileTap={{ scale: 0.9 }}
+                          onClick={() => removeFromCart(product._id)}
+                          disabled={removingItem === product._id}
+                        >
+                          {removingItem === product._id ? (
+                            <Loader2 className="w-4 h-4 animate-spin text-red-500" />
+                          ) : (
+                            <Trash2 className="w-4 h-4 text-red-500" />
+                          )}
+                        </motion.button>
+                      </motion.div>
+                    );
+                  })}
+                </AnimatePresence>
+              </div>
+            </motion.div>
+          </div>
+
+          {/* Order Summary Section */}
+          <div className="space-y-6">
+            {/* Promo Code */}
+            <motion.div
+              className="bg-white rounded-2xl shadow-xl border-2 border-amber-100 p-6"
+              initial={{ opacity: 0, x: 20 }}
+              animate={{ opacity: 1, x: 0 }}
+              transition={{ delay: 0.1 }}
+            >
+              <h3 className="text-lg font-bold text-gray-900 mb-4 flex items-center gap-2">
+                <Gift className="w-5 h-5 text-[#ff6523]" />
+                Promo Code
+              </h3>
+              <div className="flex gap-2">
+                <input
+                  type="text"
+                  placeholder="Enter promo code"
+                  value={promoCode}
+                  onChange={(e) => setPromoCode(e.target.value)}
+                  className="flex-1 px-4 py-2 border-2 border-amber-200 rounded-lg focus:outline-none focus:border-[#ff6523] transition-colors"
+                  disabled={promoApplied}
+                />
+                <motion.button
+                  className="px-4 py-2 bg-gradient-to-r from-[#ff6523] to-[#e55a1d] text-white font-semibold rounded-lg hover:shadow-lg transition-all duration-300 disabled:opacity-50"
+                  whileHover={{ scale: promoApplied ? 1 : 1.05 }}
+                  whileTap={{ scale: promoApplied ? 1 : 0.95 }}
+                  onClick={applyPromoCode}
+                  disabled={promoApplied || !promoCode}
+                >
+                  {promoApplied ? <CheckCircle className="w-4 h-4" /> : "Apply"}
+                </motion.button>
+              </div>
+              {promoApplied && (
+                <motion.div
+                  className="mt-3 flex items-center gap-2 text-green-600"
+                  initial={{ opacity: 0, y: 10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                >
+                  <CheckCircle className="w-4 h-4" />
+                  <span className="text-sm font-medium">
+                    {discount}% discount applied!
+                  </span>
+                </motion.div>
+              )}
+            </motion.div>
 
             {/* Order Summary */}
-            <div className="lg:col-span-1">
-              <div className="bg-white rounded-xl shadow-sm p-6 border border-gray-100 sticky top-28">
-                <h2 className="text-xl font-bold text-gray-900 mb-6">
-                  Order Summary
-                </h2>
+            <motion.div
+              className="bg-white rounded-2xl shadow-xl border-2 border-amber-100 p-6"
+              initial={{ opacity: 0, x: 20 }}
+              animate={{ opacity: 1, x: 0 }}
+              transition={{ delay: 0.2 }}
+            >
+              <h3 className="text-lg font-bold text-gray-900 mb-6 flex items-center gap-2">
+                <Package className="w-5 h-5 text-[#ff6523]" />
+                Order Summary
+              </h3>
 
-                <div className="space-y-4">
-                  <div className="flex justify-between">
-                    <span className="text-gray-600">Subtotal</span>
-                    <span className="font-medium">${subtotal.toFixed(2)}</span>
-                  </div>
-                  {discount > 0 && (
-                    <div className="flex justify-between text-green-600">
-                      <span>Discount ({appliedCoupon.code})</span>
-                      <span className="font-medium">
-                        -${discount.toFixed(2)}
-                      </span>
-                    </div>
-                  )}
-                  <div className="flex justify-between">
-                    <span className="text-gray-600">
-                      Shipping
-                      {shipping === 0 && (
-                        <span className="text-green-600 text-sm ml-1">
-                          {appliedCoupon?.freeShipping
-                            ? "(Free with coupon)"
-                            : "(Free over $100)"}
-                        </span>
-                      )}
-                    </span>
-                    <span className="font-medium">
-                      {shipping === 0 ? "Free" : `$${shipping.toFixed(2)}`}
+              <div className="space-y-4">
+                <div className="flex justify-between items-center">
+                  <span className="text-gray-600">Subtotal</span>
+                  <span className="font-semibold">₹{subtotal.toFixed(2)}</span>
+                </div>
+
+                {discount > 0 && (
+                  <div className="flex justify-between items-center text-green-600">
+                    <span>Discount ({discount}%)</span>
+                    <span className="font-semibold">
+                      -₹{discountAmount.toFixed(2)}
                     </span>
                   </div>
-                  <div className="flex justify-between">
-                    <span className="text-gray-600">Tax</span>
-                    <span className="font-medium">${tax.toFixed(2)}</span>
-                  </div>
-                  <div className="border-t border-gray-200 pt-4 mt-2">
-                    <div className="flex justify-between font-bold text-lg">
-                      <span>Total</span>
-                      <span>${total.toFixed(2)}</span>
-                    </div>
-                  </div>
-                  <button
-                    className="w-full py-3 bg-orange-600 hover:bg-orange-700 text-white font-medium rounded-lg transition-colors shadow-md flex items-center justify-center gap-2 mt-6"
-                    onClick={() => setShowPayment(true)}
-                  >
-                    Proceed to Checkout
-                    <ChevronRight size={18} />
-                  </button>
+                )}
 
-                  {showPayment && (
-                    <PaymentGateway
-                      totalPrice={total}
-                      onClose={() => setShowPayment(false)}
-                    />
-                  )}
+                <div className="flex justify-between items-center">
+                  <span className="text-gray-600">Shipping</span>
+                  <span className="font-semibold">
+                    {shipping === 0 ? (
+                      <span className="text-green-600">Free</span>
+                    ) : (
+                      `₹${shipping.toFixed(2)}`
+                    )}
+                  </span>
+                </div>
 
-                  <div className="flex items-center gap-2 text-sm text-gray-500 mt-4">
-                    <ShoppingCart size={16} className="text-gray-400" />
-                    <span>Free shipping on orders over $100</span>
+                <div className="border-t-2 border-amber-100 pt-4">
+                  <div className="flex justify-between items-center text-xl font-bold">
+                    <span>Total</span>
+                    <span className="text-[#ff6523]">₹{total.toFixed(2)}</span>
                   </div>
                 </div>
               </div>
-            </div>
-          </div>
-        ) : (
-          /* Empty Cart State */
-          <div className="max-w-md mx-auto bg-white p-8 rounded-2xl text-center shadow-lg border border-gray-100">
-            <div className="mx-auto w-fit p-4 bg-orange-50 rounded-full mb-6">
-              <ShoppingCart
-                className="h-12 w-12 text-orange-600"
-                strokeWidth={1.5}
+
+              <motion.button
+                className="w-full mt-6 py-4 bg-gradient-to-r from-[#ff6523] to-[#e55a1d] text-white font-bold rounded-lg hover:shadow-lg transition-all duration-300 flex items-center justify-center gap-2"
+                whileHover={{ scale: 1.02 }}
+                whileTap={{ scale: 0.98 }}
+                onClick={() => setShowPayment(true)}
+              >
+                Proceed to Checkout
+                <ArrowRight className="w-5 h-5" />
+              </motion.button>
+            </motion.div>
+            {showPayment && (
+              <PaymentGateway
+                totalPrice={total}
+                onClose={() => setShowPayment(false)}
               />
-            </div>
-            <h2 className="text-2xl font-bold text-gray-900 mb-2">
-              Your Cart is Empty
-            </h2>
-            <p className="text-gray-600 mb-6">
-              Looks like you haven't added anything to your cart yet
-            </p>
-            <button className="px-8 py-3 bg-orange-600 hover:bg-orange-700 text-white font-medium rounded-lg transition-colors shadow-md">
-              Browse Products
-            </button>
+            )}
+
+            {/* Delivery Info */}
+            <motion.div
+              className="bg-white rounded-2xl shadow-xl border-2 border-amber-100 p-6"
+              initial={{ opacity: 0, x: 20 }}
+              animate={{ opacity: 1, x: 0 }}
+              transition={{ delay: 0.3 }}
+            >
+              <h3 className="text-lg font-bold text-gray-900 mb-4 flex items-center gap-2">
+                <Truck className="w-5 h-5 text-[#ff6523]" />
+                Delivery Information
+              </h3>
+
+              <div className="space-y-3">
+                <div className="flex items-center gap-3">
+                  <Shield className="w-5 h-5 text-green-500" />
+                  <span className="text-sm text-gray-600">
+                    Secure packaging
+                  </span>
+                </div>
+                <div className="flex items-center gap-3">
+                  <Truck className="w-5 h-5 text-blue-500" />
+                  <span className="text-sm text-gray-600">
+                    Estimated delivery: {estimatedDelivery}
+                  </span>
+                </div>
+                <div className="flex items-center gap-3">
+                  <Heart className="w-5 h-5 text-red-500" />
+                  <span className="text-sm text-gray-600">
+                    Premium quality guarantee
+                  </span>
+                </div>
+              </div>
+            </motion.div>
           </div>
-        )}
+        </div>
       </div>
     </div>
   );

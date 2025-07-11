@@ -250,7 +250,8 @@ const Profile = () => {
             {/* Cart */}
             <button
               className="p-2 text-black transition-colors relative"
-              onClick={() => setActiveTab("Cart")}
+              // onClick={() => setActiveTab("Cart")}
+              onClick={() => navigate("/cart")}
             >
               <ShoppingCart className="h-6 w-6" />
               <span className="absolute -top-1 -right-1 text-white bg-[#ff6523] text-xs rounded-full h-5 w-5 flex items-center justify-center">

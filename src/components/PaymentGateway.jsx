@@ -71,30 +71,54 @@ const PaymentGateway = ({ totalPrice, onClose }) => {
         name: "Kisan Saffron",
         description: "Payment for your order",
         handler: async function (response) {
-          // Store verify-payment body in a variable
-          const verifyPaymentBody = {
-            razorpay_payment_id: response.razorpay_payment_id,
-            razorpay_order_id: response.razorpay_order_id,
-            razorpay_signature: response.razorpay_signature,
-          };
+          try {
+            const verifyPaymentBody = {
+              razorpay_payment_id: response.razorpay_payment_id,
+              razorpay_order_id: response.razorpay_order_id,
+              razorpay_signature: response.razorpay_signature,
+            };
 
-          const verifyResponse = await axios.post(
-            `${backendUrl}/api/payment/verify-payment`,
-            verifyPaymentBody,
-            {
-              headers: {
-                "Content-Type": "application/json",
-                Authorization: `Bearer ${token}`,
-              },
-              timeout: 10000, // Reduced timeout to 10 seconds
+            console.log("🧾 Sending for verification...", verifyPaymentBody);
+
+            const verifyResponse = await axios.post(
+              `${backendUrl}/api/payment/verify-payment`,
+              verifyPaymentBody,
+              {
+                headers: {
+                  "Content-Type": "application/json",
+                  Authorization: `Bearer ${token}`,
+                },
+                timeout: 10000,
+              }
+            );
+
+            console.log("🎯 verifyResponse.data:", verifyResponse.data);
+
+            if (verifyResponse.data.success) {
+              alert("✅ Payment verified successfully!");
+
+              console.log("Clearing cart now...");
+
+              await axios.delete(`${backendUrl}/api/cart/clear`, {
+                headers: {
+                  Authorization: `Bearer ${token}`,
+                },
+              });
+
+              console.log("🧹 Cart clear request sent");
+
+              window.location.href = "/cart";
+            } else {
+              alert("❌ Payment verification failed. Please try again.");
             }
-          );
-
-          if (verifyResponse.data.success) {
-            alert("✅ Payment verified successfully!");
-          } else {
-            alert("❌ Payment verification failed. Please try again.");
+          } catch (error) {
+            console.error(
+              "❌ Error during payment verification or cart clear:",
+              error
+            );
+            alert("❌ Something went wrong. Try again later.");
           }
+
           if (onClose) onClose();
         },
         prefill: {
