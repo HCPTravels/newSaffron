@@ -33,7 +33,7 @@ import SellerProtectedRoute from './components/SellerProtected'
 function App() {
   const location = useLocation();
 
-  const hideNavbarRoutes = ['/profile', '/adminpanel', '/sellerdashboard'];
+  const hideNavbarRoutes = ['/profile', '/adminpanel', '/sellerdashboard','/productlisting' ];
   const hideNavbar = hideNavbarRoutes.includes(location.pathname);
 
   return (

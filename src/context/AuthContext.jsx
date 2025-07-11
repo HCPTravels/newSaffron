@@ -163,7 +163,7 @@ export const AuthProvider = ({ children }) => {
         setToken(token);
         localStorage.setItem("token", token);
         localStorage.setItem("user", JSON.stringify(user));
-
+        console.log(token)
         console.log("User set in context:", user);
 
         // ✅ Navigate immediately with replace to remove login from history

@@ -15,8 +15,54 @@ const AdminProductPanel = () => {
   const [products, setProducts] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [rejectedProducts, setRejectedProducts] = useState('')
+  const [approvedProducts, setApprovedProducts] = useState('')
   const backendUrl = import.meta.env.VITE_BACKEND_URL;
 
+
+  useEffect(() => {
+    const fetchRejectedProducts = async () => {
+      try {
+        setLoading(true);
+        const token = localStorage.getItem('token');
+        const response = await axios.get(`${backendUrl}/api/product/rejected/product`, {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        });
+  
+       setRejectedProducts(response.data)
+        console.log(response.data);
+       
+  
+      } catch (err) {
+        console.error("Error While Fetching:", err.message);
+      } finally {
+        setLoading(false);
+      }
+    };
+  
+    fetchRejectedProducts();
+  }, []);
+
+  useEffect(() => {
+    const fethedApprovedProducts = async() => {
+      try{
+        setLoading(true)
+        const token = localStorage.getItem('token')
+        const resposne = await axios.get(`${backendUrl}/api/product/approved/product`, {
+          headers:{
+            Authorization: `Bearer ${token}`
+          }
+        })
+        setApprovedProducts(resposne.data)
+
+      }catch(err){
+        console.error("Something Went Wrong", error.err)
+      }
+    }
+    fethedApprovedProducts()
+  },[])
   // Fetch products from API
   useEffect(() => {
     const fetchProducts = async () => {
@@ -237,8 +283,8 @@ const AdminProductPanel = () => {
     return {
       total: products.length,
       pending: products.filter(p => p.status === 'pending').length,
-      approved: products.filter(p => p.status === 'approved').length,
-      rejected: products.filter(p => p.status === 'rejected').length
+      approved: approvedProducts.length,
+      rejected: rejectedProducts.length
     };
   };
 
