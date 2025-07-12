@@ -5,8 +5,10 @@ import { toast, Toaster } from "sonner";
 import Saffron from "../assets/saffron.png";
 import SaffronIcon from "../assets/icons8-saffron-64 (1).png";
 import saffronHome from "../assets/saffronHome.png";
+import axios from "axios";
 
 const ContactFormSection = () => {
+  const backendUrl = import.meta.env.VITE_BACKEND_URL;
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [phone, setPhone] = useState("");
@@ -14,24 +16,37 @@ const ContactFormSection = () => {
   const [message, setMessage] = useState("");
   const [isHovered, setIsHovered] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
+  const [formData, setFormData] = useState({
+    name,
+    email,
+    phone,
+    pincode,
+    message
+  })
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setIsLoading(true);
-
+  
     try {
-      await new Promise(resolve => setTimeout(resolve, 1500));
-      toast.success("Message sent!", {
-        description: "We'll get back to you soon.",
-        duration: 3000,
-        position: "top-center",
-        icon: <CheckCircle className="h-5 w-5 text-green-500" />,
-        style: {
-          background: "linear-gradient(135deg, #10b981, #059669)",
-          border: "1px solid #065f46",
-          color: "white",
+      const response = await axios.post(`${backendUrl}/api/contact/message`, {
+        name,
+        email,
+        contact: phone,
+        pincode,
+        message,
+      }, {
+        headers: {
+          "Content-Type": "application/json",
         },
       });
+  
+      toast.success("Message sent!", {
+        description: "We'll get back to you soon.",
+        icon: <CheckCircle className="h-5 w-5 text-green-500" />,
+      });
+  
+      // Reset fields
       setName("");
       setEmail("");
       setPhone("");
@@ -39,20 +54,13 @@ const ContactFormSection = () => {
       setMessage("");
     } catch (error) {
       toast.error("Failed to send", {
-        description: "Please try again later.",
-        duration: 4000,
-        position: "top-right",
-        style: {
-          background: "linear-gradient(135deg, #ef4444, #dc2626)",
-          border: "1px solid #991b1b",
-          color: "white",
-        },
+        description:
+          error.response?.data?.message || error.message || "Please try again later.",
       });
     } finally {
       setIsLoading(false);
     }
   };
-
   return (
     <div className="relative bg-gradient-to-br from-[#ff6523]/10 to-[#ff6523]/20 h-screen flex items-center justify-center p-4">
       <Toaster 

@@ -82,7 +82,7 @@ const HeroSection = () => {
         </div>
 
         {/* Feature badges - UPDATED to look more informative */}
-        <div className="absolute md:hidden bottom-40 left-1/2 transform -translate-x-1/2 z-0">
+        <div className="absolute hidden bottom-40 left-1/2 transform -translate-x-1/2 z-0">
           <div className="flex flex-col gap-3 items-center px-4">
             {/* First row - two informative badges */}
             <div className="flex gap-6">

@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React from "react";
 import {
   ShoppingCart,
   Plus,
@@ -21,15 +21,8 @@ import { Toaster } from "sonner";
 import { useCart } from "../context/CartContext";
 import { useAuth } from "../context/AuthContext";
 import PaymentGateway from "../components/PaymentGateway";
-// Import your ProductDetails component - adjust the path as needed
-// import ProductDetails from "./ProductDetails";
-import ProductDetails from "../components/ProductDetails";
-// import ProductDetails from "../pages/ProductDetails";
 
 const Cart = () => {
-  const [selectedProductId, setSelectedProductId] = useState(null);
-  const [showProductDetails, setShowProductDetails] = useState(false);
-
   const {
     cartItems,
     isLoading,
@@ -70,18 +63,6 @@ const Cart = () => {
     } else {
       applyPromoCode(promoCode);
     }
-  };
-
-  const handleProductClick = (productId) => {
-    console.log("Product clicked:", productId); // Debug log
-    setSelectedProductId(productId);
-    setShowProductDetails(true);
-  };
-
-  const handleBackToCart = () => {
-    console.log("Back to cart"); // Debug log
-    setShowProductDetails(false);
-    setSelectedProductId(null);
   };
 
   const getGradeBadge = (grade) => {
@@ -141,46 +122,6 @@ const Cart = () => {
       </button>
     </div>
   );
-
-  // Show ProductDetails component when a product is selected
-  // Comment out this section temporarily to test if click is working
-  /*
-  if (showProductDetails && selectedProductId) {
-    return (
-      <ProductDetails
-        id={selectedProductId}
-        onBack={handleBackToCart}
-      />
-    );
-  }
-  */
-
-  // Temporary replacement for testing - remove this when ProductDetails is working
-  if (showProductDetails && selectedProductId) {
-    return (
-      <div className="min-h-screen bg-white pt-20">
-        <div className="max-w-4xl mx-auto px-4 py-8">
-          <button
-            onClick={handleBackToCart}
-            className="mb-4 px-4 py-2 bg-[#ff6523] text-white rounded-lg hover:bg-[#e55a1d] transition-colors"
-          >
-            ← Back to Cart
-          </button>
-          <div className="bg-white rounded-lg border border-gray-200 p-6">
-            <h1 className="text-2xl font-bold text-gray-900 mb-4">
-              Product Details
-            </h1>
-            <p className="text-gray-600 mb-4">
-              Selected Product ID: {selectedProductId}
-            </p>
-            <p className="text-sm text-gray-500">
-              This is a temporary view. Replace this with your actual ProductDetails component.
-            </p>
-          </div>
-        </div>
-      </div>
-    );
-  }
 
   if (isLoading) {
     return (
@@ -253,18 +194,17 @@ const Cart = () => {
                     return (
                       <motion.div
                         key={product._id}
-                        className="flex flex-col sm:flex-row items-start sm:items-center gap-4 p-4 border border-gray-200 rounded-lg hover:border-[#ff6523] transition-all duration-200 cursor-pointer"
+                        className="flex flex-col sm:flex-row items-start sm:items-center gap-4 p-4 border border-gray-200 rounded-lg"
                         initial={{ opacity: 0, y: 20 }}
                         animate={{ opacity: 1, y: 0 }}
                         exit={{ opacity: 0, x: -100 }}
-                        onClick={() => handleProductClick(product._id)}
                       >
-                        {/* Product Image */}
-                        <div className="w-full sm:w-20 h-20 bg-gray-100 rounded-lg flex-shrink-0 overflow-hidden">
+                        {/* Product Image - Fixed aspect ratio and proper scaling */}
+                        <div className="w-full sm:w-20 h-48 sm:h-20 bg-gray-100 rounded-lg flex-shrink-0 overflow-hidden">
                           <img
                             src={product.images?.[0]}
                             alt={product.name}
-                            className="w-full h-full object-cover"
+                            className="w-full h-full object-contain"
                           />
                         </div>
 
@@ -272,7 +212,7 @@ const Cart = () => {
                         <div className="flex-1 min-w-0 w-full">
                           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
                             <div>
-                              <h3 className="text-base sm:text-lg font-bold text-gray-900 hover:text-[#ff6523] transition-colors">
+                              <h3 className="text-base sm:text-lg font-bold text-gray-900">
                                 {product.name}
                               </h3>
                               <div className="flex items-center gap-2 mt-1">
@@ -309,11 +249,8 @@ const Cart = () => {
                             <div className="sm:hidden flex items-center justify-between w-full">
                               <div className="flex items-center gap-2">
                                 <button
-                                  className="w-8 h-8 bg-white border border-gray-300 rounded-full flex items-center justify-center hover:bg-gray-50 disabled:opacity-50 z-10"
-                                  onClick={(e) => {
-                                    e.stopPropagation();
-                                    updateQuantity(product._id, itemQuantity - 1);
-                                  }}
+                                  className="w-8 h-8 bg-white border border-gray-300 rounded-full flex items-center justify-center hover:bg-gray-50 disabled:opacity-50"
+                                  onClick={() => updateQuantity(product._id, itemQuantity - 1)}
                                   disabled={itemQuantity <= 1 || updatingItem === product._id}
                                 >
                                   {updatingItem === product._id ? (
@@ -328,11 +265,8 @@ const Cart = () => {
                                 </div>
 
                                 <button
-                                  className="w-8 h-8 bg-white border border-gray-300 rounded-full flex items-center justify-center hover:bg-gray-50 disabled:opacity-50 z-10"
-                                  onClick={(e) => {
-                                    e.stopPropagation();
-                                    updateQuantity(product._id, itemQuantity + 1);
-                                  }}
+                                  className="w-8 h-8 bg-white border border-gray-300 rounded-full flex items-center justify-center hover:bg-gray-50 disabled:opacity-50"
+                                  onClick={() => updateQuantity(product._id, itemQuantity + 1)}
                                   disabled={updatingItem === product._id}
                                 >
                                   {updatingItem === product._id ? (
@@ -352,11 +286,8 @@ const Cart = () => {
                             <div className="hidden sm:flex items-center gap-4">
                               <div className="flex items-center gap-2">
                                 <button
-                                  className="w-8 h-8 bg-white border border-gray-300 rounded-full flex items-center justify-center hover:bg-gray-50 disabled:opacity-50 z-10"
-                                  onClick={(e) => {
-                                    e.stopPropagation();
-                                    updateQuantity(product._id, itemQuantity - 1);
-                                  }}
+                                  className="w-8 h-8 bg-white border border-gray-300 rounded-full flex items-center justify-center hover:bg-gray-50 disabled:opacity-50"
+                                  onClick={() => updateQuantity(product._id, itemQuantity - 1)}
                                   disabled={itemQuantity <= 1 || updatingItem === product._id}
                                 >
                                   {updatingItem === product._id ? (
@@ -371,11 +302,8 @@ const Cart = () => {
                                 </div>
 
                                 <button
-                                  className="w-8 h-8 bg-white border border-gray-300 rounded-full flex items-center justify-center hover:bg-gray-50 disabled:opacity-50 z-10"
-                                  onClick={(e) => {
-                                    e.stopPropagation();
-                                    updateQuantity(product._id, itemQuantity + 1);
-                                  }}
+                                  className="w-8 h-8 bg-white border border-gray-300 rounded-full flex items-center justify-center hover:bg-gray-50 disabled:opacity-50"
+                                  onClick={() => updateQuantity(product._id, itemQuantity + 1)}
                                   disabled={updatingItem === product._id}
                                 >
                                   {updatingItem === product._id ? (
@@ -391,11 +319,8 @@ const Cart = () => {
                               </div>
 
                               <button
-                                className="w-8 h-8 bg-white border border-gray-300 rounded-full flex items-center justify-center hover:bg-gray-50 disabled:opacity-50 z-10"
-                                onClick={(e) => {
-                                  e.stopPropagation();
-                                  removeFromCart(product._id);
-                                }}
+                                className="w-8 h-8 bg-white border border-gray-300 rounded-full flex items-center justify-center hover:bg-gray-50 disabled:opacity-50"
+                                onClick={() => removeFromCart(product._id)}
                                 disabled={removingItem === product._id}
                               >
                                 {removingItem === product._id ? (
@@ -410,11 +335,8 @@ const Cart = () => {
 
                         {/* Remove Button - Mobile */}
                         <button
-                          className="sm:hidden w-full py-2 bg-white border border-gray-300 rounded-lg flex items-center justify-center gap-2 hover:bg-gray-50 disabled:opacity-50 z-10"
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            removeFromCart(product._id);
-                          }}
+                          className="sm:hidden w-full py-2 bg-white border border-gray-300 rounded-lg flex items-center justify-center gap-2 hover:bg-gray-50 disabled:opacity-50"
+                          onClick={() => removeFromCart(product._id)}
                           disabled={removingItem === product._id}
                         >
                           {removingItem === product._id ? (

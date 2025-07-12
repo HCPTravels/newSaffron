@@ -1,6 +1,6 @@
 import React from 'react';
 import ProductFeatureSection from './FirstProduct';
-import Saffron from '../assets/saffron.png';
+import Saffron from '../assets/newsaffron.png';
 import DriedSaffron from '../assets/driedsaffron.png';
 import bowlSaffron from '../assets/bowlSaffron.png';
 import image from '../assets/image .png';
@@ -36,12 +36,12 @@ const AllProducts = () => {
           onClick: () => navigateWithScrollToTop('/ourpartners')
         }
       ],
-      topMargin: 'mt-[-20px]',
+      topMargin: 'mt-[0px]',
     },
     {
       id: 2,
       title: 'Quality You Can See, Smell & Trust',
-      description: 'Our saffron journey begins in the lush fields of Pampore, Kashmir, where age-old tradition meets masterful craftsmanship. Each flower is hand-harvested at sunrise, its crimson stigmas delicately separated and shade-dried to preserve essential oils, rich aroma, and deep color. From field to final seal, every step is executed with precision and purity, ensuring only the highest-grade saffron reaches you — full of flavor, fragrance, and wellness benefits.',
+      description: 'Our saffron journey begins in the lush fields of Pampore, Kashmir, where age-old tradition meets masterful craftsmanship. Each flower is hand-harvested at sunrise, its crimson stigmas delicately separated and shade-dried to preserve essential oils, rich aroma, and deep color.',
       image: DriedSaffron,
       features: [
         {
@@ -50,12 +50,12 @@ const AllProducts = () => {
           onClick: () => navigateWithScrollToTop('/aboutus')
         }
       ],
-      topMargin: 'mt-[-20px]',
+      topMargin: 'mt-[0px]',
     },
     {
       id: 3,
       title: 'Traditional Drying, Naturally Preserved',
-      description: 'The saffron harvested in Pampore undergoes a traditional, time-honored process that includes gently drying the delicate stigmas after hand-picking. No artificial heat is used — instead, the drying is done slowly and carefully, preserving the saffron\'s natural oils, rich aroma, and medicinal properties. These ancient techniques, passed down through generations, ensure that the final product retains its purity, potency, and deep crimson color, making Kashmiri saffron truly exceptional.',
+      description: 'The saffron harvested in Pampore undergoes a traditional, time-honored process that includes gently drying the delicate stigmas after hand-picking. No artificial heat is used — instead, the drying is done slowly and carefully, preserving the saffron\'s natural oils, rich aroma, and medicinal properties.',
       image: image,
       features: [
         {
@@ -64,12 +64,12 @@ const AllProducts = () => {
           onClick: () => navigateWithScrollToTop('/naturalsaffron')
         }
       ],
-      topMargin: 'mt-[-20px]',
+      topMargin: 'mt-[0px]',
     },
     {
       id: 4,
       title: 'Sealed for Freshness, Packed with Care',
-      description: 'Packaging is more than presentation — it\'s protection. While most saffron is sold in plastic or clear glass that allows UV damage and scent contamination, we use UV-blocking metal tins and dark glass jars to preserve aroma and potency. To maintain its rich flavor and strength, saffron should be stored in a cool, dry place away from light and moisture. Every element of our packaging is designed to protect the purity of your saffron from harvest to your kitchen.',
+      description: 'Packaging is more than presentation — it\'s protection. While most saffron is sold in plastic or clear glass that allows UV damage and scent contamination, we use UV-blocking metal tins and dark glass jars to preserve aroma and potency. To maintain its rich flavor and strength, saffron should be stored in a cool, dry place away from light and moisture.',
       image: saffron3,
       features: [
         {
@@ -78,7 +78,7 @@ const AllProducts = () => {
           onClick: () => navigateWithScrollToTop('/saffronpackaging')
         }
       ],
-      topMargin: 'mt-[-20px]',
+      topMargin: 'mt-[0px]',
     },
     {
       id: 5,
@@ -92,7 +92,7 @@ const AllProducts = () => {
           onClick: () => navigateWithScrollToTop('/precioussaffron')
         }
       ],
-      topMargin: 'mt-[-20px]',
+      topMargin: 'mt-[0px]',
     },
   ];
   
