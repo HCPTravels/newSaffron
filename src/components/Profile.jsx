@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from "react";
-import { Routes, Route, useLocation, useNavigate } from 'react-router-dom';
+import { Routes, Route, useLocation, useNavigate } from "react-router-dom";
 import {
   Home,
   Grid,
@@ -22,7 +22,7 @@ import { useCart } from "../context/CartContext";
 
 const Profile = () => {
   const location = useLocation();
-  const {cartItems} = useCart()
+  const { cartItems, getTotalItems } = useCart();
   const navigate = useNavigate();
   const passedEmail = location.state?.email || "";
   const [scrollY, setScrollY] = useState(0);
@@ -40,10 +40,10 @@ const Profile = () => {
   // Get current tab based on URL
   const getCurrentTab = () => {
     const path = location.pathname;
-    if (path.includes('/profile/cart')) return 'Cart';
-    if (path.includes('/profile/categories')) return 'Browse';
-    if (path.includes('/profile/account')) return 'Profile';
-    return 'Home'; // Default to Home
+    if (path.includes("/profile/cart")) return "Cart";
+    if (path.includes("/profile/categories")) return "Browse";
+    if (path.includes("/profile/account")) return "Profile";
+    return "Home"; // Default to Home
   };
 
   const [activeTab, setActiveTab] = useState(getCurrentTab());
@@ -103,7 +103,7 @@ const Profile = () => {
 
   const handleProfileClick = () => {
     if (isMobile) {
-      navigate('/profile/account');
+      navigate("/profile/account");
     } else {
       setIsProfileVisible(!isProfileVisible);
     }
@@ -162,7 +162,7 @@ const Profile = () => {
           <div className="flex items-center space-x-6">
             <div
               className="text-2xl font-bold text-black cursor-pointer whitespace-nowrap"
-              onClick={() => navigate('/profile')}
+              onClick={() => navigate("/profile")}
             >
               <img
                 src={saffronLogo}
@@ -249,7 +249,7 @@ const Profile = () => {
             >
               <ShoppingCart className="h-6 w-6" />
               <span className="absolute -top-1 -right-1 text-white bg-[#ff6523] text-xs rounded-full h-5 w-5 flex items-center justify-center">
-              {cartItems.length}
+                {getTotalItems}
               </span>
             </button>
 
@@ -317,12 +317,23 @@ const Profile = () => {
 
       {/* Main Page Content */}
       <div className="min-h-screen bg-[#ff6523] pt-4 pb-24 px-4 relative z-10">
-        <Routes>
-          <Route path="/" element={<HomePage onSelectProduct={setSelectedProductId} />} />
+        <Routes location={location} key={location.pathname}>
+          <Route
+            path="/"
+            element={
+              selectedProductId ? (
+                <ProductDetails
+                  id={selectedProductId}
+                  onBack={() => setSelectedProductId(null)}
+                />
+              ) : (
+                <HomePage onSelectProduct={setSelectedProductId} />
+              )
+            }
+          />
           <Route path="/categories" element={<Categories />} />
           <Route path="/cart" element={<CartPage />} />
           <Route path="/account" element={<Account isVisible={true} />} />
-          <Route path="/product/:id" element={<ProductDetails onBack={() => navigate('/profile')} />} />
         </Routes>
       </div>
 

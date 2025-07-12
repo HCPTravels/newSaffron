@@ -1,9 +1,18 @@
 import React, { useState, useEffect, useCallback } from "react";
-import { Search, Filter, ChevronDown, Star, Zap, Loader2, ImagePlus } from "lucide-react";
+import {
+  Search,
+  Filter,
+  ChevronDown,
+  Star,
+  Zap,
+  Loader2,
+  ImagePlus,
+} from "lucide-react";
 import { motion } from "framer-motion";
 import { toast, Toaster } from "sonner";
 import axios from "axios";
 import { useAuth } from "../context/AuthContext";
+import { useCart } from "../context/CartContext";
 
 const Home = ({ onSelectProduct }) => {
   const [isLoading, setIsLoading] = useState(false);
@@ -11,7 +20,8 @@ const Home = ({ onSelectProduct }) => {
   const [loadingProductId, setLoadingProductId] = useState(null);
   const [imageErrors, setImageErrors] = useState({});
   const [hasInitialized, setHasInitialized] = useState(false);
-  
+  const { addToCart } = useCart();
+
   const backendUrl = import.meta.env.VITE_BACKEND_URL;
   const { token, isAuthLoading, isAuthenticated } = useAuth();
 
@@ -20,19 +30,19 @@ const Home = ({ onSelectProduct }) => {
 
     try {
       setIsLoading(true);
-      
+
       const headers = {};
       if (token) headers.Authorization = `Bearer ${token}`;
-      
+
       const response = await axios.get(
         `${backendUrl}/api/product/approved/product`,
         { headers, timeout: 10000 }
       );
-      
+
       if (response.data) setProducts(response.data);
     } catch (err) {
       console.error("Error fetching products:", err);
-      if (err.code === 'ECONNABORTED') {
+      if (err.code === "ECONNABORTED") {
         toast.error("Request timeout - server is taking too long to respond");
       } else if (err.response?.status === 401) {
         toast.error("Authentication required");
@@ -40,7 +50,7 @@ const Home = ({ onSelectProduct }) => {
         toast.error("Access denied");
       } else if (err.response?.status >= 500) {
         toast.error("Server error - please try again later");
-      } else if (err.code === 'ERR_NETWORK') {
+      } else if (err.code === "ERR_NETWORK") {
         toast.error("Network error - check your connection");
       } else {
         toast.error("Failed to load products");
@@ -55,7 +65,13 @@ const Home = ({ onSelectProduct }) => {
     if (!isAuthLoading && backendUrl && (!hasInitialized || isAuthenticated)) {
       fetchApprovedProducts();
     }
-  }, [fetchApprovedProducts, isAuthLoading, isAuthenticated, backendUrl, hasInitialized]);
+  }, [
+    fetchApprovedProducts,
+    isAuthLoading,
+    isAuthenticated,
+    backendUrl,
+    hasInitialized,
+  ]);
 
   const retryFetch = useCallback(() => {
     setHasInitialized(false);
@@ -63,30 +79,14 @@ const Home = ({ onSelectProduct }) => {
   }, [fetchApprovedProducts]);
 
   const handleImageError = (productId) => {
-    setImageErrors(prev => ({ ...prev, [productId]: true }));
+    setImageErrors((prev) => ({ ...prev, [productId]: true }));
   };
 
   const handleAddToCart = async (product) => {
-    if (!token) {
-      toast.error("Please login to add items to your cart");
-      return;
-    }
-
     setLoadingProductId(product._id);
 
     try {
-      const cartData = { productId: product._id, quantity: 1 };
-      const response = await axios.post(
-        `${backendUrl}/api/cart/add`,
-        cartData,
-        {
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${token}`,
-          },
-          timeout: 10000,
-        }
-      );
+      const response = await addToCart(product._id);
 
       toast.success(`${product.name} has been added to your cart`);
     } catch (error) {
@@ -192,20 +192,22 @@ const Home = ({ onSelectProduct }) => {
                       <ImagePlus className="h-12 w-12" />
                     </div>
                   )}
-                  
+
                   {/* Grade Badge */}
                   {product.grade && (
                     <div className="absolute top-3 right-3">
-                      <span className={`inline-flex items-center px-2.5 py-1 rounded-full text-xs font-bold ${
-                        product.grade === 'premium' 
-                          ? 'bg-gradient-to-r from-amber-500 to-orange-500 text-white' 
-                          : 'bg-gray-100 text-gray-800'
-                      }`}>
-                        {product.grade === 'premium' && 'Premium'}
-                        {product.grade === 'category1' && 'Category I'}
-                        {product.grade === 'category2' && 'Category II'}
-                        {product.grade === 'category3' && 'Category III'}
-                        {product.grade === 'bunch' && 'Bunch'}
+                      <span
+                        className={`inline-flex items-center px-2.5 py-1 rounded-full text-xs font-bold ${
+                          product.grade === "premium"
+                            ? "bg-gradient-to-r from-amber-500 to-orange-500 text-white"
+                            : "bg-gray-100 text-gray-800"
+                        }`}
+                      >
+                        {product.grade === "premium" && "Premium"}
+                        {product.grade === "category1" && "Category I"}
+                        {product.grade === "category2" && "Category II"}
+                        {product.grade === "category3" && "Category III"}
+                        {product.grade === "bunch" && "Bunch"}
                       </span>
                     </div>
                   )}
@@ -243,7 +245,9 @@ const Home = ({ onSelectProduct }) => {
                       <span className="text-lg font-bold text-[#ff6523]">
                         ₹{parseFloat(product.price).toFixed(2)}
                       </span>
-                      <span className="text-xs text-gray-500 ml-1">per gram</span>
+                      <span className="text-xs text-gray-500 ml-1">
+                        per gram
+                      </span>
                     </div>
                     <motion.button
                       className="px-3 py-1.5 bg-gradient-to-r from-[#ff6523] to-[#e55a1d] text-white text-xs font-medium rounded-lg hover:shadow-md transition-all"

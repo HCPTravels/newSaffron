@@ -12,7 +12,6 @@ const CartContext = createContext();
 export const CartProvider = ({ children }) => {
   const navigate = useNavigate();
   const { token } = useAuth();
-  
   const [cartItems, setCartItems] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
   const [updatingItem, setUpdatingItem] = useState(null);
@@ -61,10 +60,10 @@ export const CartProvider = ({ children }) => {
     }
 
     setUpdatingItem(productId);
-    
+
     // Store original state for rollback
     const originalCartItems = [...cartItems];
-    
+
     try {
       // 1. Optimistic UI update
       setCartItems((prev) =>
@@ -97,10 +96,10 @@ export const CartProvider = ({ children }) => {
       }
     } catch (error) {
       console.error("Update quantity error:", error);
-      
+
       // Rollback to original state
       setCartItems(originalCartItems);
-      
+
       // Show appropriate error message
       let errorMessage = "Failed to update quantity";
       if (error.response?.data?.message) {
@@ -110,9 +109,9 @@ export const CartProvider = ({ children }) => {
       } else if (error.request) {
         errorMessage = "No response from server. Please check your connection.";
       }
-      
+
       toast.error(errorMessage);
-      
+
       // Optionally refetch from server to ensure consistency
       // fetchCartItems();
     } finally {
@@ -123,10 +122,10 @@ export const CartProvider = ({ children }) => {
   // Remove item from cart
   const removeFromCart = async (productId) => {
     setRemovingItem(productId);
-    
+
     // Store original state for rollback
     const originalCartItems = [...cartItems];
-    
+
     try {
       // Optimistic UI update
       setCartItems((prev) =>
@@ -148,10 +147,10 @@ export const CartProvider = ({ children }) => {
       }
     } catch (error) {
       console.error("Remove item error:", error);
-      
+
       // Rollback to original state
       setCartItems(originalCartItems);
-      
+
       toast.error("Failed to remove item. Please try again.");
     } finally {
       setRemovingItem(null);
@@ -168,7 +167,7 @@ export const CartProvider = ({ children }) => {
 
     try {
       const response = await axios.post(
-        `${backendUrl}/api/cart/additem`,
+        `${backendUrl}/api/cart/add`,
         { productId, quantity },
         {
           headers: { Authorization: `Bearer ${token}` },
@@ -185,12 +184,12 @@ export const CartProvider = ({ children }) => {
       }
     } catch (error) {
       console.error("Add to cart error:", error);
-      
+
       let errorMessage = "Failed to add item to cart";
       if (error.response?.data?.message) {
         errorMessage = error.response.data.message;
       }
-      
+
       toast.error(errorMessage);
     }
   };
@@ -198,13 +197,10 @@ export const CartProvider = ({ children }) => {
   // Clear entire cart
   const clearCart = async () => {
     try {
-      const response = await axios.delete(
-        `${backendUrl}/api/cart/clear`,
-        {
-          headers: { Authorization: `Bearer ${token}` },
-          timeout: 10000,
-        }
-      );
+      const response = await axios.delete(`${backendUrl}/api/cart/clear`, {
+        headers: { Authorization: `Bearer ${token}` },
+        timeout: 10000,
+      });
 
       if (response.data?.success) {
         setCartItems([]);
@@ -221,16 +217,17 @@ export const CartProvider = ({ children }) => {
   // Calculate total price
   const getTotalPrice = () => {
     const subtotal = cartItems.reduce((total, item) => {
-      return total + (item.productId.price * item.quantity);
+      return total + item.productId.price * item.quantity;
     }, 0);
-    
+
     return subtotal - discount;
   };
 
   // Calculate total items count
-  const getTotalItems = () => {
-    return cartItems.reduce((total, item) => total + item.quantity, 0);
-  };
+  const getTotalItems = cartItems.reduce(
+    (total, item) => total + item.quantity,
+    0
+  );
 
   // Apply promo code
   const applyPromoCode = async (code) => {
@@ -275,7 +272,7 @@ export const CartProvider = ({ children }) => {
     discount,
     estimatedDelivery,
     showPayment,
-    
+
     // Actions
     fetchCartItems,
     updateQuantity,
@@ -284,20 +281,18 @@ export const CartProvider = ({ children }) => {
     clearCart,
     applyPromoCode,
     removePromoCode,
-    
+
     // Computed values
     getTotalPrice,
     getTotalItems,
-    
+
     // Setters (if needed in components)
     setShowPayment,
     setPromoCode,
   };
 
   return (
-    <CartContext.Provider value={contextValue}>
-      {children}
-    </CartContext.Provider>
+    <CartContext.Provider value={contextValue}>{children}</CartContext.Provider>
   );
 };
 

@@ -1,4 +1,5 @@
 import React from "react";
+import { useEffect } from "react";
 import {
   ShoppingCart,
   Plus,
@@ -20,6 +21,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { Toaster } from "sonner";
 import { useCart } from "../context/CartContext";
 import { useAuth } from "../context/AuthContext";
+import { useLocation } from "react-router-dom";
 import PaymentGateway from "../components/PaymentGateway";
 
 const Cart = () => {
@@ -39,16 +41,23 @@ const Cart = () => {
     removePromoCode,
     setShowPayment,
     setPromoCode,
+    fetchCartItems,
     getTotalPrice,
     getTotalItems,
   } = useCart();
+
+  const location = useLocation();
+
+  useEffect(() => {
+    fetchCartItems(); // Safe and idempotent, only triggers if needed
+  }, [location.pathname]);
 
   const { token } = useAuth();
 
   const subtotal = cartItems.reduce((total, item) => {
     const price = parseFloat(item?.productId?.price) || 0;
     const quantity = parseInt(item?.quantity) || 0;
-    return total + (price * quantity);
+    return total + price * quantity;
   }, 0);
 
   const discountAmount = (subtotal * discount) / 100;
@@ -166,7 +175,7 @@ const Cart = () => {
             Your Saffron Collection
           </h1>
           <p className="text-gray-600">
-            {cartItems.length} item{cartItems.length !== 1 ? 's' : ''} in cart
+            {cartItems.length} item{cartItems.length !== 1 ? "s" : ""} in cart
           </p>
         </div>
 
@@ -216,7 +225,9 @@ const Cart = () => {
                                 {product.name}
                               </h3>
                               <div className="flex items-center gap-2 mt-1">
-                                <span className={`text-xs px-2 py-1 rounded-full font-medium ${gradeBadge.className}`}>
+                                <span
+                                  className={`text-xs px-2 py-1 rounded-full font-medium ${gradeBadge.className}`}
+                                >
                                   {gradeBadge.text}
                                 </span>
                                 {product.crocin && (
@@ -250,8 +261,16 @@ const Cart = () => {
                               <div className="flex items-center gap-2">
                                 <button
                                   className="w-8 h-8 bg-white border border-gray-300 rounded-full flex items-center justify-center hover:bg-gray-50 disabled:opacity-50"
-                                  onClick={() => updateQuantity(product._id, itemQuantity - 1)}
-                                  disabled={itemQuantity <= 1 || updatingItem === product._id}
+                                  onClick={() =>
+                                    updateQuantity(
+                                      product._id,
+                                      itemQuantity - 1
+                                    )
+                                  }
+                                  disabled={
+                                    itemQuantity <= 1 ||
+                                    updatingItem === product._id
+                                  }
                                 >
                                   {updatingItem === product._id ? (
                                     <Loader2 className="w-3 h-3 animate-spin" />
@@ -266,7 +285,12 @@ const Cart = () => {
 
                                 <button
                                   className="w-8 h-8 bg-white border border-gray-300 rounded-full flex items-center justify-center hover:bg-gray-50 disabled:opacity-50"
-                                  onClick={() => updateQuantity(product._id, itemQuantity + 1)}
+                                  onClick={() =>
+                                    updateQuantity(
+                                      product._id,
+                                      itemQuantity + 1
+                                    )
+                                  }
                                   disabled={updatingItem === product._id}
                                 >
                                   {updatingItem === product._id ? (
@@ -287,8 +311,16 @@ const Cart = () => {
                               <div className="flex items-center gap-2">
                                 <button
                                   className="w-8 h-8 bg-white border border-gray-300 rounded-full flex items-center justify-center hover:bg-gray-50 disabled:opacity-50"
-                                  onClick={() => updateQuantity(product._id, itemQuantity - 1)}
-                                  disabled={itemQuantity <= 1 || updatingItem === product._id}
+                                  onClick={() =>
+                                    updateQuantity(
+                                      product._id,
+                                      itemQuantity - 1
+                                    )
+                                  }
+                                  disabled={
+                                    itemQuantity <= 1 ||
+                                    updatingItem === product._id
+                                  }
                                 >
                                   {updatingItem === product._id ? (
                                     <Loader2 className="w-3 h-3 animate-spin" />
@@ -303,7 +335,12 @@ const Cart = () => {
 
                                 <button
                                   className="w-8 h-8 bg-white border border-gray-300 rounded-full flex items-center justify-center hover:bg-gray-50 disabled:opacity-50"
-                                  onClick={() => updateQuantity(product._id, itemQuantity + 1)}
+                                  onClick={() =>
+                                    updateQuantity(
+                                      product._id,
+                                      itemQuantity + 1
+                                    )
+                                  }
                                   disabled={updatingItem === product._id}
                                 >
                                   {updatingItem === product._id ? (
@@ -420,7 +457,7 @@ const Cart = () => {
                 <div className="flex justify-between items-center">
                   <span className="text-gray-600">Shipping</span>
                   <span className="font-medium">
-                    {shipping === 0 ? 'Free' : `₹${shipping.toFixed(2)}`}
+                    {shipping === 0 ? "Free" : `₹${shipping.toFixed(2)}`}
                   </span>
                 </div>
 

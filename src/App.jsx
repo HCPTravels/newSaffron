@@ -1,40 +1,47 @@
-import { Routes, Route, useLocation } from 'react-router-dom';
-import { AuthProvider } from './context/AuthContext';
-import { CartProvider } from './context/CartContext';
-import Navbar from './components/Navbar';
-import HeroSection from './components/HeroSection';
-import AllProducts from './components/Allproduct';
-import Contact from './components/Contact';
-import LoginPage from './pages/Login';
-import Signup from './pages/SignupPage';
-import Blog from './components/Blog';
-import About from './pages/About';
-import ContactUs from './pages/Contactus';
-import OurPartners from './pages/OurPartners';
-import Profile from './components/Profile';
-import ProtectedRoute from './components/ProtectedRoute';
-import Home from './pages/Homepage';
-import Categories from './pages/Categories';
-import Cart from './pages/Cart';
-import Account from './components/Account';
+import { Routes, Route, useLocation } from "react-router-dom";
+import { AuthProvider } from "./context/AuthContext";
+import { CartProvider } from "./context/CartContext";
+import Navbar from "./components/Navbar";
+import HeroSection from "./components/HeroSection";
+import AllProducts from "./components/Allproduct";
+import Contact from "./components/Contact";
+import LoginPage from "./pages/Login";
+import Signup from "./pages/SignupPage";
+import Blog from "./components/Blog";
+import About from "./pages/About";
+import ContactUs from "./pages/Contactus";
+import OurPartners from "./pages/OurPartners";
+import Profile from "./components/Profile";
+import ProtectedRoute from "./components/ProtectedRoute";
+import Home from "./pages/Homepage";
+import Categories from "./pages/Categories";
+import Cart from "./pages/Cart";
+import Account from "./components/Account";
 // import OtpVerificationPage from './pages/OtpverifyPage';
-import SignupForm from './pages/SignupForm';
-import SellerSignupPage from './pages/SellerSignupPage';
-import SaffronProductListing from './components/ProductListing';
-import SellerDashboard from './components/SellerDashboard';
-import SellerLogin from './pages/SellerLogin';
-import AdminProductPanel from './components/Adminpannel';
-import AdminRoute from "./components/AdminRoute"
-import SaffronPackaging from './components/SaffronPackaging';
-import SaffronComponent from './components/SaffronLuxury';
-import SaffronQuality from './components/SaffronComponent';
-import SellerProtectedRoute from './components/SellerProtected'
+import SignupForm from "./pages/SignupForm";
+import SellerSignupPage from "./pages/SellerSignupPage";
+import SaffronProductListing from "./components/ProductListing";
+import SellerDashboard from "./components/SellerDashboard";
+import SellerLogin from "./pages/SellerLogin";
+import AdminProductPanel from "./components/Adminpannel";
+import AdminRoute from "./components/AdminRoute";
+import SaffronPackaging from "./components/SaffronPackaging";
+import SaffronComponent from "./components/SaffronLuxury";
+import SaffronQuality from "./components/SaffronComponent";
+import SellerProtectedRoute from "./components/SellerProtected";
 
 function App() {
   const location = useLocation();
 
-  const hideNavbarRoutes = ['/profile', '/adminpanel', '/sellerdashboard','/productlisting'];
-  const hideNavbar = hideNavbarRoutes.some(route => location.pathname.startsWith(route));
+  const hideNavbarRoutes = [
+    "/profile",
+    "/adminpanel",
+    "/sellerdashboard",
+    "/productlisting",
+  ];
+  const hideNavbar = hideNavbarRoutes.some((route) =>
+    location.pathname.startsWith(route)
+  );
 
   return (
     <AuthProvider>
@@ -62,17 +69,17 @@ function App() {
           <Route path="/partners" element={<OurPartners />} />
           <Route path="/sellersignup" element={<SellerSignupPage />} />
           <Route path="/saffronpackaging" element={<SaffronPackaging />} />
-          <Route path="/precioussaffron" element={<SaffronComponent/>}/>
-          <Route path="/naturalsaffron" element={<SaffronQuality/>}/>
-          <Route path="/aboutus" element={<About/>}/>
-          <Route path="/ourpartners" element={<OurPartners />}/>
-          <Route 
-            path="/sellerdashboard" 
+          <Route path="/precioussaffron" element={<SaffronComponent />} />
+          <Route path="/naturalsaffron" element={<SaffronQuality />} />
+          <Route path="/aboutus" element={<About />} />
+          <Route path="/ourpartners" element={<OurPartners />} />
+          <Route
+            path="/sellerdashboard"
             element={
               <SellerProtectedRoute>
                 <SellerDashboard />
               </SellerProtectedRoute>
-            } 
+            }
           />
           <Route path="/sellerlogin" element={<SellerLogin />} />
           <Route path="/productlisting" element={<SaffronProductListing />} />
@@ -84,7 +91,7 @@ function App() {
               </AdminRoute>
             }
           />
-          
+
           {/* Profile routes with nested structure */}
           <Route
             path="/profile/*"
@@ -94,39 +101,39 @@ function App() {
               </ProtectedRoute>
             }
           />
-          
+
           {/* Standalone routes (these will show main navbar) */}
-          <Route 
-            path="/homepage" 
+          <Route
+            path="/homepage"
             element={
               <ProtectedRoute>
                 <Home />
               </ProtectedRoute>
-            } 
+            }
           />
-          <Route 
-            path="/categories" 
+          <Route
+            path="/categories"
             element={
               <ProtectedRoute>
                 <Categories />
               </ProtectedRoute>
-            } 
+            }
           />
-          <Route 
-            path="/cart" 
+          <Route
+            path="/cart"
             element={
               <ProtectedRoute>
                 <Cart />
               </ProtectedRoute>
-            } 
+            }
           />
-          <Route 
-            path="/account" 
+          <Route
+            path="/account"
             element={
               <ProtectedRoute>
                 <Account />
               </ProtectedRoute>
-            } 
+            }
           />
         </Routes>
       </CartProvider>
