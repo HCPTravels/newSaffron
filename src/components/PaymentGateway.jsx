@@ -4,10 +4,11 @@ import { useAuth } from "../context/AuthContext";
 
 const PaymentGateway = ({ totalPrice, onClose }) => {
   const backendUrl = import.meta.env.VITE_BACKEND_URL;
-  const { token } = useAuth();
+  const { token, user } = useAuth();
 
   useEffect(() => {
     console.log("totalPrice in PaymentGateway:", totalPrice);
+    console.log("userData in PaymentGateway:", user);
 
     const loadScript = (src) => {
       return new Promise((resolve) => {
@@ -122,9 +123,9 @@ const PaymentGateway = ({ totalPrice, onClose }) => {
           if (onClose) onClose();
         },
         prefill: {
-          name: "Bharat Aggarwal",
-          email: "bharataggarwal2k2@gmail.com",
-          contact: "+91 9625911490",
+          name: user ? user.firstName + " " + user.lastName : "Guest User",
+          email: user ? user.email : "demo@email.com",
+          contact: user ? user.contactNumber : "9999999999",
         },
         theme: {
           color: "#FF6523",
