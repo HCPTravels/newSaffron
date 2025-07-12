@@ -14,7 +14,7 @@ const ProductFeatureSection = ({
   const isFourthImage = id === 4;
 
   return (
-    <section className="py-12 relative z-10 flex items-center overflow-x-hidden">
+    <section className="py-6 md:py-12 relative z-10 flex items-center overflow-x-hidden">
       <div className={`container px-4 sm:px-6 ${isEven ? 'md:ml-[57px]' : ''}`}>
         <div className={`border-2 border-black rounded-[20px] bg-white overflow-hidden shadow-[5px_5px_0px_0px_rgba(0,0,0)]`}>
           <div
@@ -91,7 +91,7 @@ const ProductFeatureSection = ({
                 <img
                   src={image}
                   alt="Saffron"
-                  className={`w-full ${isFourthImage ? 'max-w-[300px]' : 'max-w-[250px]'} mx-auto sm:mx-0 sm:ml-[-30px] sm:${isFourthImage ? 'max-w-[350px]' : 'max-w-[350px]'} md:${isFourthImage ? 'max-w-[380px]' : 'max-w-[450px]'} lg:${isFourthImage ? 'max-w-[400px]' : 'max-w-[500px]'} h-auto object-contain ${isFirstImage ? 'mt-0 md:mt-40' : ''} ${imageClass || ''}`}
+                  className={`w-full ${isFourthImage ? 'max-w-[300px]' : 'max-w-[250px]'} mx-auto sm:mx-0 sm:ml-[-30px] md:ml-[25px] sm:${isFourthImage ? 'max-w-[350px]' : 'max-w-[350px]'} md:${isFourthImage ? 'max-w-[380px]' : 'max-w-[450px]'} lg:${isFourthImage ? 'max-w-[400px]' : 'max-w-[500px]'} h-auto object-contain ${isFirstImage ? 'mt-0 md:mt-40' : ''} ${imageClass || ''}`}
                 />
               </div>
             </div>

@@ -63,7 +63,8 @@ const ContactFormSection = () => {
   };
   return (
     <div className="relative bg-gradient-to-br from-[#ff6523]/10 to-[#ff6523]/20 h-screen flex items-center justify-center p-4">
-      <Toaster 
+      <Toaster
+        position="top-center" 
         richColors 
         closeButton 
         toastOptions={{

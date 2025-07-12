@@ -106,7 +106,7 @@ const HeroSection = () => {
         </div>
 
         {/* Bottom right description - unchanged */}
-        <div className="absolute mt-105 ml-54  xs:bottom-10 xs:right-10
+        <div className="absolute mt-105 ml-50  xs:bottom-10 xs:right-10
                         sm:bottom-15 sm:right-10 md:bottom-40 md:right-20
                         text-black font-poppins text-left
                         max-w-[120px] xs:max-w-[150px] sm:max-w-[180px] md:max-w-[200px] lg:max-w-[250px]
@@ -115,7 +115,7 @@ const HeroSection = () => {
                         z-10">
           <div className="absolute top-30 right-20 w-32 h-32 bg-white/80 rounded-full blur-[80px]"></div>
           <div className="text-right max-w-xs">
-            <div className="inline-block ">
+            <div className="inline-block">
               <p className="text-sm md:text-xl whitespace-nowrap font-light text-white/90 tracking-[0.2em] uppercase">Pure • Traceable</p>
               <p className="text-xl md:text-2xl whitespace-nowrap font-medium text-[#ffc1a7] tracking-tight mt-1 md:mt-2 leading-none">Kashmiri Saffron</p>
               <div className="mt-2 md:mt-3 h-[1px] w-full bg-gradient-to-l from-[#ffc1a7]/70 via-[#ffc1a7]/30 to-transparent"></div>
