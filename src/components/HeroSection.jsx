@@ -21,20 +21,35 @@ const HeroSection = () => {
         <div className="h-full flex items-center justify-center" style={{ marginTop: '8rem' }}>
           {/* Text above the image - unchanged */}
           <div className="absolute top-1/3 left-1/2 transform -translate-x-1/2 -translate-y-1/2 z-10">
-  <h1 className="text-[#ffc1a7] 
-                text-[80px] sm:text-[80px] md:text-[120px] lg:text-[180px] xl:text-[250px] 2xl:text-[330px]
-                font-extrabold font-poppins text-center tracking-wider opacity-90 drop-shadow-2xl leading-none">
-    Saffron
-  </h1>
-</div>
+            <h1 className="text-[#ffc1a7] 
+                          text-[80px] sm:text-[80px] md:text-[120px] lg:text-[180px] xl:text-[250px] 2xl:text-[330px]
+                          font-extrabold font-poppins text-center tracking-wider opacity-90 drop-shadow-2xl leading-none">
+              Saffron
+            </h1>
+          </div>
+
+          {/* Modern Mobile Hero Text */}
+          <div className="md:hidden absolute top-[5%] left-1/2 transform -translate-x-1/2 -translate-y-1/2 z-10 w-full px-6 text-center">
+            <div className="inline-block bg-white/10 backdrop-blur-md px-4 py-2 rounded-xl border border-white/20 shadow-sm">
+              <p className="text-[11px] tracking-[0.25em] text-white/80 uppercase font-light">Pure Kashmiri Origin</p>
+            </div>
+
+            <h2 className="mt-4 text-[28px] leading-tight font-bold text-[#ffc1a7] font-poppins tracking-tight drop-shadow-md">
+              Nature’s Most Precious Spice
+            </h2>
+
+            {/* <p className="mt-2 text-sm text-white/70 leading-relaxed px-4">
+    Hand-harvested saffron from the heart of Kashmir. Ethically sourced, lab-tested & fully traceable.
+  </p> */}
+          </div>
 
           {/* Image container - key changes here */}
           <div className="absolute top-1/3 md:top-[300px] left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-full">
             <div className="relative flex justify-center">
               {/* Center main image - added max-h-screen to prevent cutting */}
-              <img 
-                src={saffronHome} 
-                alt="Saffron Home" 
+              <img
+                src={saffronHome}
+                alt="Saffron Home"
                 className="relative max-h-[90vh]  /* Added max-height */
                   w-[500px] h-[500px] 
                   xs:w-[250px] xs:h-[250px]
@@ -45,11 +60,11 @@ const HeroSection = () => {
                   2xl:w-[600px] 2xl:h-[600px]/* Slightly reduced */
                   object-contain z-0"  /* Changed to contain */
               />
-              
+
               {/* Right decorative image - same adjustments */}
-              <img 
-                src={saffronHome} 
-                alt="Saffron Home" 
+              <img
+                src={saffronHome}
+                alt="Saffron Home"
                 className="hidden md:block absolute left-full opacity-30 max-h-[90vh]
                   w-[200px] h-[200px] xs:w-[250px] xs:h-[250px]
                   sm:w-[300px] sm:h-[300px]
@@ -57,7 +72,7 @@ const HeroSection = () => {
                   lg:w-[500px] lg:h-[500px]
                   xl:w-[550px] xl:h-[550px]
                   2xl:w-[600px] 2xl:h-[600px]
-                  object-contain z-0" 
+                  object-contain z-0"
                 style={{
                   transform: 'translateX(-50%)'
                 }}
@@ -89,7 +104,7 @@ const HeroSection = () => {
             </div>
           </div>
         </div>
-        
+
         {/* Bottom right description - unchanged */}
         <div className="absolute mt-105 ml-54  xs:bottom-10 xs:right-10
                         sm:bottom-15 sm:right-10 md:bottom-40 md:right-20
@@ -100,15 +115,15 @@ const HeroSection = () => {
                         z-10">
           <div className="absolute top-30 right-20 w-32 h-32 bg-white/80 rounded-full blur-[80px]"></div>
           <div className="text-right max-w-xs">
-  <div className="inline-block ">
-    <p className="text-sm md:text-xl whitespace-nowrap font-light text-white/90 tracking-[0.2em] uppercase">Pure • Traceable</p>
-    <p className="text-xl md:text-2xl whitespace-nowrap font-medium text-[#ffc1a7] tracking-tight mt-1 md:mt-2 leading-none">Kashmiri Saffron</p>
-    <div className="mt-2 md:mt-3 h-[1px] w-full bg-gradient-to-l from-[#ffc1a7]/70 via-[#ffc1a7]/30 to-transparent"></div>
-    <div>
-    <img src={traceable} className='ml-10 hidden md:block md:ml-30 h-15 w-15 md:h-30 md:w-30 rotate-15'/>
-    </div>
-  </div>
-</div>
+            <div className="inline-block ">
+              <p className="text-sm md:text-xl whitespace-nowrap font-light text-white/90 tracking-[0.2em] uppercase">Pure • Traceable</p>
+              <p className="text-xl md:text-2xl whitespace-nowrap font-medium text-[#ffc1a7] tracking-tight mt-1 md:mt-2 leading-none">Kashmiri Saffron</p>
+              <div className="mt-2 md:mt-3 h-[1px] w-full bg-gradient-to-l from-[#ffc1a7]/70 via-[#ffc1a7]/30 to-transparent"></div>
+              <div>
+                <img src={traceable} className='ml-10 hidden md:block md:ml-30 h-15 w-15 md:h-30 md:w-30 rotate-15' />
+              </div>
+            </div>
+          </div>
         </div>
       </section>
     </div>

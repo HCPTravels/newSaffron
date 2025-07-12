@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React from "react";
 import {
   ShoppingCart,
   Plus,
@@ -17,159 +17,64 @@ import {
   Package,
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
-import { toast, Toaster } from "sonner";
-import axios from "axios";
+import { Toaster } from "sonner";
+import { useCart } from "../context/CartContext"; // Import the cart context
 import { useAuth } from "../context/AuthContext";
 import PaymentGateway from "../components/PaymentGateway";
 
 const Cart = () => {
-  const [cartItems, setCartItems] = useState([]);
-  const [isLoading, setIsLoading] = useState(true);
-  const [updatingItem, setUpdatingItem] = useState(null);
-  const [removingItem, setRemovingItem] = useState(null);
-  const [promoCode, setPromoCode] = useState("");
-  const [promoApplied, setPromoApplied] = useState(false);
-  const [discount, setDiscount] = useState(0);
-  const [estimatedDelivery] = useState("3-5 business days");
-  const [showPayment, setShowPayment] = useState(false);
+  // Use CartContext instead of local state
+  const {
+    cartItems,
+    isLoading,
+    updatingItem,
+    removingItem,
+    promoCode,
+    promoApplied,
+    discount,
+    estimatedDelivery,
+    showPayment,
+    updateQuantity,
+    removeFromCart,
+    applyPromoCode,
+    removePromoCode,
+    setShowPayment,
+    setPromoCode,
+    getTotalPrice,
+    getTotalItems,
+  } = useCart();
 
-  const backendUrl = import.meta.env.VITE_BACKEND_URL;
   const { token } = useAuth();
 
-  // Fetch cart items from backend
-  const fetchCartItems = async () => {
-    if (!token) {
-      setIsLoading(false);
-      return;
-    }
-
-    try {
-      const response = await axios.get(
-        `${backendUrl}/api/cart/getcartproduct`,
-        {
-          headers: { Authorization: `Bearer ${token}` },
-        }
-      );
-
-      if (response.data?.items) {
-        setCartItems(response.data.items);
-      }
-    } catch (error) {
-      console.error("Error fetching cart:", error);
-      toast.error("Failed to load cart items");
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
-  // Initial data load
-  useEffect(() => {
-    fetchCartItems();
-  }, [token]);
-
-  const updateQuantity = async (productId, newQuantity) => {
-    if (newQuantity < 1) {
-      toast.error("Quantity cannot be less than 1");
-      return;
-    }
-
-    setUpdatingItem(productId);
-    try {
-      setCartItems((prev) =>
-        prev.map((item) =>
-          item.productId._id === productId
-            ? { ...item, quantity: newQuantity }
-            : item
-        )
-      );
-
-      const response = await axios.patch(
-        `${backendUrl}/api/cart/updatequantity/${productId}`,
-        { quantity: newQuantity },
-        {
-          headers: { Authorization: `Bearer ${token}` },
-          timeout: 5000,
-        }
-      );
-
-      // 3. Verify and update with backend response
-      if (response.data?.success && response.data?.cart?.items) {
-        setCartItems(response.data.cart.items);
-        toast.success("Quantity updated");
-      } else {
-        throw new Error("Invalid response from server");
-      }
-    } catch (error) {
-      console.error("Update error:", error);
-
-      // Specific error messages
-      let errorMessage = "Failed to update quantity";
-      if (error.response) {
-        errorMessage = error.response.data?.message || errorMessage;
-      } else if (error.code === "ECONNABORTED") {
-        errorMessage = "Request timed out";
-      } else if (error.request) {
-        errorMessage = "No response from server";
-      }
-
-      toast.error(errorMessage);
-      fetchCartItems(); // Revert to server state
-    } finally {
-      setUpdatingItem(null);
-    }
-  };
-
-  // Remove item from cart
-  const removeFromCart = async (productId) => {
-    setRemovingItem(productId);
-    try {
-      // Optimistic UI update
-      setCartItems((prev) =>
-        prev.filter((item) => item.productId._id !== productId)
-      );
-
-      await axios.delete(`${backendUrl}/api/cart/removeitem/${productId}`, {
-        headers: { Authorization: `Bearer ${token}` },
-      });
-
-      toast.success("Item removed");
-    } catch (error) {
-      console.error("Remove error:", error);
-      toast.error("Failed to remove item");
-      fetchCartItems(); // Revert to actual data
-    } finally {
-      setRemovingItem(null);
-    }
-  };
-
-  // Apply promo code
-  const applyPromoCode = () => {
-    if (promoCode.toLowerCase() === "saffron10") {
-      setDiscount(10);
-      setPromoApplied(true);
-      toast.success("10% discount applied!");
-    } else if (promoCode.toLowerCase() === "premium20") {
-      setDiscount(20);
-      setPromoApplied(true);
-      toast.success("20% discount applied!");
-    } else {
-      toast.error("Invalid promo code");
-    }
-  };
-
-  // Calculate order totals
+  // Calculate order totals with better error handling
   const subtotal = cartItems.reduce((total, item) => {
-    const price = item?.productId?.price || 0;
-    const quantity = item?.quantity || 0;
-    return total + price * quantity;
+    // Ensure we have valid numbers
+    const price = parseFloat(item?.productId?.price) || 0;
+    const quantity = parseInt(item?.quantity) || 0;
+    
+    // Skip items with invalid data
+    if (isNaN(price) || isNaN(quantity) || price <= 0 || quantity <= 0) {
+      console.warn("Invalid item data:", item);
+      return total;
+    }
+    
+    return total + (price * quantity);
   }, 0);
 
   const discountAmount = (subtotal * discount) / 100;
-
-  // ✅ THIS IS THE MISSING LINE:
   const shipping = subtotal > 2000 ? 0 : 150;
-
   const total = subtotal - discountAmount + shipping;
+
+  // Handle promo code application
+  const handleApplyPromo = () => {
+    if (promoCode.toLowerCase() === "saffron10") {
+      applyPromoCode("saffron10");
+    } else if (promoCode.toLowerCase() === "premium20") {
+      applyPromoCode("premium20");
+    } else {
+      applyPromoCode(promoCode);
+    }
+  };
 
   // Get styling for product grade badges
   const getGradeBadge = (grade) => {
@@ -249,7 +154,7 @@ const Cart = () => {
         className="px-8 py-3 bg-gradient-to-r from-[#ff6523] to-[#e55a1d] text-white font-semibold rounded-lg hover:shadow-lg transition-all duration-300"
         whileHover={{ scale: 1.05 }}
         whileTap={{ scale: 0.95 }}
-        onClick={() => (window.location.href = "/")}
+        onClick={() => (window.location.href = "/profile")}
       >
         Start Shopping
       </motion.button>
@@ -346,6 +251,8 @@ const Cart = () => {
                     }
 
                     const gradeBadge = getGradeBadge(product.grade);
+                    const itemPrice = parseFloat(product.price) || 0;
+                    const itemQuantity = parseInt(item.quantity) || 0;
 
                     return (
                       <motion.div
@@ -394,7 +301,7 @@ const Cart = () => {
                             )}
                           </div>
                           <div className="text-2xl font-bold text-[#ff6523]">
-                            ₹{product.price}
+                            ₹{itemPrice.toFixed(2)}
                             <span className="text-sm text-gray-500 font-normal ml-1">
                               per gram
                             </span>
@@ -404,18 +311,12 @@ const Cart = () => {
                         {/* Quantity Controls */}
                         <div className="flex items-center gap-3">
                           <motion.button
-                            className="w-10 h-10 bg-white border-2 border-amber-200 rounded-full flex items-center justify-center hover:bg-amber-50 transition-colors"
-                            whileHover={{ scale: 1.1 }}
-                            whileTap={{ scale: 0.9 }}
-                            onClick={() => {
-                              const newQuantity = item.quantity - 1;
-                              if (newQuantity >= 1) {
-                                // Additional client-side validation
-                                updateQuantity(product._id, newQuantity);
-                              }
-                            }}
+                            className="w-10 h-10 bg-white border-2 border-amber-200 rounded-full flex items-center justify-center hover:bg-amber-50 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                            whileHover={{ scale: updatingItem === product._id ? 1 : 1.1 }}
+                            whileTap={{ scale: updatingItem === product._id ? 1 : 0.9 }}
+                            onClick={() => updateQuantity(product._id, itemQuantity - 1)}
                             disabled={
-                              item.quantity <= 1 || updatingItem === product._id
+                              itemQuantity <= 1 || updatingItem === product._id
                             }
                           >
                             {updatingItem === product._id ? (
@@ -426,41 +327,39 @@ const Cart = () => {
                           </motion.button>
 
                           <div className="w-16 h-10 bg-white border-2 border-amber-200 rounded-lg flex items-center justify-center font-bold text-gray-900">
-                            {updatingItem === product._id ? (
-                              <Loader2 className="w-4 h-4 animate-spin" />
-                            ) : (
-                              item.quantity
-                            )}
+                            {itemQuantity}
                           </div>
 
                           <motion.button
-                            className="w-10 h-10 bg-white border-2 border-amber-200 rounded-full flex items-center justify-center hover:bg-amber-50 transition-colors"
-                            whileHover={{ scale: 1.1 }}
-                            whileTap={{ scale: 0.9 }}
-                            onClick={() =>
-                              updateQuantity(product._id, item.quantity + 1)
-                            }
+                            className="w-10 h-10 bg-white border-2 border-amber-200 rounded-full flex items-center justify-center hover:bg-amber-50 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                            whileHover={{ scale: updatingItem === product._id ? 1 : 1.1 }}
+                            whileTap={{ scale: updatingItem === product._id ? 1 : 0.9 }}
+                            onClick={() => updateQuantity(product._id, itemQuantity + 1)}
                             disabled={updatingItem === product._id}
                           >
-                            <Plus className="w-4 h-4 text-gray-600" />
+                            {updatingItem === product._id ? (
+                              <Loader2 className="w-4 h-4 animate-spin" />
+                            ) : (
+                              <Plus className="w-4 h-4 text-gray-600" />
+                            )}
                           </motion.button>
                         </div>
 
                         {/* Item Total */}
                         <div className="text-right">
                           <div className="text-2xl font-bold text-gray-900">
-                            ₹{(product.price * item.quantity).toFixed(2)}
+                            ₹{(itemPrice * itemQuantity).toFixed(2)}
                           </div>
                           <div className="text-sm text-gray-500">
-                            {item.quantity} gram{item.quantity > 1 ? "s" : ""}
+                            {itemQuantity} gram{itemQuantity > 1 ? "s" : ""}
                           </div>
                         </div>
 
                         {/* Remove Button */}
                         <motion.button
-                          className="w-10 h-10 bg-red-50 border-2 border-red-200 rounded-full flex items-center justify-center hover:bg-red-100 transition-colors"
-                          whileHover={{ scale: 1.1 }}
-                          whileTap={{ scale: 0.9 }}
+                          className="w-10 h-10 bg-red-50 border-2 border-red-200 rounded-full flex items-center justify-center hover:bg-red-100 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                          whileHover={{ scale: removingItem === product._id ? 1 : 1.1 }}
+                          whileTap={{ scale: removingItem === product._id ? 1 : 0.9 }}
                           onClick={() => removeFromCart(product._id)}
                           disabled={removingItem === product._id}
                         >
@@ -504,7 +403,7 @@ const Cart = () => {
                   className="px-4 py-2 bg-gradient-to-r from-[#ff6523] to-[#e55a1d] text-white font-semibold rounded-lg hover:shadow-lg transition-all duration-300 disabled:opacity-50"
                   whileHover={{ scale: promoApplied ? 1 : 1.05 }}
                   whileTap={{ scale: promoApplied ? 1 : 0.95 }}
-                  onClick={applyPromoCode}
+                  onClick={handleApplyPromo}
                   disabled={promoApplied || !promoCode}
                 >
                   {promoApplied ? <CheckCircle className="w-4 h-4" /> : "Apply"}
@@ -520,6 +419,13 @@ const Cart = () => {
                   <span className="text-sm font-medium">
                     {discount}% discount applied!
                   </span>
+                  <motion.button
+                    className="ml-2 text-red-500 hover:text-red-700 text-sm"
+                    onClick={removePromoCode}
+                    whileHover={{ scale: 1.1 }}
+                  >
+                    Remove
+                  </motion.button>
                 </motion.div>
               )}
             </motion.div>

@@ -18,9 +18,11 @@ import Account from "./Account";
 import Categories from "../pages/Categories";
 import SaffronHome from "../assets/saffronHome.png";
 import ProductDetails from "./ProductDetails";
+import { useCart } from "../context/CartContext";
 
 const Profile = () => {
   const location = useLocation();
+  const {cartItems} = useCart()
   const navigate = useNavigate();
   const passedEmail = location.state?.email || "";
   const [scrollY, setScrollY] = useState(0);
@@ -247,7 +249,7 @@ const Profile = () => {
             >
               <ShoppingCart className="h-6 w-6" />
               <span className="absolute -top-1 -right-1 text-white bg-[#ff6523] text-xs rounded-full h-5 w-5 flex items-center justify-center">
-                3
+              {cartItems.length}
               </span>
             </button>
 
@@ -376,7 +378,7 @@ const Profile = () => {
 
                 {tab.label === "Cart" && (
                   <span className="absolute -top-2 -right-2 text-white bg-gradient-to-r from-[#ff6523] to-[#ff8547] text-[10px] rounded-full h-4 w-4 flex items-center justify-center font-bold shadow-md animate-bounce">
-                    3
+                    {cartItems.length}
                   </span>
                 )}
               </div>
