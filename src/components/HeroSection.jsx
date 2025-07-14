@@ -2,8 +2,13 @@ import React from 'react';
 import saffronHome from '../assets/saffronHome.png';
 import BeeCanvas from '../modal/BeeCanvas';
 import traceable from '../assets/traceable.png'
+import { useNavigate } from "react-router-dom";
 
 const HeroSection = () => {
+  const navigate = useNavigate()
+  const clickHandler = () => {
+    navigate('/signup')
+  }
   return (
     <div className="relative">
       <BeeCanvas />
@@ -30,17 +35,9 @@ const HeroSection = () => {
 
           {/* Modern Mobile Hero Text */}
           <div className="md:hidden absolute top-[1%] left-1/2 transform -translate-x-1/2 -translate-y-1/2 z-10 w-full px-6 text-center">
-            {/* <div className="inline-block bg-white/10 backdrop-blur-md px-4 py-2 rounded-xl border border-white/20 shadow-sm">
-              <p className="text-[11px] tracking-[0.25em] text-white/80 uppercase font-light">Pure Kashmiri Origin</p>
-            </div> */}
-
             <h2 className="mt-4 text-[28px] leading-tight font-bold text-[#ffc1a7] font-poppins tracking-tight drop-shadow-md">
-              Nature’s Most Precious Spice
+              Nature's Most Precious Spice
             </h2>
-
-            {/* <p className="mt-2 text-sm text-white/70 leading-relaxed px-4">
-    Hand-harvested saffron from the heart of Kashmir. Ethically sourced, lab-tested & fully traceable.
-  </p> */}
           </div>
 
           {/* Image container - key changes here */}
@@ -78,30 +75,42 @@ const HeroSection = () => {
                 }}
               />
             </div>
-          </div>
-        </div>
 
-        {/* Feature badges - UPDATED to look more informative */}
-        <div className="absolute hidden bottom-40 left-1/2 transform -translate-x-1/2 z-0">
-          <div className="flex flex-col gap-3 items-center px-4">
-            {/* First row - two informative badges */}
-            <div className="flex gap-6">
-              <div className="bg-white/10 backdrop-blur-sm rounded-lg px-6 py-3 border border-white/20 shadow-lg min-w-[140px] text-center">
-                <span className="text-white text-xs font-medium tracking-wide whitespace-nowrap opacity-90">✨ Grade A+ Quality</span>
-              </div>
-              <div className="bg-white/10 backdrop-blur-sm rounded-lg px-6 py-3 border border-white/20 shadow-lg min-w-[140px] text-center">
-                <span className="text-white text-xs font-medium tracking-wide whitespace-nowrap opacity-90">🌱 100% Natural</span>
-              </div>
-            </div>
-            {/* Second row - two informative badges */}
-            <div className="flex gap-6">
-              <div className="bg-white/10 backdrop-blur-sm rounded-lg px-6 py-3 border border-white/20 shadow-lg min-w-[140px] text-center">
-                <span className="text-white text-xs font-medium tracking-wide whitespace-nowrap opacity-90">🏔️ Kashmir Origin</span>
-              </div>
-              <div className="bg-white/10 backdrop-blur-sm rounded-lg px-6 py-3 border border-white/20 shadow-lg min-w-[140px] text-center">
-                <span className="text-white text-xs font-medium tracking-wide whitespace-nowrap opacity-90">🔍 Traceable</span>
-              </div>
-            </div>
+            {/* Buy Now Button - Added this section */}
+            {/* Buy Now Button - Position optimized */}
+            <div className="absolute top-[calc(100%+30px)] left-[50%] transform -translate-x-1/2 z-30">
+  <button
+    onClick={clickHandler}
+    className="relative bg-[#ffb89b] text-gray-900 font-medium py-3 px-10 rounded-lg
+              transition-all duration-300 hover:bg-gray-50
+              text-sm md:text-base tracking-wider
+              shadow-sm hover:shadow-md
+              border border-gray-200
+              group/btn overflow-hidden"
+  >
+    {/* Smooth underline */}
+    <span className="absolute bottom-0 left-1/2 h-[2px] bg-[#ff7e5f] 
+                    w-0 group-hover/btn:w-full group-hover/btn:left-0
+                    transition-all duration-300 ease-out" />
+    
+    <span className="relative z-10 flex items-center gap-2">
+      <span>Buy Now</span>
+      <svg 
+        viewBox="0 0 16 16" 
+        className="w-4 h-4 transition-transform group-hover/btn:translate-x-1"
+        fill="none" 
+        xmlns="http://www.w3.org/2000/svg"
+      >
+        <path 
+          d="M6 12L10 8L6 4" 
+          stroke="currentColor" 
+          strokeWidth="2" 
+          strokeLinecap="round"
+        />
+      </svg>
+    </span>
+  </button>
+</div>
           </div>
         </div>
 
@@ -114,33 +123,33 @@ const HeroSection = () => {
                 leading-relaxed
                 text-xs xs:text-sm sm:text-base md:text-lg lg:text-xl
                 z-10">
-  
-  {/* Background blur effect */}
-  <div className="absolute -top-8 -right-8 w-32 h-32 bg-white/80 rounded-full blur-3xl"></div>
-  
-  <div className="text-right max-w-xs relative">
-  <div className="inline-block">
-    <div className="flex flex-col items-end">
-      <p className="text-lg md:text-xl font-light text-white/90 tracking-[0.1em] uppercase">
-        Pure • Traceable
-      </p>
-      <p className="text-xl md:text-2xl font-medium text-[#ffc1a7] tracking-tight leading-none">
-        Kashmiri Saffron
-      </p>
-    </div>
-    <div className="mt-2 md:mt-3 h-px w-full bg-gradient-to-l from-[#ffc1a7]/70 via-[#ffc1a7]/30 to-transparent"></div>
-    
-    {/* Image with proper responsive classes - hidden on mobile, shown on md and up */}
-    <div className="mt-1 md:mt-3 flex justify-end">
-      <img 
-        src={traceable} 
-        className="h-8 w-8 md:h-20 md:w-20 hidden md:block rotate-12" 
-        alt="Traceable"
-      />
-    </div>
-  </div>
-</div>
-</div>
+
+          {/* Background blur effect */}
+          <div className="absolute -top-8 -right-8 w-32 h-32 bg-white/80 rounded-full blur-3xl"></div>
+
+          <div className="text-right max-w-xs relative">
+            <div className="inline-block">
+              <div className="flex flex-col items-end">
+                <p className="text-lg md:text-xl font-light text-white/90 tracking-[0.1em] uppercase">
+                  Pure • Traceable
+                </p>
+                <p className="text-xl md:text-2xl font-medium text-[#ffc1a7] tracking-tight leading-none">
+                  Kashmiri Saffron
+                </p>
+              </div>
+              <div className="mt-2 md:mt-3 h-px w-full bg-gradient-to-l from-[#ffc1a7]/70 via-[#ffc1a7]/30 to-transparent"></div>
+
+              {/* Image with proper responsive classes - hidden on mobile, shown on md and up */}
+              <div className="mt-1 md:mt-3 flex justify-end">
+                <img
+                  src={traceable}
+                  className="h-8 w-8 md:h-20 md:w-20 hidden md:block rotate-12"
+                  alt="Traceable"
+                />
+              </div>
+            </div>
+          </div>
+        </div>
       </section>
     </div>
   );

@@ -13,7 +13,7 @@ import {
 import { useAuth } from "../context/AuthContext";
 import saffronLogo from "../assets/saffron logo.png";
 import HomePage from "../pages/Homepage";
-import CartPage from "../pages/Cart";
+import Cart from "../pages/Cart";
 import Account from "./Account";
 import Categories from "../pages/Categories";
 import SaffronHome from "../assets/saffronHome.png";
@@ -36,6 +36,20 @@ const Profile = () => {
   const currencyRef = useRef(null);
   const { user } = useAuth();
   const [selectedProductId, setSelectedProductId] = useState(null);
+
+  // Handle route redirects for standalone routes
+  useEffect(() => {
+    const path = location.pathname;
+    if (path === '/cart') {
+      navigate('/profile/cart', { replace: true });
+    } else if (path === '/homepage') {
+      navigate('/profile', { replace: true });
+    } else if (path === '/categories') {
+      navigate('/profile/categories', { replace: true });
+    } else if (path === '/account') {
+      navigate('/profile/account', { replace: true });
+    }
+  }, [location.pathname, navigate]);
 
   // Get current tab based on URL
   const getCurrentTab = () => {
@@ -332,7 +346,7 @@ const Profile = () => {
             }
           />
           <Route path="/categories" element={<Categories />} />
-          <Route path="/cart" element={<CartPage />} />
+          <Route path="/cart" element={<Cart />} />
           <Route path="/account" element={<Account isVisible={true} />} />
         </Routes>
       </div>

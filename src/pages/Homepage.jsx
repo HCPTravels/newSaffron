@@ -1,38 +1,72 @@
 import React, { useState, useEffect, useCallback } from "react";
 import {
   Search,
-  Filter,
-  ChevronDown,
-  Star,
-  Zap,
   Loader2,
-  ImagePlus,
 } from "lucide-react";
 import { motion } from "framer-motion";
 import { toast, Toaster } from "sonner";
 import axios from "axios";
 import { useAuth } from "../context/AuthContext";
 import { useCart } from "../context/CartContext";
+import useWishlist from "../hooks/useWishlist";
+import ProductCard from "./ProductCard"; // Import the new ProductCard component
 
 const Home = ({ onSelectProduct }) => {
-  const [isLoading, setIsLoading] = useState(false);
+  const [isProductsLoading, setIsProductsLoading] = useState(false);
   const [products, setProducts] = useState([]);
   const [loadingProductId, setLoadingProductId] = useState(null);
-  const [imageErrors, setImageErrors] = useState({});
   const [hasInitialized, setHasInitialized] = useState(false);
   const { addToCart } = useCart();
 
   const backendUrl = import.meta.env.VITE_BACKEND_URL;
-  const { token, isAuthLoading, isAuthenticated } = useAuth();
+  // Get both token and isLoading from useAuth hook
+  const { token, isLoading } = useAuth();
+
+  // Helper function to check if user is authenticated
+  const checkAuthentication = useCallback(() => {
+    // Simple token-based authentication check
+    const hasValidToken = !!(token && token.length > 0);
+    
+    console.log('🔍 Authentication check:', {
+      hasValidToken,
+      tokenLength: token?.length || 0
+    });
+    
+    return hasValidToken;
+  }, [token]);
+
+  // Debug: Log auth state changes
+  useEffect(() => {
+    console.log('🔍 Home - Auth state changed:', {
+      hasToken: !!token,
+      tokenLength: token?.length,
+      tokenPreview: token ? `${token.substring(0, 20)}...` : 'null',
+      isAuthenticatedFinal: checkAuthentication()
+    });
+  }, [token, checkAuthentication]);
+
+  // Use the custom wishlist hook
+  const { wishlist, wishlistLoading, toggleWishlist } = useWishlist(token);
+
+  // Debug: Log wishlist state changes
+  useEffect(() => {
+    console.log('🔍 Home - Wishlist state changed:', {
+      wishlistSize: wishlist.size,
+      wishlistItems: [...wishlist],
+      loadingItems: [...wishlistLoading]
+    });
+  }, [wishlist, wishlistLoading]);
 
   const fetchApprovedProducts = useCallback(async () => {
-    if (isAuthLoading) return;
+    if (isLoading) return;
 
     try {
-      setIsLoading(true);
+      setIsProductsLoading(true);
 
       const headers = {};
       if (token) headers.Authorization = `Bearer ${token}`;
+
+      console.log('🚀 Fetching products with headers:', headers);
 
       const response = await axios.get(
         `${backendUrl}/api/product/approved/product`,
@@ -56,19 +90,17 @@ const Home = ({ onSelectProduct }) => {
         toast.error("Failed to load products");
       }
     } finally {
-      setIsLoading(false);
+      setIsProductsLoading(false);
       setHasInitialized(true);
     }
-  }, [backendUrl, token, isAuthLoading, isAuthenticated]);
+  }, [backendUrl, token, isLoading]);
 
   useEffect(() => {
-    if (!isAuthLoading && backendUrl && (!hasInitialized || isAuthenticated)) {
+    if (backendUrl && !hasInitialized) {
       fetchApprovedProducts();
     }
   }, [
     fetchApprovedProducts,
-    isAuthLoading,
-    isAuthenticated,
     backendUrl,
     hasInitialized,
   ]);
@@ -78,23 +110,39 @@ const Home = ({ onSelectProduct }) => {
     fetchApprovedProducts();
   }, [fetchApprovedProducts]);
 
-  const handleImageError = (productId) => {
-    setImageErrors((prev) => ({ ...prev, [productId]: true }));
-  };
-
   const handleAddToCart = async (product) => {
     setLoadingProductId(product._id);
 
     try {
       const response = await addToCart(product._id);
-
-      toast.success(`${product.name} has been added to your cart`);
+      // Success toast is handled in ProductCard component
     } catch (error) {
       console.error("Error adding to cart:", error);
-      toast.error("Failed to add item to cart");
+      // Error toast is handled in ProductCard component
+      throw error; // Re-throw to let ProductCard handle it
     } finally {
       setLoadingProductId(null);
     }
+  };
+
+  // Enhanced wishlist handler with token-based authentication
+  const handleWishlistToggle = async (product) => {
+    const isUserAuthenticated = checkAuthentication();
+    
+    console.log('🔄 handleWishlistToggle called:', {
+      productName: product.name,
+      hasToken: !!token,
+      isUserAuthenticated
+    });
+
+    // Check if user has valid token
+    if (!isUserAuthenticated) {
+      console.log('❌ No valid token in handleWishlistToggle');
+      toast.error("Please log in to add items to your wishlist");
+      return;
+    }
+
+    await toggleWishlist(product);
   };
 
   const LoadingState = () => (
@@ -120,13 +168,13 @@ const Home = ({ onSelectProduct }) => {
         className="text-center max-w-md"
       >
         <h3 className="text-2xl font-bold text-gray-900 mb-3">
-          {isAuthLoading ? "Authenticating..." : "Loading Premium Saffron"}
+          Loading Premium Saffron
         </h3>
       </motion.div>
     </motion.div>
   );
 
-  if (isAuthLoading && !hasInitialized) {
+  if (isProductsLoading && !hasInitialized) {
     return (
       <div className="min-h-screen relative">
         <Toaster richColors closeButton />
@@ -138,6 +186,15 @@ const Home = ({ onSelectProduct }) => {
   return (
     <div className="min-h-screen relative">
       <Toaster richColors closeButton />
+
+      {/* Debug Info - Remove in production
+      {process.env.NODE_ENV === 'development' && (
+        <div className="fixed top-0 right-0 bg-black text-white p-2 text-xs z-50 max-w-xs">
+          <div>Token: {token ? '✅' : '❌'}</div>
+          <div>Auth: {checkAuthentication() ? '✅' : '❌'}</div>
+          <div>Wishlist: {wishlist.size} items</div>
+        </div>
+      )} */}
 
       {/* Hero Section */}
       <div className="relative pt-24 pb-16 px-4 overflow-hidden">
@@ -158,7 +215,7 @@ const Home = ({ onSelectProduct }) => {
 
       {/* Product Grid */}
       <div className="max-w-7xl mx-auto px-4 py-12">
-        {isLoading ? (
+        {isProductsLoading ? (
           <LoadingState />
         ) : products.length > 0 ? (
           <motion.div
@@ -168,109 +225,16 @@ const Home = ({ onSelectProduct }) => {
             transition={{ delay: 0.3 }}
           >
             {products.map((product) => (
-              <motion.div
+              <ProductCard
                 key={product._id}
-                onClick={() => onSelectProduct(product._id)}
-                className="group bg-white rounded-xl overflow-hidden shadow-sm hover:shadow-md transition-all border border-gray-200 cursor-pointer"
-                whileHover={{ y: -5 }}
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.3 }}
-              >
-                {/* Image Container */}
-                <div className="h-48 relative bg-gray-100 flex items-center justify-center">
-                  {product.images?.length > 0 && !imageErrors[product._id] ? (
-                    <img
-                      src={product.images[0]}
-                      alt={product.name}
-                      className="max-w-full max-h-full object-contain"
-                      onError={() => handleImageError(product._id)}
-                      loading="lazy"
-                    />
-                  ) : (
-                    <div className="absolute inset-0 flex items-center justify-center text-gray-300">
-                      <ImagePlus className="h-12 w-12" />
-                    </div>
-                  )}
-
-                  {/* Grade Badge */}
-                  {product.grade && (
-                    <div className="absolute top-3 right-3">
-                      <span
-                        className={`inline-flex items-center px-2.5 py-1 rounded-full text-xs font-bold ${
-                          product.grade === "premium"
-                            ? "bg-gradient-to-r from-amber-500 to-orange-500 text-white"
-                            : "bg-gray-100 text-gray-800"
-                        }`}
-                      >
-                        {product.grade === "premium" && "Premium"}
-                        {product.grade === "category1" && "Category I"}
-                        {product.grade === "category2" && "Category II"}
-                        {product.grade === "category3" && "Category III"}
-                        {product.grade === "bunch" && "Bunch"}
-                      </span>
-                    </div>
-                  )}
-                </div>
-
-                {/* Product Info */}
-                <div className="p-4">
-                  <div className="flex justify-between items-start mb-2">
-                    <h3 className="font-semibold text-gray-800 line-clamp-1">
-                      {product.name}
-                    </h3>
-                    {product.stock && (
-                      <span className="text-xs bg-gray-100 text-gray-600 px-2 py-1 rounded-full">
-                        {product.stock}g
-                      </span>
-                    )}
-                  </div>
-
-                  <div className="flex items-center justify-between mb-3">
-                    <span className="text-sm text-gray-500">
-                      {product.origin}
-                    </span>
-                    {product.rating && (
-                      <div className="flex items-center gap-1">
-                        <Star className="w-3 h-3 text-yellow-500 fill-current" />
-                        <span className="text-xs text-gray-600">
-                          {product.rating}
-                        </span>
-                      </div>
-                    )}
-                  </div>
-
-                  <div className="flex items-center justify-between">
-                    <div>
-                      <span className="text-lg font-bold text-[#ff6523]">
-                        ₹{parseFloat(product.price).toFixed(2)}
-                      </span>
-                      <span className="text-xs text-gray-500 ml-1">
-                        per gram
-                      </span>
-                    </div>
-                    <motion.button
-                      className="px-3 py-1.5 bg-gradient-to-r from-[#ff6523] to-[#e55a1d] text-white text-xs font-medium rounded-lg hover:shadow-md transition-all"
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        handleAddToCart(product);
-                      }}
-                      whileHover={{ scale: 1.05 }}
-                      whileTap={{ scale: 0.95 }}
-                      disabled={loadingProductId === product._id}
-                    >
-                      {loadingProductId === product._id ? (
-                        <div className="flex items-center gap-1">
-                          <Loader2 className="h-3 w-3 animate-spin" />
-                          <span>Adding...</span>
-                        </div>
-                      ) : (
-                        "Add to Cart"
-                      )}
-                    </motion.button>
-                  </div>
-                </div>
-              </motion.div>
+                product={product}
+                onSelectProduct={onSelectProduct}
+                onAddToCart={handleAddToCart}
+                onWishlistToggle={handleWishlistToggle}
+                wishlist={wishlist}
+                wishlistLoading={wishlistLoading}
+                loadingProductId={loadingProductId}
+              />
             ))}
           </motion.div>
         ) : (
@@ -280,7 +244,7 @@ const Home = ({ onSelectProduct }) => {
             animate={{ opacity: 1 }}
             transition={{ delay: 0.3 }}
           >
-            <div className="max-w-md mx-auto">
+           <div className="max-w-md mx-auto">
               <motion.div
                 className="w-16 h-16 bg-gradient-to-r from-[#ff6523] to-[#e55a1d] rounded-full flex items-center justify-center mx-auto mb-6"
                 animate={{ rotate: 360 }}
@@ -288,9 +252,11 @@ const Home = ({ onSelectProduct }) => {
               >
                 <Search className="w-8 h-8 text-white" />
               </motion.div>
+              
               <h3 className="text-xl font-bold text-gray-900 mb-4">
                 No products available
               </h3>
+
               <motion.button
                 onClick={retryFetch}
                 className="px-6 py-3 bg-gradient-to-r from-[#ff6523] to-[#e55a1d] text-white font-semibold rounded-lg hover:shadow-lg transition-all duration-300"
