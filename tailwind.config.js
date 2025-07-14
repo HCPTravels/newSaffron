@@ -11,6 +11,7 @@ module.exports = {
         fontWeight: {
             '620': '620',
           },
+          
       },
     },
     plugins: [],

@@ -8,7 +8,7 @@ const HeroSection = () => {
     <div className="relative">
       <BeeCanvas />
       {/* Changed to min-h-screen and removed fixed height */}
-      <section className="min-h-screen relative overflow-visible"> {/* Changed overflow to visible */}
+      <section className="md:min-h-screen h-[70vh] relative overflow-visible"> {/* Changed overflow to visible */}
         {/* Left decorative image - unchanged */}
         <img
           src={saffronHome}
@@ -29,10 +29,10 @@ const HeroSection = () => {
           </div>
 
           {/* Modern Mobile Hero Text */}
-          <div className="md:hidden absolute top-[5%] left-1/2 transform -translate-x-1/2 -translate-y-1/2 z-10 w-full px-6 text-center">
-            <div className="inline-block bg-white/10 backdrop-blur-md px-4 py-2 rounded-xl border border-white/20 shadow-sm">
+          <div className="md:hidden absolute top-[1%] left-1/2 transform -translate-x-1/2 -translate-y-1/2 z-10 w-full px-6 text-center">
+            {/* <div className="inline-block bg-white/10 backdrop-blur-md px-4 py-2 rounded-xl border border-white/20 shadow-sm">
               <p className="text-[11px] tracking-[0.25em] text-white/80 uppercase font-light">Pure Kashmiri Origin</p>
-            </div>
+            </div> */}
 
             <h2 className="mt-4 text-[28px] leading-tight font-bold text-[#ffc1a7] font-poppins tracking-tight drop-shadow-md">
               Nature’s Most Precious Spice
@@ -106,25 +106,41 @@ const HeroSection = () => {
         </div>
 
         {/* Bottom right description - unchanged */}
-        <div className="absolute mt-105 ml-50  xs:bottom-10 xs:right-10
-                        sm:bottom-15 sm:right-10 md:bottom-40 md:right-20
-                        text-black font-poppins text-left
-                        max-w-[120px] xs:max-w-[150px] sm:max-w-[180px] md:max-w-[200px] lg:max-w-[250px]
-                        leading-relaxed
-                        text-[12px] xs:text-[14px] sm:text-[16px] md:text-[18px] lg:text-[20px]
-                        z-10">
-          <div className="absolute top-30 right-20 w-32 h-32 bg-white/80 rounded-full blur-[80px]"></div>
-          <div className="text-right max-w-xs">
-            <div className="inline-block">
-              <p className="text-sm md:text-xl whitespace-nowrap font-light text-white/90 tracking-[0.2em] uppercase">Pure • Traceable</p>
-              <p className="text-xl md:text-2xl whitespace-nowrap font-medium text-[#ffc1a7] tracking-tight mt-1 md:mt-2 leading-none">Kashmiri Saffron</p>
-              <div className="mt-2 md:mt-3 h-[1px] w-full bg-gradient-to-l from-[#ffc1a7]/70 via-[#ffc1a7]/30 to-transparent"></div>
-              <div>
-                <img src={traceable} className='ml-10 hidden md:block md:ml-30 h-15 w-15 md:h-30 md:w-30 rotate-15' />
-              </div>
-            </div>
-          </div>
-        </div>
+        <div className="absolute 
+                bottom-30 right-10 xs:bottom-10 xs:right-10
+                sm:bottom-16 sm:right-10 md:bottom-35 md:right-20
+                text-black font-poppins text-left
+                max-w-[120px] xs:max-w-[150px] sm:max-w-[180px] md:max-w-[200px] lg:max-w-[250px]
+                leading-relaxed
+                text-xs xs:text-sm sm:text-base md:text-lg lg:text-xl
+                z-10">
+  
+  {/* Background blur effect */}
+  <div className="absolute -top-8 -right-8 w-32 h-32 bg-white/80 rounded-full blur-3xl"></div>
+  
+  <div className="text-right max-w-xs relative">
+  <div className="inline-block">
+    <div className="flex flex-col items-end">
+      <p className="text-lg md:text-xl font-light text-white/90 tracking-[0.1em] uppercase">
+        Pure • Traceable
+      </p>
+      <p className="text-xl md:text-2xl font-medium text-[#ffc1a7] tracking-tight leading-none">
+        Kashmiri Saffron
+      </p>
+    </div>
+    <div className="mt-2 md:mt-3 h-px w-full bg-gradient-to-l from-[#ffc1a7]/70 via-[#ffc1a7]/30 to-transparent"></div>
+    
+    {/* Image with proper responsive classes - hidden on mobile, shown on md and up */}
+    <div className="mt-1 md:mt-3 flex justify-end">
+      <img 
+        src={traceable} 
+        className="h-8 w-8 md:h-20 md:w-20 hidden md:block rotate-12" 
+        alt="Traceable"
+      />
+    </div>
+  </div>
+</div>
+</div>
       </section>
     </div>
   );

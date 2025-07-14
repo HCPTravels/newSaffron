@@ -4,7 +4,7 @@ const Contact = () => {
   const buttons = ['Whatsapp', 'Call Now', 'Email'];
   
   return (
-    <div className="flex justify-center items-center p-2 sm:p-4 min-h-screen sm:min-h-0">
+    <div className="flex justify-center items-center p-2 sm:p-4 mt-20 sm:min-h-0">
       <div className="w-full max-w-[95%] sm:max-w-[1100px] z-19 h-auto min-h-[320px] sm:min-h-[300px] md:h-[488px] flex justify-center items-center bg-white/100 transparent rounded-[15px] sm:rounded-[30px] md:rounded-[50px] flex-col space-y-4 sm:space-y-6 md:space-y-8 p-4 sm:p-6 md:p-10 backdrop-blur-md border border-white/30">
         <div className="text-center space-y-3 sm:space-y-4">
           <h2 className="text-lg sm:text-2xl md:text-3xl lg:text-[40px] font-bold leading-tight px-2 text-gray-800">
