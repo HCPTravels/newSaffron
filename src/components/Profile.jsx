@@ -26,7 +26,7 @@ import { useWishlist } from '../context/WishlistContext';
 
 const Profile = () => {
   const location = useLocation();
-  const {wishlist} = useWishlist()
+  const {wishlist, getWishlistCount} = useWishlist()
   const { cartItems, getTotalItems } = useCart();
   const navigate = useNavigate();
   const passedEmail = location.state?.email || "";
@@ -265,7 +265,7 @@ const Profile = () => {
             >
               <Heart className="h-6 w-6 transition-colors" />
               <span className="absolute -top-1 -right-1 text-white bg-[#ff6523] text-xs rounded-full h-5 w-5 flex items-center justify-center">
-              {wishlist?.length}
+              {getWishlistCount}
               </span>
             </button>
 
