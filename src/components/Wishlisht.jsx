@@ -14,13 +14,10 @@ const Wishlist = () => {
     wishlistSet,
     loadingSet,
     toggleWishlist,
+    isInWishlist, // ✅ Add this
   } = useWishlist();
 
   const [loadingProductId, setLoadingProductId] = useState(null);
-
-  // ✅ REMOVED: The problematic fetchWishlist() call
-  // The wishlist data is already managed by WishlistProvider
-  // and updates automatically when toggleWishlist is called
 
   const handleAddToCart = async (product) => {
     try {
@@ -33,7 +30,6 @@ const Wishlist = () => {
     }
   };
 
-  // ✅ Enhanced toggle with product details for instant updates
   const handleWishlistToggle = (product) => {
     toggleWishlist(product._id, {
       name: product.name,
@@ -42,7 +38,6 @@ const Wishlist = () => {
       images: product.images,
       description: product.description,
       category: product.category,
-      // Add any other product fields you need
     });
   };
 
@@ -58,7 +53,7 @@ const Wishlist = () => {
         </p>
         <button
           className="bg-primary-600 hover:bg-primary-700 text-white font-medium py-2 px-6 rounded-lg transition-colors"
-          onClick={() => window.location.href = "/products"} // or use your router navigation
+          onClick={() => window.location.href = "/products"}
         >
           Browse Products
         </button>
@@ -83,8 +78,9 @@ const Wishlist = () => {
             onSelectProduct={() => {}}
             onAddToCart={() => handleAddToCart(product)}
             onWishlistToggle={() => handleWishlistToggle(product)}
-            wishlist={wishlistSet}
-            wishlistLoading={loadingSet}
+            // ✅ FIXED: Use correct prop names that ProductCard expects
+            isInWishlist={isInWishlist(product._id)}
+            isWishlistLoading={loadingSet.has(product._id)}
             loadingProductId={loadingProductId}
           />
         ))}

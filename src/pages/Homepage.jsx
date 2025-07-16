@@ -8,8 +8,8 @@ import { toast, Toaster } from "sonner";
 import axios from "axios";
 import { useAuth } from "../context/AuthContext";
 import { useCart } from "../context/CartContext";
-import useWishlist from "../hooks/useWishlist";
-import ProductCard from "./ProductCard"; // Import the new ProductCard component
+import { useWishlist } from "../context/WishlistContext"; // ✅ Use context instead of hook
+import ProductCard from "./ProductCard";
 
 const Home = ({ onSelectProduct }) => {
   const [isProductsLoading, setIsProductsLoading] = useState(false);
@@ -21,6 +21,15 @@ const Home = ({ onSelectProduct }) => {
   const backendUrl = import.meta.env.VITE_BACKEND_URL;
   // Get both token and isLoading from useAuth hook
   const { token, isLoading } = useAuth();
+
+  // ✅ Use wishlist context instead of custom hook
+  const { 
+    wishlistSet, 
+    loadingSet, 
+    toggleWishlist, 
+    isInWishlist,
+    isLoading: wishlistIsLoading 
+  } = useWishlist();
 
   // Helper function to check if user is authenticated
   const checkAuthentication = useCallback(() => {
@@ -45,17 +54,14 @@ const Home = ({ onSelectProduct }) => {
     });
   }, [token, checkAuthentication]);
 
-  // Use the custom wishlist hook
-  const { wishlist, wishlistLoading, toggleWishlist } = useWishlist(token);
-
-  // Debug: Log wishlist state changes
+  // ✅ Updated debug log for wishlist context
   useEffect(() => {
     console.log('🔍 Home - Wishlist state changed:', {
-      wishlistSize: wishlist.size,
-      wishlistItems: [...wishlist],
-      loadingItems: [...wishlistLoading]
+      wishlistSize: wishlistSet.size,
+      wishlistItems: [...wishlistSet],
+      loadingItems: [...loadingSet]
     });
-  }, [wishlist, wishlistLoading]);
+  }, [wishlistSet, loadingSet]);
 
   const fetchApprovedProducts = useCallback(async () => {
     if (isLoading) return;
@@ -125,7 +131,7 @@ const Home = ({ onSelectProduct }) => {
     }
   };
 
-  // Enhanced wishlist handler with token-based authentication
+  // ✅ Updated wishlist handler to use context
   const handleWishlistToggle = async (product) => {
     const isUserAuthenticated = checkAuthentication();
     
@@ -142,7 +148,8 @@ const Home = ({ onSelectProduct }) => {
       return;
     }
 
-    await toggleWishlist(product);
+    // ✅ Use context method with product details
+    await toggleWishlist(product._id, product);
   };
 
   const LoadingState = () => (
@@ -187,12 +194,12 @@ const Home = ({ onSelectProduct }) => {
     <div className="min-h-screen relative">
       <Toaster richColors closeButton />
 
-      {/* Debug Info - Remove in production
+      {/* ✅ Updated debug info for context
       {process.env.NODE_ENV === 'development' && (
         <div className="fixed top-0 right-0 bg-black text-white p-2 text-xs z-50 max-w-xs">
           <div>Token: {token ? '✅' : '❌'}</div>
           <div>Auth: {checkAuthentication() ? '✅' : '❌'}</div>
-          <div>Wishlist: {wishlist.size} items</div>
+          <div>Wishlist: {wishlistSet.size} items</div>
         </div>
       )} */}
 
@@ -231,8 +238,9 @@ const Home = ({ onSelectProduct }) => {
                 onSelectProduct={onSelectProduct}
                 onAddToCart={handleAddToCart}
                 onWishlistToggle={handleWishlistToggle}
-                wishlist={wishlist}
-                wishlistLoading={wishlistLoading}
+                // ✅ Updated props for context
+                isInWishlist={isInWishlist(product._id)}
+                isWishlistLoading={loadingSet.has(product._id)}
                 loadingProductId={loadingProductId}
               />
             ))}

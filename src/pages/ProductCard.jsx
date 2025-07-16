@@ -13,8 +13,8 @@ const ProductCard = ({
   onSelectProduct,
   onAddToCart,
   onWishlistToggle,
-  wishlist = new Set(),
-  wishlistLoading = new Set(),
+  isInWishlist = false,          // ✅ Changed from wishlist Set
+  isWishlistLoading = false,     // ✅ Changed from wishlistLoading Set
   loadingProductId = null,
   className = "",
 }) => {
@@ -107,14 +107,14 @@ const ProductCard = ({
           onClick={handleWishlistToggle}
           whileHover={{ scale: 1.1 }}
           whileTap={{ scale: 0.9 }}
-          disabled={wishlistLoading.has(product._id)}
+          disabled={isWishlistLoading}  // ✅ Changed from wishlistLoading.has(product._id)
         >
-          {wishlistLoading.has(product._id) ? (
+          {isWishlistLoading ? (  // ✅ Changed from wishlistLoading.has(product._id)
             <Loader2 className="h-4 w-4 animate-spin text-gray-500" />
           ) : (
             <Heart
               className={`h-4 w-4 transition-colors duration-200 ${
-                wishlist.has(product._id)
+                isInWishlist  // ✅ Changed from wishlist.has(product._id)
                   ? "text-red-500 fill-current"
                   : "text-gray-500 hover:text-red-500"
               }`}
