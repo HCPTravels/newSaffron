@@ -29,6 +29,9 @@ import SaffronPackaging from "./components/SaffronPackaging";
 import SaffronComponent from "./components/SaffronLuxury";
 import SaffronQuality from "./components/SaffronComponent";
 import SellerProtectedRoute from "./components/SellerProtected";
+import Wishlist from "./components/Wishlisht";
+import { WishlistProvider } from './context/WishlistContext'; // ✅ named import
+
 
 function App() {
   const location = useLocation();
@@ -37,7 +40,7 @@ function App() {
     "/profile",
     "/adminpanel",
     "/sellerdashboard",
-    "/productlisting",
+    "/productlisting"
   ];
   const hideNavbar = hideNavbarRoutes.some((route) =>
     location.pathname.startsWith(route)
@@ -46,6 +49,7 @@ function App() {
   return (
     <AuthProvider>
       <CartProvider>
+        <WishlistProvider>
         {!hideNavbar && <Navbar />}
 
         <Routes>
@@ -128,6 +132,14 @@ function App() {
             }
           />
           <Route
+            path="/wishlist"
+            element={
+              <ProtectedRoute>
+                <Wishlist />
+              </ProtectedRoute>
+            }
+          />
+          <Route
             path="/account"
             element={
               <ProtectedRoute>
@@ -136,6 +148,8 @@ function App() {
             }
           />
         </Routes>
+        </WishlistProvider>
+
       </CartProvider>
     </AuthProvider>
   );

@@ -16,12 +16,17 @@ import HomePage from "../pages/Homepage";
 import Cart from "../pages/Cart";
 import Account from "./Account";
 import Categories from "../pages/Categories";
+import Wishlist from "./Wishlisht";
 import SaffronHome from "../assets/saffronHome.png";
 import ProductDetails from "./ProductDetails";
 import { useCart } from "../context/CartContext";
+import { useWishlist } from '../context/WishlistContext';
+
+
 
 const Profile = () => {
   const location = useLocation();
+  const {wishlist} = useWishlist()
   const { cartItems, getTotalItems } = useCart();
   const navigate = useNavigate();
   const passedEmail = location.state?.email || "";
@@ -48,6 +53,8 @@ const Profile = () => {
       navigate('/profile/categories', { replace: true });
     } else if (path === '/account') {
       navigate('/profile/account', { replace: true });
+    } else if (path === '/wishlist') {
+      navigate('/profile/wishlist', { replace: true });
     }
   }, [location.pathname, navigate]);
 
@@ -57,6 +64,7 @@ const Profile = () => {
     if (path.includes("/profile/cart")) return "Cart";
     if (path.includes("/profile/categories")) return "Browse";
     if (path.includes("/profile/account")) return "Profile";
+    if (path.includes("/profile/wishlist")) return "Wishlist";
     return "Home"; // Default to Home
   };
 
@@ -104,6 +112,7 @@ const Profile = () => {
   const mobileTabs = [
     { icon: Home, label: "Home", path: "/profile" },
     { icon: Grid, label: "Browse", path: "/profile/categories" },
+    { icon: Heart, label: "Wishlist", path: "/profile/wishlist" },
     { icon: ShoppingCart, label: "Cart", path: "/profile/cart" },
     { icon: User, label: "Profile", path: "/profile/account" },
   ];
@@ -166,6 +175,10 @@ const Profile = () => {
     navigate(tab.path);
     setActiveTab(tab.label);
   };
+
+  // Check if current route is cart or wishlist
+  const isCartRoute = location.pathname.includes("/profile/cart");
+  const isWishlistRoute = location.pathname.includes("/profile/wishlist");
 
   return (
     <>
@@ -248,11 +261,11 @@ const Profile = () => {
             {/* Wishlist */}
             <button
               className="p-2 text-black transition-colors relative group"
-              onClick={() => navigate("/wishlist")}
+              onClick={() => navigate("/profile/wishlist")}
             >
               <Heart className="h-6 w-6 transition-colors" />
               <span className="absolute -top-1 -right-1 text-white bg-[#ff6523] text-xs rounded-full h-5 w-5 flex items-center justify-center">
-                5
+              {wishlist?.length}
               </span>
             </button>
 
@@ -301,36 +314,42 @@ const Profile = () => {
         </div>
       </div>
 
-      {/* Decorative Images - Fixed Z-Index */}
-      <img
-        src={SaffronHome}
-        alt="Saffron Home"
-        className="absolute left-full fixed opacity-30
-                   w-[200px] h-[200px] xs:w-[250px] xs:h-[250px]
-                   sm:w-[300px] sm:h-[300px]
-                   md:w-[400px] md:h-[400px]
-                   lg:w-[500px] lg:h-[500px]
-                   xl:w-[550px] xl:h-[550px]
-                   2xl:w-[767px] 2xl:h-[767px]
-                   object-cover z-11 transition-transform duration-700 ease-out pointer-events-none"
-        style={{ transform: `translateX(-50%) translateY(${scrollY * 0.3}px)` }}
-      />
+      {/* Only show decorative images on non-cart and non-wishlist pages */}
+      {!isCartRoute && !isWishlistRoute && (
+        <>
+          <img
+            src={SaffronHome}
+            alt="Saffron Home"
+            className="absolute left-full fixed opacity-30
+                       w-[200px] h-[200px] xs:w-[250px] xs:h-[250px]
+                       sm:w-[300px] sm:h-[300px]
+                       md:w-[400px] md:h-[400px]
+                       lg:w-[500px] lg:h-[500px]
+                       xl:w-[550px] xl:h-[550px]
+                       2xl:w-[767px] 2xl:h-[767px]
+                       object-cover z-11 transition-transform duration-700 ease-out pointer-events-none"
+            style={{ transform: `translateX(-50%) translateY(${scrollY * 0.3}px)` }}
+          />
 
-      <img
-        src={SaffronHome}
-        alt="Decorative Saffron"
-        className="fixed bottom-[-75px] left-[-75px] w-[150px] h-[150px]
-               md:top-[586px] md:left-[-154px] md:w-[375px] md:h-[375px]
-               object-cover pointer-events-none opacity-30 z-11 transition-transform duration-700 ease-out"
-        style={{
-          transform: `translateY(${scrollY * -0.2}px) rotate(${
-            scrollY * 0.1
-          }deg)`,
-        }}
-      />
+          <img
+            src={SaffronHome}
+            alt="Decorative Saffron"
+            className="fixed bottom-[-75px] left-[-75px] w-[150px] h-[150px]
+                   md:top-[586px] md:left-[-154px] md:w-[375px] md:h-[375px]
+                   object-cover pointer-events-none opacity-30 z-11 transition-transform duration-700 ease-out"
+            style={{
+              transform: `translateY(${scrollY * -0.2}px) rotate(${
+                scrollY * 0.1
+              }deg)`,
+            }}
+          />
+        </>
+      )}
 
       {/* Main Page Content */}
-      <div className="min-h-screen bg-[#ff6523] pt-4 pb-24 px-4 relative z-10">
+      <div className={`min-h-screen pt-4 pb-24 px-4 relative z-10 ${
+        isCartRoute || isWishlistRoute ? "bg-white" : "bg-[#ff6523]"
+      }`}>
         <Routes location={location} key={location.pathname}>
           <Route
             path="/"
@@ -346,7 +365,16 @@ const Profile = () => {
             }
           />
           <Route path="/categories" element={<Categories />} />
-          <Route path="/cart" element={<Cart />} />
+          <Route path="/cart" element={
+            <div className="max-w-7xl mx-auto">
+              <Cart />
+            </div>
+          } />
+          <Route path="/wishlist" element={
+            <div className="max-w-7xl mx-auto">
+              <Wishlist />
+            </div>
+          } />
           <Route path="/account" element={<Account isVisible={true} />} />
         </Routes>
       </div>
@@ -358,9 +386,9 @@ const Profile = () => {
             className="absolute top-2 bottom-2 bg-gradient-to-r from-[#ff6523]/20 to-[#ff6523]/30 rounded-xl transition-all duration-500 ease-out"
             style={{
               left: `${
-                mobileTabs.findIndex((tab) => tab.label === activeTab) * 25 + 2
+                mobileTabs.findIndex((tab) => tab.label === activeTab) * 20 + 2
               }%`,
-              width: "21%",
+              width: "16%",
               transform: `translateY(${Math.sin(Date.now() * 0.001) * 1}px)`,
             }}
           />
@@ -404,6 +432,12 @@ const Profile = () => {
                 {tab.label === "Cart" && (
                   <span className="absolute -top-2 -right-2 text-white bg-gradient-to-r from-[#ff6523] to-[#ff8547] text-[10px] rounded-full h-4 w-4 flex items-center justify-center font-bold shadow-md animate-bounce">
                     {cartItems.length}
+                  </span>
+                )}
+
+                {tab.label === "Wishlist" && (
+                  <span className="absolute -top-2 -right-2 text-white bg-gradient-to-r from-[#ff6523] to-[#ff8547] text-[10px] rounded-full h-4 w-4 flex items-center justify-center font-bold shadow-md">
+                  {wishlist?.length}
                   </span>
                 )}
               </div>
