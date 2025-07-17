@@ -309,6 +309,24 @@ const LoginPage = () => {
                     ease: "easeOut"
                   }}
                 />
+                {/* Forgot Password Link */}
+                <motion.div 
+                  className="text-right mt-1"
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  transition={{ delay: 0.9, duration: 0.4 }}
+                >
+                  <a
+                    href="#forgot-password"
+                    className="text-xs font-medium text-[#fe6522] hover:text-[#e55a1d] transition-colors"
+                    onClick={(e) => {
+                      e.preventDefault();
+                      navigate('/forgot-password');
+                    }}
+                  >
+                    Forgot password?
+                  </a>
+                </motion.div>
               </motion.div>
 
               <motion.button
@@ -321,7 +339,7 @@ const LoginPage = () => {
                 transition={{
                   duration: 0.5,
                   ease: "easeOut",
-                  delay: 0.9
+                  delay: 1.0
                 }}
               >
                 {isLoading ? (
@@ -351,7 +369,7 @@ const LoginPage = () => {
                 className="relative py-2"
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
-                transition={{ delay: 1.0, duration: 0.4 }}
+                transition={{ delay: 1.1, duration: 0.4 }}
               >
                 <div className="absolute inset-0 flex items-center">
                   <div className="w-full border-t border-gray-300"></div>
@@ -371,7 +389,7 @@ const LoginPage = () => {
                 transition={{
                   duration: 0.5,
                   ease: "easeOut",
-                  delay: 1.1
+                  delay: 1.2
                 }}
               >
                 <FcGoogle className="h-5 w-5" />
@@ -386,14 +404,14 @@ const LoginPage = () => {
               transition={{
                 duration: 0.5,
                 ease: "easeOut",
-                delay: 1.2
+                delay: 1.3
               }}
             >
               <motion.p 
                 className="text-gray-600"
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
-                transition={{ delay: 1.3, duration: 0.4 }}
+                transition={{ delay: 1.4, duration: 0.4 }}
               >
                 Don't have an account?{' '}
                 <a
@@ -408,7 +426,7 @@ const LoginPage = () => {
                 className="text-gray-600"
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
-                transition={{ delay: 1.4, duration: 0.4 }}
+                transition={{ delay: 1.5, duration: 0.4 }}
               >
                 Are you a seller?{' '}
                 <a
