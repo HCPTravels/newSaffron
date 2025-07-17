@@ -1,4 +1,5 @@
 import { Routes, Route, useLocation } from "react-router-dom";
+import LoginSuccess from "./pages/LoginSuccess";
 import { AuthProvider } from "./context/AuthContext";
 import { CartProvider } from "./context/CartContext";
 import Navbar from "./components/Navbar";
@@ -29,6 +30,7 @@ import SaffronPackaging from "./components/SaffronPackaging";
 import SaffronComponent from "./components/SaffronLuxury";
 import SaffronQuality from "./components/SaffronComponent";
 import SellerProtectedRoute from "./components/SellerProtected";
+import Orders from "./pages/Orders";
 
 function App() {
   const location = useLocation();
@@ -61,8 +63,11 @@ function App() {
           />
           <Route path="/login" element={<LoginPage />} />
           <Route path="/signup" element={<Signup />} />
+
+          <Route path="/login-success" element={<LoginSuccess />} />
           {/* <Route path="/otpverify" element={<OtpVerificationPage />} /> */}
           <Route path="/signupform" element={<SignupForm />} />
+          <Route path="/orders" element={<Orders />} />
           <Route path="/blog" element={<Blog />} />
           <Route path="/about" element={<About />} />
           <Route path="/contact" element={<ContactUs />} />
