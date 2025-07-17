@@ -1,20 +1,28 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
-import { LogIn, CheckCircle } from "lucide-react";
+import { LogIn, CheckCircle, Eye, EyeOff } from "lucide-react";
 import { FcGoogle } from "react-icons/fc";
 import { toast, Toaster } from "sonner";
 import Saffron from "../assets/bowlSaffron.png";
 import SaffronIcon from "../assets/icons8-saffron-64 (1).png";
 import { useAuth } from '../context/AuthContext';
 import loaderimage from '../assets/loader1.png';
+import Modal from '../components/Modal';
 
 const LoginPage = () => {
-  const { logIn } = useAuth();
+  const { logIn, forgotSendOtp, verifyForgotOtp } = useAuth();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [isLoading, setIsLoading] = useState(false);
+  const [showForgotModal, setShowForgotModal] = useState(false);
+  const [forgotEmail, setForgotEmail] = useState("");
+  const [forgotLoading, setForgotLoading] = useState(false);
+  const [otpSent, setOtpSent] = useState(false);
+  const [otp, setOtp] = useState("");
+  const [verifying, setVerifying] = useState(false);
   const navigate = useNavigate();
+  const [showPassword, setShowPassword] = useState(false);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -293,22 +301,33 @@ const LoginPage = () => {
                 >
                   Password
                 </motion.label>
-                <motion.input
-                  type="password"
-                  id="password"
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  placeholder="Enter your password"
-                  className="w-full px-3 py-2 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-[#fe6522]/50 focus:border-transparent transition-all h-12"
-                  required
-                  initial={{ opacity: 0, y: 10 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{
-                    duration: 0.4,
-                    delay: 0.8,
-                    ease: "easeOut"
-                  }}
-                />
+                <div className="relative">
+                  <motion.input
+                    type={showPassword ? "text" : "password"}
+                    id="password"
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                    placeholder="Enter your password"
+                    className="w-full px-3 py-2 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-[#fe6522]/50 focus:border-transparent transition-all h-12 pr-12"
+                    required
+                    initial={{ opacity: 0, y: 10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{
+                      duration: 0.4,
+                      delay: 0.8,
+                      ease: "easeOut"
+                    }}
+                  />
+                  <button
+                    type="button"
+                    className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-[#fe6522] focus:outline-none"
+                    onClick={() => setShowPassword((prev) => !prev)}
+                    tabIndex={-1}
+                    aria-label={showPassword ? "Hide password" : "Show password"}
+                  >
+                    {showPassword ? <EyeOff className="h-5 w-5" /> : <Eye className="h-5 w-5" />}
+                  </button>
+                </div>
                 {/* Forgot Password Link */}
                 <motion.div 
                   className="text-right mt-1"
@@ -321,7 +340,7 @@ const LoginPage = () => {
                     className="text-xs font-medium text-[#fe6522] hover:text-[#e55a1d] transition-colors"
                     onClick={(e) => {
                       e.preventDefault();
-                      navigate('/forgot-password');
+                      setShowForgotModal(true);
                     }}
                   >
                     Forgot password?
@@ -441,6 +460,104 @@ const LoginPage = () => {
           </motion.div>
         </motion.div>
       </motion.div>
+
+      {/* Forgot Password Modal */}
+      <Modal
+        open={showForgotModal}
+        onClose={() => {
+          setShowForgotModal(false);
+          setForgotEmail("");
+          setOtpSent(false);
+          setOtp("");
+          setForgotLoading(false);
+          setVerifying(false);
+        }}
+        title="Reset your password"
+      >
+        <form
+          onSubmit={async (e) => {
+            e.preventDefault();
+            if (!otpSent) {
+              setForgotLoading(true);
+              try {
+                await forgotSendOtp(forgotEmail);
+                setOtpSent(true);
+                toast.success("OTP sent to your email.", {
+                  duration: 3500,
+                  position: "top-center",
+                });
+              } catch (error) {
+                toast.error("Failed to send OTP", {
+                  description: error.message || "Please try again later.",
+                  duration: 4000,
+                  position: "top-right",
+                });
+              } finally {
+                setForgotLoading(false);
+              }
+            } else {
+              setVerifying(true);
+              try {
+                await verifyForgotOtp({ email: forgotEmail, otp });
+                toast.success("OTP verified! You can now reset your password.", {
+                  duration: 3500,
+                  position: "top-center",
+                });
+                setShowForgotModal(false);
+                setForgotEmail("");
+                setOtpSent(false);
+                setOtp("");
+                navigate('/reset-password', { state: { email: forgotEmail } });
+              } catch (error) {
+                toast.error("Invalid OTP", {
+                  description: error.message || "Please try again.",
+                  duration: 4000,
+                  position: "top-right",
+                });
+              } finally {
+                setVerifying(false);
+              }
+            }
+          }}
+          className="space-y-4"
+        >
+          <label className="block text-sm font-medium text-gray-700">Email address</label>
+          <input
+            type="email"
+            className="w-full px-3 py-2 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-[#fe6522]/50 focus:border-transparent transition-all h-12"
+            placeholder="Enter your email"
+            value={forgotEmail}
+            onChange={e => setForgotEmail(e.target.value)}
+            required
+            disabled={otpSent}
+          />
+          {otpSent && (
+            <>
+              <label className="block text-sm font-medium text-gray-700">Enter OTP</label>
+              <input
+                type="text"
+                className="w-full px-3 py-2 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-[#fe6522]/50 focus:border-transparent transition-all h-12 tracking-widest text-center"
+                placeholder="Enter OTP"
+                value={otp}
+                onChange={e => setOtp(e.target.value)}
+                required
+                maxLength={6}
+              />
+            </>
+          )}
+          <button
+            type="submit"
+            className="w-full px-4 py-3 rounded-lg bg-gradient-to-r from-[#fe6522] to-[#e55a1d] text-white font-medium shadow-sm h-12 flex items-center justify-center gap-2"
+            disabled={forgotLoading || verifying}
+          >
+            {forgotLoading || verifying ? (
+              <span>{otpSent ? "Verifying..." : "Sending..."}</span>
+            ) : (
+              <span>{otpSent ? "Verify Otp" : "Send Otp"}</span>
+            )}
+          </button>
+        </form>
+      </Modal>
     </motion.div>
   );
 };

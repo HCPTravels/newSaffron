@@ -31,6 +31,7 @@ import SaffronQuality from "./components/SaffronComponent";
 import SellerProtectedRoute from "./components/SellerProtected";
 import Wishlist from "./components/Wishlisht";
 import { WishlistProvider } from './context/WishlistContext'; // ✅ named import
+import ResetPassword from "./pages/ResetPassword";
 
 
 function App() {
@@ -77,6 +78,7 @@ function App() {
           <Route path="/naturalsaffron" element={<SaffronQuality />} />
           <Route path="/aboutus" element={<About />} />
           <Route path="/ourpartners" element={<OurPartners />} />
+          <Route path="/reset-password" element={<ResetPassword />} />
           <Route
             path="/sellerdashboard"
             element={
