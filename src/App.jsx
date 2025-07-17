@@ -31,6 +31,9 @@ import SaffronPackaging from "./components/SaffronPackaging";
 import SaffronComponent from "./components/SaffronLuxury";
 import SaffronQuality from "./components/SaffronComponent";
 import SellerProtectedRoute from "./components/SellerProtected";
+import { ProductProvider } from "./context/ProductContext";
+import Wishlist from "./components/Wishlisht";
+import { WishlistProvider } from "./context/WishlistContext";
 
 function App() {
   const location = useLocation();

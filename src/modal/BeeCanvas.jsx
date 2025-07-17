@@ -267,7 +267,6 @@ export default function BeeCanvas() {
           fov: screenSize.isMobile ? 70 : screenSize.isTablet ? 60 : 45,
         }}
         onContextMenu={(e) => e.preventDefault()}
-        onSelectStart={(e) => e.preventDefault()}
         onDragStart={(e) => e.preventDefault()}
         onCreated={({ gl, scene }) => {
           gl.setClearColor(0x000000, 0);
