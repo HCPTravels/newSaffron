@@ -22,7 +22,12 @@ const Account = ({ isVisible, onClose, onMouseEnter, onMouseLeave }) => {
 
   const menuItems = useMemo(
     () => [
-      { icon: <ShoppingBag size={20} />, label: "Orders", count: 3 },
+      { icon: <ShoppingBag size={20} />, label: "Orders",
+      onClick: () => {
+        navigate("/profile/orders");
+        if (typeof onClose === "function") onClose();
+      },
+    },
       {
         icon: <Heart size={20} />,
         label: "Wishlist",

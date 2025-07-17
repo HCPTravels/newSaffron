@@ -9,6 +9,7 @@ import {
   Heart,
   ChevronDown,
   Globe,
+  Package,
 } from "lucide-react";
 import { useAuth } from "../context/AuthContext";
 import saffronLogo from "../assets/saffron logo.png";
@@ -21,7 +22,7 @@ import SaffronHome from "../assets/saffronHome.png";
 import ProductDetails from "./ProductDetails";
 import { useCart } from "../context/CartContext";
 import { useWishlist } from '../context/WishlistContext';
-
+import Order from "../pages/Order";
 
 
 const Profile = () => {
@@ -55,6 +56,8 @@ const Profile = () => {
       navigate('/profile/account', { replace: true });
     } else if (path === '/wishlist') {
       navigate('/profile/wishlist', { replace: true });
+    } else if (path === '/orders') {
+      navigate('/profile/orders', { replace: true });
     }
   }, [location.pathname, navigate]);
 
@@ -65,6 +68,7 @@ const Profile = () => {
     if (path.includes("/profile/categories")) return "Browse";
     if (path.includes("/profile/account")) return "Profile";
     if (path.includes("/profile/wishlist")) return "Wishlist";
+    if (path.includes("/profile/orders")) return "Orders";
     return "Home"; // Default to Home
   };
 
@@ -111,9 +115,10 @@ const Profile = () => {
 
   const mobileTabs = [
     { icon: Home, label: "Home", path: "/profile" },
-    { icon: Grid, label: "Browse", path: "/profile/categories" },
+    // { icon: Grid, label: "Browse", path: "/profile/categories" }, // Browse tab commented out
     { icon: Heart, label: "Wishlist", path: "/profile/wishlist" },
     { icon: ShoppingCart, label: "Cart", path: "/profile/cart" },
+    { icon: Package, label: "Orders", path: "/profile/orders" },
     { icon: User, label: "Profile", path: "/profile/account" },
   ];
 
@@ -179,6 +184,7 @@ const Profile = () => {
   // Check if current route is cart or wishlist
   const isCartRoute = location.pathname.includes("/profile/cart");
   const isWishlistRoute = location.pathname.includes("/profile/wishlist");
+  const isOrdersRoute = location.pathname.includes("/profile/orders");
 
   return (
     <>
@@ -315,7 +321,7 @@ const Profile = () => {
       </div>
 
       {/* Only show decorative images on non-cart and non-wishlist pages */}
-      {!isCartRoute && !isWishlistRoute && (
+      {!isCartRoute && !isWishlistRoute && !isOrdersRoute && (
         <>
           <img
             src={SaffronHome}
@@ -348,7 +354,7 @@ const Profile = () => {
 
       {/* Main Page Content */}
       <div className={`min-h-screen pt-4 pb-24 px-4 relative z-10 ${
-        isCartRoute || isWishlistRoute ? "bg-white" : "bg-[#ff6523]"
+        isCartRoute || isWishlistRoute || isOrdersRoute ? "bg-white" : "bg-[#ff6523]"
       }`}>
         <Routes location={location} key={location.pathname}>
           <Route
@@ -375,6 +381,7 @@ const Profile = () => {
               <Wishlist />
             </div>
           } />
+          <Route path="/orders" element={<Order />} />
           <Route path="/account" element={<Account isVisible={true} />} />
         </Routes>
       </div>

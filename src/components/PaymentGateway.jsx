@@ -1,152 +1,174 @@
-import { useEffect } from "react";
+import { useEffect, useRef } from "react";
 import axios from "axios";
 import { useAuth } from "../context/AuthContext";
+import { useCart } from "../context/CartContext";
 
 const PaymentGateway = ({ totalPrice, onClose }) => {
   const backendUrl = import.meta.env.VITE_BACKEND_URL;
   const { token, user } = useAuth();
+  const { cartItems } = useCart();
+  
+  // Use ref to prevent multiple executions
+  const hasInitialized = useRef(false);
+  const isProcessing = useRef(false);
 
   useEffect(() => {
+    // Prevent multiple executions
+    if (hasInitialized.current || isProcessing.current) return;
+    
     console.log("totalPrice in PaymentGateway:", totalPrice);
     console.log("userData in PaymentGateway:", user);
 
+    // Validate required data
+    if (!totalPrice || !user || !token) {
+      console.error("Missing required data for payment");
+      return;
+    }
+
+    hasInitialized.current = true;
+    isProcessing.current = true;
+
     const loadScript = (src) => {
       return new Promise((resolve) => {
+        // Check if script already exists
+        if (document.querySelector(`script[src="${src}"]`)) {
+          resolve(true);
+          return;
+        }
+
         const script = document.createElement("script");
         script.src = src;
-        script.onload = () => {
-          resolve(true);
-        };
-        script.onerror = () => {
-          resolve(false);
-        };
+        script.onload = () => resolve(true);
+        script.onerror = () => resolve(false);
         document.body.appendChild(script);
       });
     };
 
     const loadRazorpay = async () => {
-      const res = await loadScript(
-        "https://checkout.razorpay.com/v1/checkout.js"
-      );
-      if (!res) {
-        toast.error(
-          "⚠️ Razorpay failed to load. Please check your internet connection.",
+      try {
+        const res = await loadScript("https://checkout.razorpay.com/v1/checkout.js");
+        
+        if (!res) {
+          console.error("Razorpay failed to load");
+          isProcessing.current = false;
+          return;
+        }
+
+        const createOrderBody = {
+          amount: Number(totalPrice).toFixed(2),
+          currency: "INR",
+        };
+
+        console.log("Creating order with:", createOrderBody);
+
+        const orderResponse = await axios.post(
+          `${backendUrl}/api/payment/create-order`,
+          createOrderBody,
           {
-            position: "top-center",
-            autoClose: 3000,
-            style: {
-              background: "linear-gradient(to right, #fff3cd, #ffeeba)",
-              color: "#856404",
-              fontWeight: "bold",
-              borderRadius: "10px",
-              boxShadow: "0 4px 12px rgba(0,0,0,0.1)",
+            headers: {
+              "Content-Type": "application/json",
+              Authorization: `Bearer ${token}`,
             },
-            icon: "🛑",
+            timeout: 10000,
           }
         );
-        return;
-      }
 
-      const createOrderBody = {
-        amount: totalPrice.toFixed(2),
-        currency: "INR",
-      };
+        console.log("Order created:", orderResponse.data);
 
-      const orderResponse = await axios.post(
-        `${backendUrl}/api/payment/create-order`,
-        createOrderBody,
-        {
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${token}`,
-          },
-          timeout: 10000,
-        }
-      );
+        const options = {
+          key: "rzp_test_NGI3AugaqSO59N",
+          amount: orderResponse.data.amount,
+          currency: orderResponse.data.currency,
+          order_id: orderResponse.data.id,
+          name: "Kisan Saffron",
+          description: "Payment for your order",
+          handler: async function (response) {
+            try {
+              const verifyPaymentBody = {
+                razorpay_payment_id: response.razorpay_payment_id,
+                razorpay_order_id: response.razorpay_order_id,
+                razorpay_signature: response.razorpay_signature,
+                items: cartItems, // <-- send cart items to backend
+              };
 
-      const options = {
-        key: "rzp_test_NGI3AugaqSO59N", // from Razorpay dashboard
-        amount: orderResponse.data.amount, // Amount in paise
-        currency: orderResponse.data.currency,
-        order_id: orderResponse.data.id, // Use the order ID from the response
-        name: "Kisan Saffron",
-        description: "Payment for your order",
-        handler: async function (response) {
-          try {
-            const verifyPaymentBody = {
-              razorpay_payment_id: response.razorpay_payment_id,
-              razorpay_order_id: response.razorpay_order_id,
-              razorpay_signature: response.razorpay_signature,
-            };
+              console.log("🧾 Sending for verification...", verifyPaymentBody);
 
-            console.log("🧾 Sending for verification...", verifyPaymentBody);
+              const verifyResponse = await axios.post(
+                `${backendUrl}/api/payment/verify-payment`,
+                verifyPaymentBody,
+                {
+                  headers: {
+                    "Content-Type": "application/json",
+                    Authorization: `Bearer ${token}`,
+                  },
+                  timeout: 10000,
+                }
+              );
 
-            const verifyResponse = await axios.post(
-              `${backendUrl}/api/payment/verify-payment`,
-              verifyPaymentBody,
-              {
-                headers: {
-                  "Content-Type": "application/json",
-                  Authorization: `Bearer ${token}`,
-                },
-                timeout: 10000,
+              console.log("🎯 verifyResponse.data:", verifyResponse.data);
+
+              if (verifyResponse.data.success) {
+                alert("✅ Payment verified successfully!");
+
+                console.log("Clearing cart now...");
+
+                await axios.delete(`${backendUrl}/api/cart/clear`, {
+                  headers: {
+                    Authorization: `Bearer ${token}`,
+                  },
+                });
+
+                console.log("🧹 Cart clear request sent");
+                window.location.href = "/profile/cart";
+              } else {
+                alert("❌ Payment verification failed. Please try again.");
               }
-            );
-
-            console.log("🎯 verifyResponse.data:", verifyResponse.data);
-
-            if (verifyResponse.data.success) {
-              alert("✅ Payment verified successfully!");
-
-              console.log("Clearing cart now...");
-
-              await axios.delete(`${backendUrl}/api/cart/clear`, {
-                headers: {
-                  Authorization: `Bearer ${token}`,
-                },
-              });
-
-              console.log("🧹 Cart clear request sent");
-
-              window.location.href = "/cart";
-            } else {
-              alert("❌ Payment verification failed. Please try again.");
+            } catch (error) {
+              console.error("❌ Error during payment verification or cart clear:", error);
+              alert("❌ Something went wrong. Try again later.");
             }
-          } catch (error) {
-            console.error(
-              "❌ Error during payment verification or cart clear:",
-              error
-            );
-            alert("❌ Something went wrong. Try again later.");
-          }
 
-          if (onClose) onClose();
-        },
-        prefill: {
-          name: user ? user.firstName + " " + user.lastName : "Guest User",
-          email: user ? user.email : "demo@email.com",
-          contact: user ? user.contactNumber : "9999999999",
-        },
-        theme: {
-          color: "#FF6523",
-        },
-        notes: {
-          address: "Razorpay Corporate Office",
-        },
-        modal: {
-          ondismiss: function () {
             if (onClose) onClose();
           },
-        },
-      };
-      const razorpay = new window.Razorpay(options);
-      razorpay.open();
+          prefill: {
+            name: user ? `${user.firstName} ${user.lastName}` : "Guest User",
+            email: user ? user.email : "demo@email.com",
+            contact: user ? user.contactNumber : "9999999999",
+          },
+          theme: {
+            color: "#FF6523",
+          },
+          notes: {
+            address: "Razorpay Corporate Office",
+          },
+          modal: {
+            ondismiss: function () {
+              isProcessing.current = false;
+              if (onClose) onClose();
+            },
+          },
+        };
+
+        const razorpay = new window.Razorpay(options);
+        razorpay.open();
+        
+        isProcessing.current = false;
+      } catch (error) {
+        console.error("Error in loadRazorpay:", error);
+        isProcessing.current = false;
+        if (onClose) onClose();
+      }
     };
 
     loadRazorpay();
-  }, [totalPrice, onClose]);
 
-  // Do not render anything
+    // Cleanup function
+    return () => {
+      hasInitialized.current = false;
+      isProcessing.current = false;
+    };
+  }, []); // Empty dependency array to run only once
+
   return null;
 };
 

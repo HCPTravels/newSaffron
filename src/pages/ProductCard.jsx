@@ -19,6 +19,7 @@ const ProductCard = ({
   className = "",
 }) => {
   const [imageError, setImageError] = useState(false);
+  const [wishlistActionLoading, setWishlistActionLoading] = useState(false);
 
   const handleImageError = () => {
     setImageError(true);
@@ -35,9 +36,22 @@ const ProductCard = ({
     }
   };
 
-  const handleWishlistToggle = (e) => {
+  const handleWishlistToggle = async (e) => {
     e.stopPropagation();
-    onWishlistToggle(product);
+    if (isWishlistLoading) return;
+    setWishlistActionLoading(true);
+    const wasInWishlist = isInWishlist;
+    await onWishlistToggle(product);
+    setWishlistActionLoading(false);
+    if (!wasInWishlist) {
+      toast.success(`${product.name} added to your wishlist`, {
+        position: 'top-right',
+      });
+    } else {
+      toast.success(`${product.name} removed from your wishlist`, {
+        position: 'top-right',
+      });
+    }
   };
 
   const getGradeLabel = (grade) => {
@@ -107,14 +121,14 @@ const ProductCard = ({
           onClick={handleWishlistToggle}
           whileHover={{ scale: 1.1 }}
           whileTap={{ scale: 0.9 }}
-          disabled={isWishlistLoading}  // ✅ Changed from wishlistLoading.has(product._id)
+          disabled={isWishlistLoading || wishlistActionLoading}
         >
-          {isWishlistLoading ? (  // ✅ Changed from wishlistLoading.has(product._id)
+          {isWishlistLoading || wishlistActionLoading ? (
             <Loader2 className="h-4 w-4 animate-spin text-gray-500" />
           ) : (
             <Heart
               className={`h-4 w-4 transition-colors duration-200 ${
-                isInWishlist  // ✅ Changed from wishlist.has(product._id)
+                isInWishlist
                   ? "text-red-500 fill-current"
                   : "text-gray-500 hover:text-red-500"
               }`}

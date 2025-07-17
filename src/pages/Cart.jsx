@@ -21,10 +21,16 @@ import { motion, AnimatePresence } from "framer-motion";
 import { Toaster } from "sonner";
 import { useCart } from "../context/CartContext";
 import { useAuth } from "../context/AuthContext";
-import { useLocation } from "react-router-dom";
+import { useLocation, Navigate } from "react-router-dom";
 import PaymentGateway from "../components/PaymentGateway";
 
 const Cart = () => {
+  const location = useLocation();
+  // Redirect if accessed directly via /cart
+  if (location.pathname === "/cart") {
+    return <Navigate to="/profile/cart" replace />;
+  }
+
   const {
     cartItems,
     isLoading,
@@ -45,8 +51,6 @@ const Cart = () => {
     getTotalPrice,
     getTotalItems,
   } = useCart();
-
-  const location = useLocation();
 
   useEffect(() => {
     fetchCartItems(); // Safe and idempotent, only triggers if needed
