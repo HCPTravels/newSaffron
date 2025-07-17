@@ -1,5 +1,6 @@
 import React from "react";
 import { Routes, Route, useLocation, Navigate } from "react-router-dom";
+import LoginSuccess from "./pages/LoginSuccess";
 import { AuthProvider } from "./context/AuthContext";
 import { CartProvider } from "./context/CartContext";
 import Navbar from "./components/Navbar";
@@ -30,11 +31,6 @@ import SaffronPackaging from "./components/SaffronPackaging";
 import SaffronComponent from "./components/SaffronLuxury";
 import SaffronQuality from "./components/SaffronComponent";
 import SellerProtectedRoute from "./components/SellerProtected";
-import Wishlist from "./components/Wishlisht";
-import { WishlistProvider } from './context/WishlistContext'; // ✅ named import
-import ResetPassword from "./pages/ResetPassword";
-import { ProductProvider } from "./context/ProductContext";
-
 
 function App() {
   const location = useLocation();
@@ -56,50 +52,49 @@ function App() {
           <WishlistProvider>
           {!hideNavbar && <Navbar />}
 
-          <Routes>
-            <Route
-              path="/"
-              element={
-                <>
-                  <HeroSection />
-                  <AllProducts />
-                  <Contact />
-                </>
-              }
-            />
-            <Route path="/login" element={<LoginPage />} />
-            <Route path="/signup" element={<Signup />} />
-            {/* <Route path="/otpverify" element={<OtpVerificationPage />} /> */}
-            <Route path="/signupform" element={<SignupForm />} />
-            <Route path="/blog" element={<Blog />} />
-            <Route path="/about" element={<About />} />
-            <Route path="/contact" element={<ContactUs />} />
-            <Route path="/partners" element={<OurPartners />} />
-            <Route path="/sellersignup" element={<SellerSignupPage />} />
-            <Route path="/saffronpackaging" element={<SaffronPackaging />} />
-            <Route path="/precioussaffron" element={<SaffronComponent />} />
-            <Route path="/naturalsaffron" element={<SaffronQuality />} />
-            <Route path="/aboutus" element={<About />} />
-            <Route path="/ourpartners" element={<OurPartners />} />
-            <Route path="/reset-password" element={<ResetPassword />} />
-            <Route
-              path="/sellerdashboard"
-              element={
-                <SellerProtectedRoute>
-                  <SellerDashboard />
-                </SellerProtectedRoute>
-              }
-            />
-            <Route path="/sellerlogin" element={<SellerLogin />} />
-            <Route path="/productlisting" element={<SaffronProductListing />} />
-            <Route
-              path="/adminpanel"
-              element={
-                <AdminRoute>
-                  <AdminProductPanel />
-                </AdminRoute>
-              }
-            />
+        <Routes>
+          <Route
+            path="/"
+            element={
+              <>
+                <HeroSection />
+                <AllProducts />
+                <Contact />
+              </>
+            }
+          />
+          <Route path="/login" element={<LoginPage />} />
+          <Route path="/signup" element={<Signup />} />
+          {/* <Route path="/otpverify" element={<OtpVerificationPage />} /> */}
+          <Route path="/signupform" element={<SignupForm />} />
+          <Route path="/blog" element={<Blog />} />
+          <Route path="/about" element={<About />} />
+          <Route path="/contact" element={<ContactUs />} />
+          <Route path="/partners" element={<OurPartners />} />
+          <Route path="/sellersignup" element={<SellerSignupPage />} />
+          <Route path="/saffronpackaging" element={<SaffronPackaging />} />
+          <Route path="/precioussaffron" element={<SaffronComponent />} />
+          <Route path="/naturalsaffron" element={<SaffronQuality />} />
+          <Route path="/aboutus" element={<About />} />
+          <Route path="/ourpartners" element={<OurPartners />} />
+          <Route
+            path="/sellerdashboard"
+            element={
+              <SellerProtectedRoute>
+                <SellerDashboard />
+              </SellerProtectedRoute>
+            }
+          />
+          <Route path="/sellerlogin" element={<SellerLogin />} />
+          <Route path="/productlisting" element={<SaffronProductListing />} />
+          <Route
+            path="/adminpanel"
+            element={
+              <AdminRoute>
+                <AdminProductPanel />
+              </AdminRoute>
+            }
+          />
 
             {/* Profile routes with nested structure */}
             <Route

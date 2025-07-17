@@ -163,7 +163,7 @@ export const AuthProvider = ({ children }) => {
         setToken(token);
         localStorage.setItem("token", token);
         localStorage.setItem("user", JSON.stringify(user));
-        console.log(token)
+        console.log(token);
         console.log("User set in context:", user);
 
         // ✅ Navigate immediately with replace to remove login from history
@@ -202,27 +202,39 @@ export const AuthProvider = ({ children }) => {
     console.log("User/seller logged out successfully");
   };
 
-  const loginWithGoogle = async (googleToken) => {
-    try {
-      const res = await axios.post(`${backendUrl}/api/users/google-login`, {
-        token: googleToken,
-      });
-      if (res.data.success) {
-        const { user, token } = res.data;
-        setUser(user);
-        setToken(token);
-        localStorage.setItem("token", token);
-        localStorage.setItem("user", JSON.stringify(user));
+  // const loginWithGoogle = async (token) => {
+  //   try {
+  //     const res = await axios.post(`${backendUrl}/auth/google`, {
+  //       token,
+  //     });
+  //     if (res.data.success) {
+  //       const { user, token: newToken } = res.data;
+  //       setUser(user);
+  //       setToken(newToken);
+  //       localStorage.setItem("token", newToken);
+  //       localStorage.setItem("user", JSON.stringify(user));
+  //       return true;
+  //     }
+  //     throw new Error(res.data.message || "Google login failed");
+  //   } catch (error) {
+  //     console.error("Google login failed:", error);
+  //     throw error;
+  //   }
+  // };
+  // AuthContext.jsx
+  const loginWithGoogle = (jwt) => {
+    localStorage.setItem("token", jwt);
+    axios.defaults.headers.common["Authorization"] = `Bearer ${jwt}`;
+    setToken(jwt);
 
-        // ✅ Navigate with replace
-        navigate("/profile", { replace: true });
-      }
-      return res.data;
-    } catch (error) {
-      console.error("Google login failed:", error);
-      alert("Google login failed.");
-      throw error;
-    }
+    const payload = JSON.parse(atob(jwt.split(".")[1]));
+    setUser({
+      id: payload.id,
+      email: payload.email,
+      username: payload.username,
+    });
+
+    return Promise.resolve(true);
   };
 
   const sellerSignUp = async (formData) => {
