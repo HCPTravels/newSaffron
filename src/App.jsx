@@ -34,6 +34,7 @@ import SellerProtectedRoute from "./components/SellerProtected";
 import { ProductProvider } from "./context/ProductContext";
 import Wishlist from "./components/Wishlisht";
 import { WishlistProvider } from "./context/WishlistContext";
+import ResetPassword from "./pages/ResetPassword";
 
 function App() {
   const location = useLocation();
@@ -146,6 +147,7 @@ function App() {
                 </ProtectedRoute>
               }
             />
+          <Route path="/reset-password" element={<ResetPassword />} />
           </Routes>
           </WishlistProvider>
         </ProductProvider>
