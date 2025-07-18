@@ -234,13 +234,19 @@ const LoginPage = () => {
                     className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-[#fe6522] focus:outline-none"
                     onClick={() => setShowPassword((prev) => !prev)}
                     tabIndex={-1}
-                    aria-label={showPassword ? "Hide password" : "Show password"}
+                    aria-label={
+                      showPassword ? "Hide password" : "Show password"
+                    }
                   >
-                    {showPassword ? <EyeOff className="h-5 w-5" /> : <Eye className="h-5 w-5" />}
+                    {showPassword ? (
+                      <EyeOff className="h-5 w-5" />
+                    ) : (
+                      <Eye className="h-5 w-5" />
+                    )}
                   </button>
                 </div>
                 {/* Forgot Password Link */}
-                <motion.div 
+                <motion.div
                   className="text-right mt-1"
                   initial={{ opacity: 0 }}
                   animate={{ opacity: 1 }}
@@ -419,15 +425,18 @@ const LoginPage = () => {
               setVerifying(true);
               try {
                 await verifyForgotOtp({ email: forgotEmail, otp });
-                toast.success("OTP verified! You can now reset your password.", {
-                  duration: 3500,
-                  position: "top-center",
-                });
+                toast.success(
+                  "OTP verified! You can now reset your password.",
+                  {
+                    duration: 3500,
+                    position: "top-center",
+                  }
+                );
                 setShowForgotModal(false);
                 setForgotEmail("");
                 setOtpSent(false);
                 setOtp("");
-                navigate('/reset-password', { state: { email: forgotEmail } });
+                navigate("/reset-password", { state: { email: forgotEmail } });
               } catch (error) {
                 toast.error("Invalid OTP", {
                   description: error.message || "Please try again.",
@@ -441,25 +450,29 @@ const LoginPage = () => {
           }}
           className="space-y-4"
         >
-          <label className="block text-sm font-medium text-gray-700">Email address</label>
+          <label className="block text-sm font-medium text-gray-700">
+            Email address
+          </label>
           <input
             type="email"
             className="w-full px-3 py-2 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-[#fe6522]/50 focus:border-transparent transition-all h-12"
             placeholder="Enter your email"
             value={forgotEmail}
-            onChange={e => setForgotEmail(e.target.value)}
+            onChange={(e) => setForgotEmail(e.target.value)}
             required
             disabled={otpSent}
           />
           {otpSent && (
             <>
-              <label className="block text-sm font-medium text-gray-700">Enter OTP</label>
+              <label className="block text-sm font-medium text-gray-700">
+                Enter OTP
+              </label>
               <input
                 type="text"
                 className="w-full px-3 py-2 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-[#fe6522]/50 focus:border-transparent transition-all h-12 tracking-widest text-center"
                 placeholder="Enter OTP"
                 value={otp}
-                onChange={e => setOtp(e.target.value)}
+                onChange={(e) => setOtp(e.target.value)}
                 required
                 maxLength={6}
               />

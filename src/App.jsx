@@ -43,7 +43,7 @@ function App() {
     "/profile",
     "/adminpanel",
     "/sellerdashboard",
-    "/productlisting"
+    "/productlisting",
   ];
   const hideNavbar = hideNavbarRoutes.some((route) =>
     location.pathname.startsWith(route)
@@ -54,101 +54,105 @@ function App() {
       <CartProvider>
         <ProductProvider>
           <WishlistProvider>
-          {!hideNavbar && <Navbar />}
+            {!hideNavbar && <Navbar />}
 
-        <Routes>
-          <Route
-            path="/"
-            element={
-              <>
-                <HeroSection />
-                <AllProducts />
-                <Contact />
-              </>
-            }
-          />
-          <Route path="/login" element={<LoginPage />} />
-          <Route path="/signup" element={<Signup />} />
-          {/* <Route path="/otpverify" element={<OtpVerificationPage />} /> */}
-          <Route path="/signupform" element={<SignupForm />} />
-          <Route path="/blog" element={<Blog />} />
-          <Route path="/about" element={<About />} />
-          <Route path="/contact" element={<ContactUs />} />
-          <Route path="/partners" element={<OurPartners />} />
-          <Route path="/sellersignup" element={<SellerSignupPage />} />
-          <Route path="/saffronpackaging" element={<SaffronPackaging />} />
-          <Route path="/precioussaffron" element={<SaffronComponent />} />
-          <Route path="/naturalsaffron" element={<SaffronQuality />} />
-          <Route path="/aboutus" element={<About />} />
-          <Route path="/ourpartners" element={<OurPartners />} />
-          <Route
-            path="/sellerdashboard"
-            element={
-              <SellerProtectedRoute>
-                <SellerDashboard />
-              </SellerProtectedRoute>
-            }
-          />
-          <Route path="/sellerlogin" element={<SellerLogin />} />
-          <Route path="/productlisting" element={<SaffronProductListing />} />
-          <Route
-            path="/adminpanel"
-            element={
-              <AdminRoute>
-                <AdminProductPanel />
-              </AdminRoute>
-            }
-          />
+            <Routes>
+              <Route
+                path="/"
+                element={
+                  <>
+                    <HeroSection />
+                    <AllProducts />
+                    <Contact />
+                  </>
+                }
+              />
+              <Route path="/login" element={<LoginPage />} />
+              <Route path="/signup" element={<Signup />} />
+              <Route path="/login-success" element={<LoginSuccess />} />
+              {/* <Route path="/otpverify" element={<OtpVerificationPage />} /> */}
+              <Route path="/signupform" element={<SignupForm />} />
+              <Route path="/blog" element={<Blog />} />
+              <Route path="/about" element={<About />} />
+              <Route path="/contact" element={<ContactUs />} />
+              <Route path="/partners" element={<OurPartners />} />
+              <Route path="/sellersignup" element={<SellerSignupPage />} />
+              <Route path="/saffronpackaging" element={<SaffronPackaging />} />
+              <Route path="/precioussaffron" element={<SaffronComponent />} />
+              <Route path="/naturalsaffron" element={<SaffronQuality />} />
+              <Route path="/aboutus" element={<About />} />
+              <Route path="/ourpartners" element={<OurPartners />} />
+              <Route
+                path="/sellerdashboard"
+                element={
+                  <SellerProtectedRoute>
+                    <SellerDashboard />
+                  </SellerProtectedRoute>
+                }
+              />
+              <Route path="/sellerlogin" element={<SellerLogin />} />
+              <Route
+                path="/productlisting"
+                element={<SaffronProductListing />}
+              />
+              <Route
+                path="/adminpanel"
+                element={
+                  <AdminRoute>
+                    <AdminProductPanel />
+                  </AdminRoute>
+                }
+              />
 
-            {/* Profile routes with nested structure */}
-            <Route
-              path="/profile/*"
-              element={
-                <ProtectedRoute>
-                  <Profile />
-                </ProtectedRoute>
-              }
-            />
+              {/* Profile routes with nested structure */}
+              <Route
+                path="/profile/*"
+                element={
+                  <ProtectedRoute>
+                    <Profile />
+                  </ProtectedRoute>
+                }
+              />
 
-            {/* Standalone routes (these will show main navbar) */}
-            <Route
-              path="/homepage"
-              element={
-                <ProtectedRoute>
-                  <Home />
-                </ProtectedRoute>
-              }
-            />
-            <Route
-              path="/categories"
-              element={
-                <ProtectedRoute>
-                  <Categories />
-                </ProtectedRoute>
-              }
-            />
-            <Route
-              path="/cart"
-              element={<Navigate to="/profile/cart" replace />}
-            />
-            <Route
-              path="/wishlist"
-              element={
-                <ProtectedRoute>
-                  <Wishlist />
-                </ProtectedRoute>
-              }
-            />
-            <Route
-              path="/account"
-              element={
-                <ProtectedRoute>
-                  <Account />
-                </ProtectedRoute>
-              }
-            />
-          <Route path="/reset-password" element={<ResetPassword />} />
-          </Routes>
+              {/* Standalone routes (these will show main navbar) */}
+              <Route
+                path="/homepage"
+                element={
+                  <ProtectedRoute>
+                    <Home />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/categories"
+                element={
+                  <ProtectedRoute>
+                    <Categories />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/cart"
+                element={<Navigate to="/profile/cart" replace />}
+              />
+              <Route
+                path="/wishlist"
+                element={
+                  <ProtectedRoute>
+                    <Wishlist />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/account"
+                element={
+                  <ProtectedRoute>
+                    <Account />
+                  </ProtectedRoute>
+                }
+              />
+              <Route path="/reset-password" element={<ResetPassword />} />
+            </Routes>
           </WishlistProvider>
         </ProductProvider>
       </CartProvider>
