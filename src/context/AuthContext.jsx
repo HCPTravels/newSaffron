@@ -331,6 +331,27 @@ export const AuthProvider = ({ children }) => {
     }
   };
 
+  const forgotSendOtp = async (email) => {
+    try {
+      const res = await axios.post(`${backendUrl}/api/forget/send-forget-otp`, { email });
+      return res.data;
+    } catch (error) {
+      console.error("Forgot password failed:", error);
+      throw error;
+    }
+  };
+
+  const verifyForgotOtp = async ({ email, otp }) => {
+
+    try {
+      const res = await axios.post(`${backendUrl}/api/forget/verify-forget-otp`, { email, otp });
+      return res.data;
+    } catch (error) {
+      console.error("Forgot password failed:", error);
+      throw error;
+    }
+  };
+
   return (
     <AuthContext.Provider
       value={{
@@ -350,6 +371,8 @@ export const AuthProvider = ({ children }) => {
         sellerLogin,
         email,
         setEmail,
+        forgotSendOtp,
+        verifyForgotOtp
       }}
     >
       {children}

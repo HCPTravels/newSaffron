@@ -1,64 +1,69 @@
-import React from "react";
+import React, { useMemo } from "react";
 import { AnimatePresence, motion } from "framer-motion";
-import { 
-  ShoppingBag, 
-  Heart, 
-  Tag, 
-  HelpCircle, 
-  MapPin, 
-  Star, 
+import {
+  ShoppingBag,
+  Heart,
+  Tag,
+  HelpCircle,
+  MapPin,
+  Star,
   Settings,
   LogOut,
   ChevronRight,
-  User
 } from "lucide-react";
 import { useAuth } from "../context/AuthContext";
 import { useNavigate } from "react-router-dom";
+import { useWishlist } from "../context/WishlistContext";
 
 const Account = ({ isVisible, onClose, onMouseEnter, onMouseLeave }) => {
+  const { wishlist } = useWishlist();
   const navigate = useNavigate();
   const { user, logout, email } = useAuth();
-  
-  const menuItems = [
-    { icon: <ShoppingBag size={20} />, label: "Orders", count: 3 },
-    { icon: <Heart size={20} />, label: "Wishlist", count: 12 },
-    { icon: <Tag size={20} />, label: "Coupons" },
-    { icon: <HelpCircle size={20} />, label: "Help Center" },
-    { icon: <MapPin size={20} />, label: "Addresses" },
-    { icon: <Star size={20} />, label: "Reviews" },
-    { icon: <Settings size={20} />, label: "Settings" }
-  ];
 
-  const handleItemClick = (label) => {
+  const menuItems = useMemo(
+    () => [
+      { icon: <ShoppingBag size={20} />, label: "Orders",
+      onClick: () => {
+        navigate("/profile/orders");
+        if (typeof onClose === "function") onClose();
+      },
+    },
+      {
+        icon: <Heart size={20} />,
+        label: "Wishlist",
+        count: wishlist?.length ?? "0",
+        onClick: () => {
+          navigate("/profile/wishlist");
+          if (typeof onClose === "function") onClose();
+        },
+      },
+      { icon: <Tag size={20} />, label: "Coupons" },
+      { icon: <HelpCircle size={20} />, label: "Help Center" },
+      { icon: <MapPin size={20} />, label: "Addresses" },
+      { icon: <Star size={20} />, label: "Reviews" },
+      { icon: <Settings size={20} />, label: "Settings" },
+    ],
+    [wishlist, navigate, onClose]
+  );
+
+  const handleItemClick = (label, customOnClick) => {
     console.log(`Clicked: ${label}`);
-    if (window.innerWidth < 768) {
-      onClose();
-    }
+    if (typeof customOnClick === "function") customOnClick();
+    else if (window.innerWidth < 768 && typeof onClose === "function") onClose();
   };
 
   const logoutHandler = async (e) => {
     e.stopPropagation();
     e.preventDefault();
-  
-    console.log("Logout button clicked in desktop mode");
-  
     try {
       await logout();
-      localStorage.removeItem("email"); // 🧹 clear email if not done in context
+      localStorage.removeItem("email");
       navigate("/", { replace: true });
-      console.log("User logged out from desktop");
-  
-      if (onClose) {
-        onClose();
-      }
+      if (typeof onClose === "function") onClose();
     } catch (error) {
       console.error("Logout failed:", error);
     }
   };
-
-  // Add debug logging to see what values we have
-  console.log("Account component - email:", email);
-  console.log("Account component - user:", user);
 
   return (
     <AnimatePresence>
@@ -74,7 +79,7 @@ const Account = ({ isVisible, onClose, onMouseEnter, onMouseLeave }) => {
             onClick={onClose}
           />
 
-          {/* Account dropdown */}
+          {/* Dropdown */}
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
@@ -85,31 +90,29 @@ const Account = ({ isVisible, onClose, onMouseEnter, onMouseLeave }) => {
                        mx-4 md:mx-0 mb-6 md:mb-0 md:w-80 bg-white rounded-2xl 
                        shadow-xl md:shadow-2xl overflow-hidden border-0 md:border border-gray-200
                        z-50 md:z-[60] flex flex-col"
-            // Pass through mouse events for desktop hover functionality
             onMouseEnter={onMouseEnter}
             onMouseLeave={onMouseLeave}
-            // Prevent mouse leave from bubbling up when interacting with content
             onMouseDown={(e) => e.stopPropagation()}
             onMouseUp={(e) => e.stopPropagation()}
           >
-            {/* Header with user info - Fixed height */}
+            {/* Header */}
             <div className="p-5 md:p-6 bg-gradient-to-r from-[#ff6523] to-[#ff8547] flex-shrink-0">
               <div className="flex items-center gap-4">
-                <div className="p-3 md:p-3 bg-white/20 rounded-full backdrop-blur-sm">
-                 {user?.profilePicture}
+                <div className="p-3 bg-white/20 rounded-full backdrop-blur-sm">
+                  {user?.profilePicture}
                 </div>
                 <div className="min-w-0 flex-1">
-                  <h3 className="text-white font-semibold text-lg md:text-lg truncate">
+                  <h3 className="text-white font-semibold text-lg truncate">
                     {user?.firstName || "Welcome"}
                   </h3>
-                  <p className="text-white/90 text-sm md:text-sm truncate">
-                  {user?.email || email || "No email provided"}
+                  <p className="text-white/90 text-sm truncate">
+                    {user?.email || email || "No email provided"}
                   </p>
                 </div>
               </div>
             </div>
 
-            {/* Menu items with scroll area - Flexible height */}
+            {/* Menu */}
             <div className="flex-1 overflow-y-auto min-h-0">
               <div className="pb-2">
                 {menuItems.map((item, index) => (
@@ -117,54 +120,48 @@ const Account = ({ isVisible, onClose, onMouseEnter, onMouseLeave }) => {
                     key={index}
                     whileHover={{ backgroundColor: "#f97316", color: "#ffffff" }}
                     whileTap={{ scale: 0.98 }}
-                    className="flex items-center justify-between px-5 md:px-6 py-2.5 md:py-3 
-                               transition-all duration-200 cursor-pointer hover:bg-orange-50
-                               group"
-                    onClick={() => handleItemClick(item.label)}
+                    className="flex items-center justify-between px-5 py-2.5 
+                               transition-all cursor-pointer hover:bg-orange-50 group"
+                    onClick={() => handleItemClick(item.label, item.onClick)}
                   >
-                    <div className="flex items-center gap-3 md:gap-4 min-w-0 flex-1">
+                    <div className="flex items-center gap-3 min-w-0 flex-1">
                       <div className="p-2 rounded-lg bg-orange-100/50 text-[#ff6523] 
-                                      group-hover:bg-white/20 group-hover:text-white transition-all
-                                      flex-shrink-0">
+                                      group-hover:bg-white/20 group-hover:text-white">
                         {item.icon}
                       </div>
-                      <span className="font-medium group-hover:text-white transition-colors truncate">
+                      <span className="font-medium group-hover:text-white truncate">
                         {item.label}
                       </span>
                     </div>
-                    <div className="flex items-center gap-2 flex-shrink-0">
+                    <div className="flex items-center gap-2">
                       {item.count && (
                         <span className="text-xs bg-orange-500 text-white px-2 py-1 rounded-full
-                                         group-hover:bg-white group-hover:text-[#ff6523] transition-all">
+                                         group-hover:bg-white group-hover:text-[#ff6523]">
                           {item.count}
                         </span>
                       )}
-                      <ChevronRight className="text-gray-400 group-hover:text-white transition-colors" size={18} />
+                      <ChevronRight
+                        className="text-gray-400 group-hover:text-white"
+                        size={18}
+                      />
                     </div>
                   </motion.div>
                 ))}
               </div>
             </div>
 
-            {/* Footer with logout - Fixed height */}
-            <div className="p-3 md:p-4 border-t border-gray-100 flex-shrink-0">
+            {/* Footer */}
+            <div className="p-3 border-t border-gray-100">
               <motion.button
                 whileHover={{ scale: 1.02 }}
                 whileTap={{ scale: 0.95 }}
-                className="w-full flex items-center justify-center gap-3 px-4 py-4 md:py-4
+                className="w-full flex items-center justify-center gap-3 px-4 py-4
                            bg-[#ff6523] rounded-xl text-gray-700 border border-gray-200 font-medium
                            hover:bg-red-50 hover:border-red-300 hover:text-red-700 
-                           transition-all duration-200 shadow-sm hover:shadow-md text-sm md:text-base"
+                           transition-all text-sm"
                 onClick={logoutHandler}
-                // Prevent mouse events from interfering with hover logic
-                onMouseDown={(e) => {
-                  e.stopPropagation();
-                  console.log("Mouse down on logout button");
-                }}
-                onMouseUp={(e) => {
-                  e.stopPropagation();
-                  console.log("Mouse up on logout button");
-                }}
+                onMouseDown={(e) => e.stopPropagation()}
+                onMouseUp={(e) => e.stopPropagation()}
               >
                 <LogOut className="text-red-500" size={18} />
                 <span>Sign Out</span>

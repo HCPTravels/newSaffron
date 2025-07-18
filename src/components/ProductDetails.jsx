@@ -3,6 +3,7 @@ import axios from "axios";
 import { useAuth } from "../context/AuthContext";
 import { toast, Toaster } from "sonner";
 import { Loader2, Zap } from "lucide-react";
+import ProductReviews from "./ProductReviews.jsx";
 
 const ProductDetails = ({ id, onBack }) => {
   const [isLoading, setIsLoading] = useState(false);
@@ -149,7 +150,7 @@ const ProductDetails = ({ id, onBack }) => {
         {/* Right: Seller Info */}
         {product.seller && (
           <div className="space-y-4">
-            <h3 className="text-xl font-semibold text-[#ff6523]">
+            <h3 className="text-2xl font-semibold text-[#ff6523]">
               Seller Info
             </h3>
             <div className="text-sm text-gray-800 space-y-2 bg-white/30 p-4 rounded-xl shadow-sm">
@@ -170,6 +171,12 @@ const ProductDetails = ({ id, onBack }) => {
                 <strong>Business Type:</strong> {product.seller.businessType}
               </p>
             </div>
+
+            <h3 className="text-2xl font-semibold text-[#ff6523]">
+              Customer Reviews
+            </h3>
+
+            <ProductReviews ProductId={id} />
           </div>
         )}
       </div>

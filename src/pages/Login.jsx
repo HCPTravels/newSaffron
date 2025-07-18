@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
-import { LogIn, CheckCircle } from "lucide-react";
+import { LogIn, CheckCircle, Eye, EyeOff } from "lucide-react";
 import { FcGoogle } from "react-icons/fc";
 import { toast, Toaster } from "sonner";
 import Saffron from "../assets/bowlSaffron.png";
@@ -16,6 +16,7 @@ const LoginPage = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [isGoogleLoading, setIsGoogleLoading] = useState(false);
   const navigate = useNavigate();
+  const [showPassword, setShowPassword] = useState(false);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -272,7 +273,7 @@ const LoginPage = () => {
                 className="relative py-2"
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
-                transition={{ delay: 1.0, duration: 0.4 }}
+                transition={{ delay: 1.1, duration: 0.4 }}
               >
                 <div className="absolute inset-0 flex items-center">
                   <div className="w-full border-t border-gray-300"></div>
@@ -328,7 +329,7 @@ const LoginPage = () => {
                 className="text-gray-600"
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
-                transition={{ delay: 1.3, duration: 0.4 }}
+                transition={{ delay: 1.4, duration: 0.4 }}
               >
                 Don't have an account?{" "}
                 <a
@@ -343,7 +344,7 @@ const LoginPage = () => {
                 className="text-gray-600"
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
-                transition={{ delay: 1.4, duration: 0.4 }}
+                transition={{ delay: 1.5, duration: 0.4 }}
               >
                 Are you a seller?{" "}
                 <a
@@ -358,6 +359,111 @@ const LoginPage = () => {
           </motion.div>
         </motion.div>
       </motion.div>
+
+      {/* Forgot Password Modal */}
+      <Modal
+        open={showForgotModal}
+        onClose={() => {
+          setShowForgotModal(false);
+          setForgotEmail("");
+          setOtpSent(false);
+          setOtp("");
+          setForgotLoading(false);
+          setVerifying(false);
+        }}
+        title="Reset your password"
+      >
+        <form
+          onSubmit={async (e) => {
+            e.preventDefault();
+            if (!otpSent) {
+              setForgotLoading(true);
+              try {
+                await forgotSendOtp(forgotEmail);
+                setOtpSent(true);
+                toast.success("OTP sent to your email.", {
+                  duration: 3500,
+                  position: "top-center",
+                });
+              } catch (error) {
+                toast.error("Failed to send OTP", {
+                  description: error.message || "Please try again later.",
+                  duration: 4000,
+                  position: "top-right",
+                });
+              } finally {
+                setForgotLoading(false);
+              }
+            } else {
+              setVerifying(true);
+              try {
+                await verifyForgotOtp({ email: forgotEmail, otp });
+                toast.success(
+                  "OTP verified! You can now reset your password.",
+                  {
+                    duration: 3500,
+                    position: "top-center",
+                  }
+                );
+                setShowForgotModal(false);
+                setForgotEmail("");
+                setOtpSent(false);
+                setOtp("");
+                navigate("/reset-password", { state: { email: forgotEmail } });
+              } catch (error) {
+                toast.error("Invalid OTP", {
+                  description: error.message || "Please try again.",
+                  duration: 4000,
+                  position: "top-right",
+                });
+              } finally {
+                setVerifying(false);
+              }
+            }
+          }}
+          className="space-y-4"
+        >
+          <label className="block text-sm font-medium text-gray-700">
+            Email address
+          </label>
+          <input
+            type="email"
+            className="w-full px-3 py-2 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-[#fe6522]/50 focus:border-transparent transition-all h-12"
+            placeholder="Enter your email"
+            value={forgotEmail}
+            onChange={(e) => setForgotEmail(e.target.value)}
+            required
+            disabled={otpSent}
+          />
+          {otpSent && (
+            <>
+              <label className="block text-sm font-medium text-gray-700">
+                Enter OTP
+              </label>
+              <input
+                type="text"
+                className="w-full px-3 py-2 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-[#fe6522]/50 focus:border-transparent transition-all h-12 tracking-widest text-center"
+                placeholder="Enter OTP"
+                value={otp}
+                onChange={(e) => setOtp(e.target.value)}
+                required
+                maxLength={6}
+              />
+            </>
+          )}
+          <button
+            type="submit"
+            className="w-full px-4 py-3 rounded-lg bg-gradient-to-r from-[#fe6522] to-[#e55a1d] text-white font-medium shadow-sm h-12 flex items-center justify-center gap-2"
+            disabled={forgotLoading || verifying}
+          >
+            {forgotLoading || verifying ? (
+              <span>{otpSent ? "Verifying..." : "Sending..."}</span>
+            ) : (
+              <span>{otpSent ? "Verify Otp" : "Send Otp"}</span>
+            )}
+          </button>
+        </form>
+      </Modal>
     </motion.div>
   );
 };

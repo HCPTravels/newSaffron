@@ -1,148 +1,59 @@
-import React, { useState, useEffect, useCallback } from "react";
+import React, { useEffect } from "react";
 import {
   Search,
   Loader2,
 } from "lucide-react";
 import { motion } from "framer-motion";
 import { toast, Toaster } from "sonner";
-import axios from "axios";
 import { useAuth } from "../context/AuthContext";
 import { useCart } from "../context/CartContext";
-import useWishlist from "../hooks/useWishlist";
-import ProductCard from "./ProductCard"; // Import the new ProductCard component
+import { useWishlist } from "../context/WishlistContext";
+import { useProductContext } from "../context/ProductContext";
+import ProductCard from "./ProductCard";
 
 const Home = ({ onSelectProduct }) => {
-  const [isProductsLoading, setIsProductsLoading] = useState(false);
-  const [products, setProducts] = useState([]);
-  const [loadingProductId, setLoadingProductId] = useState(null);
-  const [hasInitialized, setHasInitialized] = useState(false);
   const { addToCart } = useCart();
-
   const backendUrl = import.meta.env.VITE_BACKEND_URL;
-  // Get both token and isLoading from useAuth hook
   const { token, isLoading } = useAuth();
+  const {
+    wishlistSet,
+    loadingSet,
+    toggleWishlist,
+    isInWishlist,
+    isLoading: wishlistIsLoading,
+  } = useWishlist();
+  const {
+    products,
+    isProductsLoading,
+    error,
+    fetchProducts,
+    setProducts,
+  } = useProductContext();
 
-  // Helper function to check if user is authenticated
-  const checkAuthentication = useCallback(() => {
-    // Simple token-based authentication check
-    const hasValidToken = !!(token && token.length > 0);
-    
-    console.log('🔍 Authentication check:', {
-      hasValidToken,
-      tokenLength: token?.length || 0
-    });
-    
-    return hasValidToken;
-  }, [token]);
-
-  // Debug: Log auth state changes
   useEffect(() => {
-    console.log('🔍 Home - Auth state changed:', {
-      hasToken: !!token,
-      tokenLength: token?.length,
-      tokenPreview: token ? `${token.substring(0, 20)}...` : 'null',
-      isAuthenticatedFinal: checkAuthentication()
-    });
-  }, [token, checkAuthentication]);
-
-  // Use the custom wishlist hook
-  const { wishlist, wishlistLoading, toggleWishlist } = useWishlist(token);
-
-  // Debug: Log wishlist state changes
-  useEffect(() => {
-    console.log('🔍 Home - Wishlist state changed:', {
-      wishlistSize: wishlist.size,
-      wishlistItems: [...wishlist],
-      loadingItems: [...wishlistLoading]
-    });
-  }, [wishlist, wishlistLoading]);
-
-  const fetchApprovedProducts = useCallback(async () => {
-    if (isLoading) return;
-
-    try {
-      setIsProductsLoading(true);
-
-      const headers = {};
-      if (token) headers.Authorization = `Bearer ${token}`;
-
-      console.log('🚀 Fetching products with headers:', headers);
-
-      const response = await axios.get(
-        `${backendUrl}/api/product/approved/product`,
-        { headers, timeout: 10000 }
-      );
-
-      if (response.data) setProducts(response.data);
-    } catch (err) {
-      console.error("Error fetching products:", err);
-      if (err.code === "ECONNABORTED") {
-        toast.error("Request timeout - server is taking too long to respond");
-      } else if (err.response?.status === 401) {
-        toast.error("Authentication required");
-      } else if (err.response?.status === 403) {
-        toast.error("Access denied");
-      } else if (err.response?.status >= 500) {
-        toast.error("Server error - please try again later");
-      } else if (err.code === "ERR_NETWORK") {
-        toast.error("Network error - check your connection");
-      } else {
-        toast.error("Failed to load products");
-      }
-    } finally {
-      setIsProductsLoading(false);
-      setHasInitialized(true);
+    if (backendUrl && products.length === 0 && !isProductsLoading) {
+      fetchProducts(backendUrl, token);
     }
-  }, [backendUrl, token, isLoading]);
-
-  useEffect(() => {
-    if (backendUrl && !hasInitialized) {
-      fetchApprovedProducts();
-    }
-  }, [
-    fetchApprovedProducts,
-    backendUrl,
-    hasInitialized,
-  ]);
-
-  const retryFetch = useCallback(() => {
-    setHasInitialized(false);
-    fetchApprovedProducts();
-  }, [fetchApprovedProducts]);
+  }, [backendUrl, token, fetchProducts, products.length, isProductsLoading]);
 
   const handleAddToCart = async (product) => {
-    setLoadingProductId(product._id);
-
+    // ...same as before
+    // You may want to add a loading state per product if needed
     try {
-      const response = await addToCart(product._id);
-      // Success toast is handled in ProductCard component
+      await addToCart(product._id);
     } catch (error) {
       console.error("Error adding to cart:", error);
-      // Error toast is handled in ProductCard component
-      throw error; // Re-throw to let ProductCard handle it
-    } finally {
-      setLoadingProductId(null);
+      throw error;
     }
   };
 
-  // Enhanced wishlist handler with token-based authentication
   const handleWishlistToggle = async (product) => {
-    const isUserAuthenticated = checkAuthentication();
-    
-    console.log('🔄 handleWishlistToggle called:', {
-      productName: product.name,
-      hasToken: !!token,
-      isUserAuthenticated
-    });
-
-    // Check if user has valid token
+    const isUserAuthenticated = !!(token && token.length > 0);
     if (!isUserAuthenticated) {
-      console.log('❌ No valid token in handleWishlistToggle');
       toast.error("Please log in to add items to your wishlist");
       return;
     }
-
-    await toggleWishlist(product);
+    await toggleWishlist(product._id, product);
   };
 
   const LoadingState = () => (
@@ -174,7 +85,7 @@ const Home = ({ onSelectProduct }) => {
     </motion.div>
   );
 
-  if (isProductsLoading && !hasInitialized) {
+  if (isProductsLoading && products.length === 0) {
     return (
       <div className="min-h-screen relative">
         <Toaster richColors closeButton />
@@ -186,16 +97,6 @@ const Home = ({ onSelectProduct }) => {
   return (
     <div className="min-h-screen relative">
       <Toaster richColors closeButton />
-
-      {/* Debug Info - Remove in production
-      {process.env.NODE_ENV === 'development' && (
-        <div className="fixed top-0 right-0 bg-black text-white p-2 text-xs z-50 max-w-xs">
-          <div>Token: {token ? '✅' : '❌'}</div>
-          <div>Auth: {checkAuthentication() ? '✅' : '❌'}</div>
-          <div>Wishlist: {wishlist.size} items</div>
-        </div>
-      )} */}
-
       {/* Hero Section */}
       <div className="relative pt-24 pb-16 px-4 overflow-hidden">
         <motion.div
@@ -212,10 +113,9 @@ const Home = ({ onSelectProduct }) => {
           </p>
         </motion.div>
       </div>
-
       {/* Product Grid */}
       <div className="max-w-7xl mx-auto px-4 py-12">
-        {isProductsLoading ? (
+        {isProductsLoading && products.length === 0 ? (
           <LoadingState />
         ) : products.length > 0 ? (
           <motion.div
@@ -231,9 +131,9 @@ const Home = ({ onSelectProduct }) => {
                 onSelectProduct={onSelectProduct}
                 onAddToCart={handleAddToCart}
                 onWishlistToggle={handleWishlistToggle}
-                wishlist={wishlist}
-                wishlistLoading={wishlistLoading}
-                loadingProductId={loadingProductId}
+                isInWishlist={isInWishlist(product._id)}
+                isWishlistLoading={loadingSet.has(product._id)}
+                // loadingProductId={loadingProductId} // If you want per-product loading
               />
             ))}
           </motion.div>
@@ -244,7 +144,7 @@ const Home = ({ onSelectProduct }) => {
             animate={{ opacity: 1 }}
             transition={{ delay: 0.3 }}
           >
-           <div className="max-w-md mx-auto">
+            <div className="max-w-md mx-auto">
               <motion.div
                 className="w-16 h-16 bg-gradient-to-r from-[#ff6523] to-[#e55a1d] rounded-full flex items-center justify-center mx-auto mb-6"
                 animate={{ rotate: 360 }}
@@ -252,13 +152,14 @@ const Home = ({ onSelectProduct }) => {
               >
                 <Search className="w-8 h-8 text-white" />
               </motion.div>
-              
               <h3 className="text-xl font-bold text-gray-900 mb-4">
                 No products available
               </h3>
-
               <motion.button
-                onClick={retryFetch}
+                onClick={() => {
+                  setProducts([]); // Clear cache
+                  fetchProducts(backendUrl, token);
+                }}
                 className="px-6 py-3 bg-gradient-to-r from-[#ff6523] to-[#e55a1d] text-white font-semibold rounded-lg hover:shadow-lg transition-all duration-300"
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
