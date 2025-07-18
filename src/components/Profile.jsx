@@ -24,6 +24,143 @@ import { useCart } from "../context/CartContext";
 import { useWishlist } from '../context/WishlistContext';
 import Order from "../pages/Order";
 
+// --- ProfileNavbar component ---
+function ProfileNavbar({
+  selectedCurrency,
+  setSelectedCurrency,
+  isCurrencyOpen,
+  setIsCurrencyOpen,
+  isProfileVisible,
+  setIsProfileVisible,
+  handleProfileClick,
+  handleProfileMouseEnter,
+  handleProfileMouseLeave,
+  handleAccountClose,
+  handleDropdownMouseEnter,
+  handleDropdownMouseLeave,
+  currencyRef,
+  profileButtonRef,
+  dropdownRef,
+  getWishlistCount,
+  getTotalItems,
+  isMobile,
+  Account,
+  navigate,
+  currencies
+}) {
+  return (
+    <div className="hidden md:flex items-center justify-between px-8 py-4 bg-[#ff6523] backdrop-blur-sm fixed top-0 left-0 w-full z-50 shadow-md">
+      <div className="flex items-center space-x-8 w-full max-w-7xl mx-auto">
+        {/* Logo */}
+        <div className="flex items-center space-x-6">
+          <div
+            className="text-2xl font-bold text-black cursor-pointer whitespace-nowrap"
+            onClick={() => navigate("/profile")}
+          >
+            <img
+              src={saffronLogo}
+              alt="Saffron Logo"
+              className="h-[50px] w-[60px] sm:h-[60px] sm:w-[72px] md:h-[65px] md:w-[80px] lg:h-[72px] lg:w-[87px]"
+            />
+          </div>
+        </div>
+        {/* Right-aligned Navbar Items (no search bar) */}
+        <div className="flex items-center space-x-6 ml-auto">
+          {/* Currency Selector */}
+          <div className="relative" ref={currencyRef}>
+            <button
+              className="flex items-center space-x-1 px-3 py-1 rounded-lg hover:bg-black/10 transition-colors"
+              onClick={() => setIsCurrencyOpen(!isCurrencyOpen)}
+            >
+              <Globe className="h-5 w-5" />
+              <span className="text-sm font-medium">{selectedCurrency}</span>
+              <ChevronDown
+                className={`h-4 w-4 transition-transform ${
+                  isCurrencyOpen ? "transform rotate-180" : ""
+                }`}
+              />
+            </button>
+            {isCurrencyOpen && (
+              <div className="absolute right-0 mt-2 w-48 bg-white rounded-lg shadow-lg z-50 py-1">
+                {currencies.map((currency) => (
+                  <button
+                    key={currency.code}
+                    className={`w-full text-left px-4 py-2 hover:bg-[#ff6523]/10 flex items-center ${
+                      selectedCurrency === currency.code
+                        ? "bg-[#ff6523]/10 text-[#ff6523]"
+                        : "text-gray-800"
+                    }`}
+                    onClick={() => {
+                      setSelectedCurrency(currency.code);
+                      setIsCurrencyOpen(false);
+                    }}
+                  >
+                    <span className="font-medium mr-2">
+                      {currency.symbol}
+                    </span>
+                    <span>{currency.name}</span>
+                  </button>
+                ))}
+              </div>
+            )}
+          </div>
+          {/* Wishlist */}
+          <button
+            className="p-2 text-black transition-colors relative group"
+            onClick={() => navigate("/profile/wishlist")}
+          >
+            <Heart className="h-6 w-6 transition-colors" />
+            <span className="absolute -top-1 -right-1 text-white bg-[#ff6523] text-xs rounded-full h-5 w-5 flex items-center justify-center">
+              {getWishlistCount()}
+            </span>
+          </button>
+          {/* Cart */}
+          <button
+            className="p-2 text-black transition-colors relative"
+            onClick={() => navigate("/profile/cart")}
+          >
+            <ShoppingCart className="h-6 w-6" />
+            <span className="absolute -top-1 -right-1 text-white bg-[#ff6523] text-xs rounded-full h-5 w-5 flex items-center justify-center">
+              {getTotalItems}
+            </span>
+          </button>
+          {/* Profile */}
+          <div
+            className="relative"
+            ref={profileButtonRef}
+            onMouseEnter={handleProfileMouseEnter}
+            onMouseLeave={handleProfileMouseLeave}
+          >
+            <button
+              className={`p-2 text-black transition-colors rounded-lg ${
+                isProfileVisible ? "bg-black/10" : "hover:bg-black/10"
+              }`}
+              onClick={handleProfileClick}
+            >
+              <User className="h-6 w-6" />
+            </button>
+            {!isMobile && isProfileVisible && (
+              <div
+                ref={dropdownRef}
+                className="absolute right-0 top-full pt-2 z-50"
+              >
+                <Account
+                  isVisible={isProfileVisible}
+                  onClose={handleAccountClose}
+                  onMouseEnter={handleDropdownMouseEnter}
+                  onMouseLeave={handleDropdownMouseLeave}
+                />
+              </div>
+            )}
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// --- Main Profile component ---
+const NAVBAR_HEIGHT = 88; // px, adjust if needed (py-4 + logo height)
 
 const Profile = () => {
   const location = useLocation();
@@ -35,7 +172,8 @@ const Profile = () => {
   const [isProfileVisible, setIsProfileVisible] = useState(false);
   const [isMobile, setIsMobile] = useState(false);
   const [isCurrencyOpen, setIsCurrencyOpen] = useState(false);
-  const [selectedCurrency, setSelectedCurrency] = useState("USD");
+  // Set default currency to INR and only allow INR and USD
+  const [selectedCurrency, setSelectedCurrency] = useState("INR");
   const [searchQuery, setSearchQuery] = useState("");
   const dropdownRef = useRef(null);
   const profileButtonRef = useRef(null);
@@ -123,10 +261,8 @@ const Profile = () => {
   ];
 
   const currencies = [
-    { code: "USD", symbol: "$", name: "US Dollar" },
-    { code: "EUR", symbol: "€", name: "Euro" },
-    { code: "GBP", symbol: "£", name: "British Pound" },
     { code: "INR", symbol: "₹", name: "Indian Rupee" },
+    { code: "USD", symbol: "$", name: "US Dollar" },
   ];
 
   const handleProfileClick = () => {
@@ -188,202 +324,86 @@ const Profile = () => {
 
   return (
     <>
-      {/* Desktop Navbar */}
-      <div className="hidden md:flex items-center justify-between px-8 py-4 bg-[#ff6523] backdrop-blur-sm sticky top-0 z-50">
-        <div className="flex items-center space-x-8 w-full max-w-7xl mx-auto">
-          {/* Logo */}
-          <div className="flex items-center space-x-6">
-            <div
-              className="text-2xl font-bold text-black cursor-pointer whitespace-nowrap"
-              onClick={() => navigate("/profile")}
-            >
-              <img
-                src={saffronLogo}
-                alt="Saffron Logo"
-                className="h-[50px] w-[60px] sm:h-[60px] sm:w-[72px] md:h-[65px] md:w-[80px] lg:h-[72px] lg:w-[87px]"
-              />
-            </div>
-          </div>
-
-          {/* Search Bar */}
-          <div className="flex-1 max-w-xl mx-4">
-            <form onSubmit={handleSearch} className="relative">
-              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-gray-500" />
-              <input
-                type="text"
-                placeholder="Search for saffron, spices..."
-                className="w-full pl-10 pr-4 py-2 rounded-full bg-white/90 border border-white focus:border-[#ff6523]/50 focus:outline-none focus:ring-2 focus:ring-[#ff6523]/30 transition-all"
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-              />
-              <button
-                type="submit"
-                className="absolute right-2 top-1/2 transform -translate-y-1/2 bg-[#ff6523] text-white px-3 py-1 rounded-full text-sm font-medium hover:bg-[#e55b1f] transition-colors"
-              >
-                Search
-              </button>
-            </form>
-          </div>
-
-          {/* Navigation Icons */}
-          <div className="flex items-center space-x-6">
-            {/* Currency Selector */}
-            <div className="relative" ref={currencyRef}>
-              <button
-                className="flex items-center space-x-1 px-3 py-1 rounded-lg hover:bg-black/10 transition-colors"
-                onClick={() => setIsCurrencyOpen(!isCurrencyOpen)}
-              >
-                <Globe className="h-5 w-5" />
-                <span className="text-sm font-medium">{selectedCurrency}</span>
-                <ChevronDown
-                  className={`h-4 w-4 transition-transform ${
-                    isCurrencyOpen ? "transform rotate-180" : ""
-                  }`}
-                />
-              </button>
-
-              {isCurrencyOpen && (
-                <div className="absolute right-0 mt-2 w-48 bg-white rounded-lg shadow-lg z-50 py-1">
-                  {currencies.map((currency) => (
-                    <button
-                      key={currency.code}
-                      className={`w-full text-left px-4 py-2 hover:bg-[#ff6523]/10 flex items-center ${
-                        selectedCurrency === currency.code
-                          ? "bg-[#ff6523]/10 text-[#ff6523]"
-                          : "text-gray-800"
-                      }`}
-                      onClick={() => handleCurrencySelect(currency)}
-                    >
-                      <span className="font-medium mr-2">
-                        {currency.symbol}
-                      </span>
-                      <span>{currency.name}</span>
-                    </button>
-                  ))}
-                </div>
-              )}
-            </div>
-
-            {/* Wishlist */}
-            <button
-              className="p-2 text-black transition-colors relative group"
-              onClick={() => navigate("/profile/wishlist")}
-            >
-              <Heart className="h-6 w-6 transition-colors" />
-              <span className="absolute -top-1 -right-1 text-white bg-[#ff6523] text-xs rounded-full h-5 w-5 flex items-center justify-center">
-              {getWishlistCount()}
-              </span>
-            </button>
-
-            {/* Cart */}
-            <button
-              className="p-2 text-black transition-colors relative"
-              onClick={() => navigate("/profile/cart")}
-            >
-              <ShoppingCart className="h-6 w-6" />
-              <span className="absolute -top-1 -right-1 text-white bg-[#ff6523] text-xs rounded-full h-5 w-5 flex items-center justify-center">
-                {getTotalItems}
-              </span>
-            </button>
-
-            {/* Profile */}
-            <div
-              className="relative"
-              ref={profileButtonRef}
-              onMouseEnter={handleProfileMouseEnter}
-              onMouseLeave={handleProfileMouseLeave}
-            >
-              <button
-                className={`p-2 text-black transition-colors rounded-lg ${
-                  isProfileVisible ? "bg-black/10" : "hover:bg-black/10"
-                }`}
-                onClick={handleProfileClick}
-              >
-                <User className="h-6 w-6" />
-              </button>
-
-              {!isMobile && isProfileVisible && (
-                <div
-                  ref={dropdownRef}
-                  className="absolute right-0 top-full pt-2 z-50"
-                >
-                  <Account
-                    isVisible={isProfileVisible}
-                    onClose={handleAccountClose}
-                    onMouseEnter={handleDropdownMouseEnter}
-                    onMouseLeave={handleDropdownMouseLeave}
+      <ProfileNavbar
+        selectedCurrency={selectedCurrency}
+        setSelectedCurrency={setSelectedCurrency}
+        isCurrencyOpen={isCurrencyOpen}
+        setIsCurrencyOpen={setIsCurrencyOpen}
+        isProfileVisible={isProfileVisible}
+        setIsProfileVisible={setIsProfileVisible}
+        handleProfileClick={handleProfileClick}
+        handleProfileMouseEnter={handleProfileMouseEnter}
+        handleProfileMouseLeave={handleProfileMouseLeave}
+        handleAccountClose={handleAccountClose}
+        handleDropdownMouseEnter={handleDropdownMouseEnter}
+        handleDropdownMouseLeave={handleDropdownMouseLeave}
+        currencyRef={currencyRef}
+        profileButtonRef={profileButtonRef}
+        dropdownRef={dropdownRef}
+        getWishlistCount={getWishlistCount}
+        getTotalItems={getTotalItems}
+        isMobile={isMobile}
+        Account={Account}
+        navigate={navigate}
+        currencies={currencies}
+      />
+      {/* Add top padding to push content below the fixed navbar */}
+      <div style={{ paddingTop: `${NAVBAR_HEIGHT}px` }}>
+        {/* Decorative images always visible on all profile subpages */}
+        <img
+          src={SaffronHome}
+          alt="Saffron Home"
+          className="absolute left-full fixed opacity-30
+                     w-[200px] h-[200px] xs:w-[250px] xs:h-[250px]
+                     sm:w-[300px] sm:h-[300px]
+                     md:w-[400px] md:h-[400px]
+                     lg:w-[500px] lg:h-[500px]
+                     xl:w-[550px] xl:h-[550px]
+                     2xl:w-[767px] 2xl:h-[767px]
+                     object-cover z-11 transition-transform duration-700 ease-out pointer-events-none"
+          style={{ transform: `translateX(-50%) translateY(${scrollY * 0.3}px)` }}
+        />
+        <img
+          src={SaffronHome}
+          alt="Decorative Saffron"
+          className="fixed bottom-[-75px] left-[-75px] w-[150px] h-[150px]
+                 md:top-[586px] md:left-[-154px] md:w-[375px] md:h-[375px]
+                 object-cover pointer-events-none opacity-30 z-11 transition-transform duration-700 ease-out"
+          style={{
+            transform: `translateY(${scrollY * -0.2}px) rotate(${scrollY * 0.1}deg)`,
+          }}
+        />
+        {/* Main Page Content */}
+        <div className={`min-h-screen pt-4 pb-24 px-4 relative z-10`}>
+          <Routes location={location} key={location.pathname}>
+            <Route
+              path="/"
+              element={
+                selectedProductId ? (
+                  <ProductDetails
+                    id={selectedProductId}
+                    onBack={() => setSelectedProductId(null)}
                   />
-                </div>
-              )}
-            </div>
-          </div>
+                ) : (
+                  <HomePage onSelectProduct={setSelectedProductId} />
+                )
+              }
+            />
+            <Route path="/categories" element={<Categories />} />
+            <Route path="/cart" element={
+              <div className="max-w-7xl mx-auto">
+                <Cart />
+              </div>
+            } />
+            <Route path="/wishlist" element={
+              <div className="max-w-7xl mx-auto">
+                <Wishlist />
+              </div>
+            } />
+            <Route path="/orders" element={<Order />} />
+            <Route path="/account" element={<Account isVisible={true} />} />
+          </Routes>
         </div>
-      </div>
-
-      {/* Only show decorative images on non-cart and non-wishlist pages */}
-      {!isCartRoute && !isWishlistRoute && !isOrdersRoute && (
-        <>
-          <img
-            src={SaffronHome}
-            alt="Saffron Home"
-            className="absolute left-full fixed opacity-30
-                       w-[200px] h-[200px] xs:w-[250px] xs:h-[250px]
-                       sm:w-[300px] sm:h-[300px]
-                       md:w-[400px] md:h-[400px]
-                       lg:w-[500px] lg:h-[500px]
-                       xl:w-[550px] xl:h-[550px]
-                       2xl:w-[767px] 2xl:h-[767px]
-                       object-cover z-11 transition-transform duration-700 ease-out pointer-events-none"
-            style={{ transform: `translateX(-50%) translateY(${scrollY * 0.3}px)` }}
-          />
-
-          <img
-            src={SaffronHome}
-            alt="Decorative Saffron"
-            className="fixed bottom-[-75px] left-[-75px] w-[150px] h-[150px]
-                   md:top-[586px] md:left-[-154px] md:w-[375px] md:h-[375px]
-                   object-cover pointer-events-none opacity-30 z-11 transition-transform duration-700 ease-out"
-            style={{
-              transform: `translateY(${scrollY * -0.2}px) rotate(${
-                scrollY * 0.1
-              }deg)`,
-            }}
-          />
-        </>
-      )}
-
-      {/* Main Page Content */}
-      <div className={`min-h-screen pt-4 pb-24 px-4 relative z-10 ${
-        isCartRoute || isWishlistRoute || isOrdersRoute ? "bg-white" : "bg-[#ff6523]"
-      }`}>
-        <Routes location={location} key={location.pathname}>
-          <Route
-            path="/"
-            element={
-              selectedProductId ? (
-                <ProductDetails
-                  id={selectedProductId}
-                  onBack={() => setSelectedProductId(null)}
-                />
-              ) : (
-                <HomePage onSelectProduct={setSelectedProductId} />
-              )
-            }
-          />
-          <Route path="/categories" element={<Categories />} />
-          <Route path="/cart" element={
-            <div className="max-w-7xl mx-auto">
-              <Cart />
-            </div>
-          } />
-          <Route path="/wishlist" element={
-            <div className="max-w-7xl mx-auto">
-              <Wishlist />
-            </div>
-          } />
-          <Route path="/orders" element={<Order />} />
-          <Route path="/account" element={<Account isVisible={true} />} />
-        </Routes>
       </div>
 
       {/* Mobile Bottom Tab */}

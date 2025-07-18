@@ -3,7 +3,9 @@ import { useAuth } from "../context/AuthContext";
 import ProductCard from "../pages/ProductCard";
 import { useCart } from "../context/CartContext";
 import { useWishlist } from "../context/WishlistContext";
-import { FiHeart, FiShoppingCart } from "react-icons/fi";
+
+import { FiHeart, FiShoppingCart, FiArrowRight } from "react-icons/fi";
+import SaffronIcon from "../assets/icons8-saffron-64 (1).png";
 
 const Wishlist = () => {
   const { token } = useAuth();
@@ -14,7 +16,7 @@ const Wishlist = () => {
     wishlistSet,
     loadingSet,
     toggleWishlist,
-    isInWishlist, // ✅ Add this
+    isInWishlist,
   } = useWishlist();
 
   const [loadingProductId, setLoadingProductId] = useState(null);
@@ -43,34 +45,40 @@ const Wishlist = () => {
 
   if (wishlist.length === 0) {
     return (
-      <div className="flex flex-col items-center justify-center min-h-[60vh] p-8 text-center">
-        <div className="bg-primary-100 p-6 rounded-full mb-6">
-          <FiHeart className="text-primary-600 text-4xl" />
+      <div className="flex justify-center items-center min-h-[70vh] px-4">
+        <div className="bg-white rounded-3xl shadow-sm p-10 max-w-md w-full text-center border border-gray-100">
+          <div className="flex justify-center mb-6">
+            <div className="bg-orange-50 w-20 h-20 flex items-center justify-center rounded-full">
+              <img src={SaffronIcon} alt="Saffron" className="w-12 h-12" />
+            </div>
+          </div>
+          <h2 className="text-3xl font-bold text-gray-900 mb-3">Your Wishlist is Empty</h2>
+          <p className="text-gray-500 mb-8 text-lg">
+            Start exploring and add items you love to your wishlist!
+          </p>
+          <button
+            className="bg-gradient-to-r from-orange-500 to-orange-600 hover:from-orange-600 hover:to-orange-700 text-white font-medium py-3 px-8 rounded-full transition-all flex items-center justify-center gap-2 mx-auto shadow-md hover:shadow-lg"
+            onClick={() => window.location.href = "/profile"}
+          >
+            Browse Products
+            <FiArrowRight className="text-lg" />
+          </button>
         </div>
-        <h2 className="text-2xl font-bold text-gray-800 mb-2">Your Wishlist is Empty</h2>
-        <p className="text-gray-600 mb-6 max-w-md">
-          Looks like you haven't added anything to your wishlist yet. Start exploring and add items you love!
-        </p>
-        <button
-          className="bg-primary-600 hover:bg-primary-700 text-white font-medium py-2 px-6 rounded-lg transition-colors"
-          onClick={() => window.location.href = "/products"}
-        >
-          Browse Products
-        </button>
       </div>
     );
   }
 
   return (
-    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-      <div className="flex items-center justify-between mb-8">
-        <h1 className="text-2xl font-bold text-gray-900">Your Wishlist</h1>
-        <span className="bg-primary-100 text-primary-800 text-sm font-medium px-3 py-1 rounded-full">
+    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+      <div className="text-center mb-12">
+        <h1 className="text-4xl font-bold text-white mb-3">Your Wishlist</h1>
+        <div className="inline-flex items-center bg-orange-100 text-orange-800 text-sm font-medium px-4 py-2 rounded-full">
+          <img src={SaffronIcon} alt="Saffron" className="w-4 h-4 mr-2" />
           {wishlist.length} {wishlist.length === 1 ? "Item" : "Items"}
-        </span>
+        </div>
       </div>
       
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8">
         {wishlist.map((product) => (
           <ProductCard
             key={product._id}
@@ -78,7 +86,6 @@ const Wishlist = () => {
             onSelectProduct={() => {}}
             onAddToCart={() => handleAddToCart(product)}
             onWishlistToggle={() => handleWishlistToggle(product)}
-            // ✅ FIXED: Use correct prop names that ProductCard expects
             isInWishlist={isInWishlist(product._id)}
             isWishlistLoading={loadingSet.has(product._id)}
             loadingProductId={loadingProductId}
