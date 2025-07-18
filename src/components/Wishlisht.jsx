@@ -52,8 +52,8 @@ const Wishlist = () => {
               <img src={SaffronIcon} alt="Saffron" className="w-12 h-12" />
             </div>
           </div>
-          <h2 className="text-3xl font-bold text-gray-900 mb-3">Your Wishlist is Empty</h2>
-          <p className="text-gray-500 mb-8 text-lg">
+          <h2 className="text-xl font-bold text-gray-900 mb-2">Your Wishlist is Empty</h2>
+          <p className="text-gray-500 mb-6">
             Start exploring and add items you love to your wishlist!
           </p>
           <button
@@ -71,7 +71,7 @@ const Wishlist = () => {
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
       <div className="text-center mb-12">
-        <h1 className="text-4xl font-bold text-white mb-3">Your Wishlist</h1>
+        <h1 className="text-2xl font-bold text-white mb-3">Your Wishlist</h1>
         <div className="inline-flex items-center bg-orange-100 text-orange-800 text-sm font-medium px-4 py-2 rounded-full">
           <img src={SaffronIcon} alt="Saffron" className="w-4 h-4 mr-2" />
           {wishlist.length} {wishlist.length === 1 ? "Item" : "Items"}

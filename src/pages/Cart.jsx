@@ -121,16 +121,15 @@ const Cart = () => {
   );
 
   const EmptyCart = () => (
-    <div className="flex justify-center items-center min-h-[60vh]">
-      <div className="text-center">
-        <div className="w-24 h-24 bg-[#ff6523] rounded-full flex items-center justify-center mx-auto mb-8">
-          <ShoppingCart className="w-12 h-12 text-white" />
+    <div className="fixed inset-0 flex items-center justify-center z-50 md:static md:mt-0 md:mb-0 md:relative md:flex md:items-center md:justify-center py-16">
+      <div className="w-full max-w-md bg-gradient-to-r from-white/95 via-white/90 to-white/95 backdrop-blur-xl rounded-2xl shadow-2xl border border-gray-100 p-8 mx-2 text-center">
+        <div className="w-20 h-20 bg-[#ff6523] rounded-full flex items-center justify-center mx-auto mb-6">
+          <ShoppingCart className="w-10 h-10 text-white" />
         </div>
-        <h2 className="text-2xl font-bold text-gray-900 mb-4">
-          Your cart is empty
-        </h2>
+        <h2 className="text-xl font-bold text-gray-900 mb-2">Your cart is empty</h2>
+        <p className="text-gray-500 mb-6">Looks like you haven't added anything yet.</p>
         <button
-          className="px-8 py-3 bg-[#ff6523] text-white font-semibold rounded-lg"
+          className="px-6 py-2 bg-[#ff6523] text-white font-semibold rounded-lg"
           onClick={() => (window.location.href = "/profile")}
         >
           Start Shopping
@@ -164,11 +163,7 @@ const Cart = () => {
   }
 
   if (cartItems.length === 0) {
-    return (
-      <div className="min-h-screen pt-20 bg-white rounded-3xl">
-        <EmptyCart />
-      </div>
-    );
+    return <EmptyCart />;
   }
 
   return (
@@ -189,7 +184,7 @@ const Cart = () => {
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-10">
           {/* Cart Items Section */}
-          <div className="lg:col-span-2 space-y-8">
+          <div className="lg:col-span-2 space-y-4">
             {cartItems.map((item, idx) => {
               const product = item?.productId;
               if (!product) return null;
@@ -197,7 +192,7 @@ const Cart = () => {
               const itemPrice = parseFloat(product.price) || 0;
               const itemQuantity = parseInt(item.quantity) || 0;
               return (
-                <div key={product._id} className="bg-white rounded-3xl shadow-md p-6 flex flex-col sm:flex-row gap-6 items-center border border-gray-100">
+                <div key={product._id} className="bg-white rounded-xl shadow-sm hover:shadow-md transition-all border border-gray-200 p-4 sm:p-6 flex flex-col sm:flex-row gap-4 sm:gap-6 items-center">
                   {/* Product Image */}
                   <div className="w-full sm:w-32 h-40 sm:h-32 bg-gray-100 rounded-xl flex items-center justify-center overflow-hidden">
                     <img
