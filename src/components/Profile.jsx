@@ -10,6 +10,7 @@ import {
   ChevronDown,
   Globe,
   Package,
+  MapPin,
 } from "lucide-react";
 import { useAuth } from "../context/AuthContext";
 import saffronLogo from "../assets/saffron logo.png";
@@ -300,6 +301,7 @@ const Profile = () => {
     { icon: Heart, label: "Wishlist", path: "/profile/wishlist" },
     { icon: ShoppingCart, label: "Cart", path: "/profile/cart" },
     { icon: Package, label: "Orders", path: "/profile/orders" },
+    { icon: MapPin, label: "Addresses", path: "/profile/useraddresses" },
     { icon: User, label: "Profile", path: "/profile/account" },
   ];
 
