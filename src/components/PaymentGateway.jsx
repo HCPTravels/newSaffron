@@ -3,7 +3,13 @@ import axios from "axios";
 import { useAuth } from "../context/AuthContext";
 import { useCart } from "../context/CartContext";
 
-const PaymentGateway = ({ totalPrice, onClose }) => {
+/**
+ * @param {Object} props
+ * @param {number} props.totalPrice
+ * @param {function} props.onClose
+ * @param {Object} [props.shippingAddress] - Optional shipping address data to send with payment
+ */
+const PaymentGateway = ({ totalPrice, onClose, shippingAddress }) => {
   const backendUrl = import.meta.env.VITE_BACKEND_URL;
   const { token, user } = useAuth();
   const { cartItems } = useCart();
@@ -89,6 +95,7 @@ const PaymentGateway = ({ totalPrice, onClose }) => {
                 razorpay_order_id: response.razorpay_order_id,
                 razorpay_signature: response.razorpay_signature,
                 items: cartItems, // <-- send cart items to backend
+                shippingAddress, // <-- send shipping address to backend if provided
               };
 
               console.log("🧾 Sending for verification...", verifyPaymentBody);

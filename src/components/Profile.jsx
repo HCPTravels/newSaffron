@@ -23,6 +23,7 @@ import ProductDetails from "./ProductDetails";
 import { useCart } from "../context/CartContext";
 import { useWishlist } from '../context/WishlistContext';
 import Order from "../pages/Order";
+import Address from "../pages/Address";
 
 // --- ProfileNavbar component ---
 function ProfileNavbar({
@@ -442,6 +443,7 @@ const Profile = () => {
             <Route path="/orders" element={<Order />} />
             <Route path="/account" element={<Account isVisible={true} />} />
             <Route path="/product/:id" element={<ProductDetailsWrapper />} />
+            <Route path="/address" element={<Address />} />
           </Routes>
         </div>
       </div>

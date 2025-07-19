@@ -21,12 +21,13 @@ import { motion, AnimatePresence } from "framer-motion";
 import { Toaster } from "sonner";
 import { useCart } from "../context/CartContext";
 import { useAuth } from "../context/AuthContext";
-import { useLocation, Navigate } from "react-router-dom";
+import { useLocation, Navigate, useNavigate } from "react-router-dom";
 import PaymentGateway from "../components/PaymentGateway";
 import SaffronIcon from "../assets/icons8-saffron-64 (1).png";
 
 const Cart = () => {
   const location = useLocation();
+  const navigate = useNavigate();
   // Redirect if accessed directly via /cart
   if (location.pathname === "/cart") {
     return <Navigate to="/profile/cart" replace />;
@@ -340,19 +341,12 @@ const Cart = () => {
 
               <button
                 className="w-full mt-6 py-3 bg-[#ff6523] hover:from-orange-600 hover:to-orange-700 text-white font-bold rounded-xl shadow-md hover:shadow-lg transition-all flex items-center justify-center gap-2 text-lg"
-                onClick={() => setShowPayment(true)}
+                onClick={() => navigate("/profile/address")}
               >
                 Proceed to Checkout
                 <ArrowRight className="w-5 h-5" />
               </button>
             </div>
-
-            {showPayment && (
-              <PaymentGateway
-                totalPrice={total}
-                onClose={() => setShowPayment(false)}
-              />
-            )}
 
             {/* Delivery Info */}
             <div className="bg-white rounded-3xl shadow-md border border-gray-100 p-6">
