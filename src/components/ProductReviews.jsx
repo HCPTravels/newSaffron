@@ -22,6 +22,7 @@ const ProductReviews = ({ ProductId }) => {
   const { user } = useAuth();
 
   const fetchReviews = async () => {
+    console.log("Fetching reviews from server...");
     setIsLoading(true);
     try {
       const response = await axios.get(
@@ -41,7 +42,8 @@ const ProductReviews = ({ ProductId }) => {
 
   useEffect(() => {
     fetchReviews();
-  }, [ProductId, backendUrl, token]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [ProductId]);
 
   const renderStars = (rating) => {
     return (
@@ -144,7 +146,7 @@ const ProductReviews = ({ ProductId }) => {
       <div className="flex justify-between items-center mb-4">
         <button
           onClick={() => setIsModalOpen(true)}
-          className="bg-orange-500 hover:bg-orange-600 text-white px-4 py-2 rounded-lg text-md"
+          className="bg-[#ff6523]  text-white px-4 py-2 rounded-lg text-md"
         >
           Write a Review
         </button>
@@ -247,10 +249,10 @@ const ProductReviews = ({ ProductId }) => {
 
       {/* Modal */}
       {isModalOpen && (
-        <div className="fixed inset-0 bg-black/40 flex items-start justify-center pt-10 z-50">
-          <div className="bg-white rounded-xl shadow-lg w-[90%] md:w-[50%] relative">
+        <div className="fixed inset-0 bg-black/40 flex items-center justify-center p-4 z-50">
+          <div className="bg-white rounded-xl shadow-lg w-[90%] md:w-[50%] max-h-[90vh] overflow-y-auto relative transform translate-y-4">
             {/* Modal Header */}
-            <div className="bg-orange-500 text-white px-6 py-4 rounded-t-xl flex justify-between items-center">
+            <div className="bg-[#ff6523] text-white px-6 py-4 rounded-t-xl flex justify-between items-center">
               <h3 className="text-xl md:text-2xl font-semibold">
                 {isEditMode ? "Edit Your Review" : "Write a Review"}
               </h3>

@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { motion } from "framer-motion";
 import { Mail, Phone, MapPin, Send, Facebook, Twitter, Instagram, CheckCircle } from "lucide-react";
-import { toast, Toaster } from "sonner";
+import { toast } from "sonner";
 import Saffron from "../assets/saffron.png";
 import SaffronIcon from "../assets/icons8-saffron-64 (1).png";
 import saffronHome from "../assets/saffronHome.png";
@@ -63,22 +63,6 @@ const ContactFormSection = () => {
   };
   return (
     <div className="relative bg-gradient-to-br from-[#ff6523]/10 to-[#ff6523]/20 h-screen flex items-center justify-center p-4">
-      <Toaster
-        position="top-center" 
-        richColors 
-        closeButton 
-        toastOptions={{
-          style: {
-            fontFamily: 'system-ui, -apple-system, sans-serif',
-            fontSize: '14px',
-            fontWeight: '500',
-            borderRadius: '12px',
-            padding: '16px',
-            boxShadow: '0 10px 25px rgba(0, 0, 0, 0.1), 0 4px 6px rgba(0, 0, 0, 0.05)',
-            backdropFilter: 'blur(8px)',
-          },
-        }}
-      />
 
       {/* Background Elements */}
       <div className="absolute inset-0 overflow-hidden z-0">

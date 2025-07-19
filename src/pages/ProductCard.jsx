@@ -29,10 +29,8 @@ const ProductCard = ({
     e.stopPropagation();
     try {
       await onAddToCart(product);
-      toast.success(`${product.name} has been added to your cart`);
     } catch (error) {
       console.error("Error adding to cart:", error);
-      toast.error("Failed to add item to cart");
     }
   };
 

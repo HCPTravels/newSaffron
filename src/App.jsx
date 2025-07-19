@@ -35,9 +35,25 @@ import { ProductProvider } from "./context/ProductContext";
 import Wishlist from "./components/Wishlisht";
 import { WishlistProvider } from "./context/WishlistContext";
 import ResetPassword from "./pages/ResetPassword";
+import { Toaster } from "sonner";
+import { useEffect, useState } from "react";
 
 function App() {
   const location = useLocation();
+  const [toastPosition, setToastPosition] = useState("top-right");
+
+  useEffect(() => {
+    const checkPosition = () => {
+      if (window.innerWidth < 640) {
+        setToastPosition("top-center");
+      } else {
+        setToastPosition("top-right");
+      }
+    };
+    checkPosition();
+    window.addEventListener("resize", checkPosition);
+    return () => window.removeEventListener("resize", checkPosition);
+  }, []);
 
   const hideNavbarRoutes = [
     "/profile",
@@ -51,111 +67,112 @@ function App() {
 
   return (
     <AuthProvider>
-      <CartProvider>
-        <ProductProvider>
-          <WishlistProvider>
-            {!hideNavbar && <Navbar />}
+      <Toaster richColors closeButton position={toastPosition} />
+      {!hideNavbar && <Navbar />}
 
-            <Routes>
-              <Route
-                path="/"
-                element={
-                  <>
-                    <HeroSection />
-                    <AllProducts />
-                    <Contact />
-                  </>
-                }
-              />
-              <Route path="/login" element={<LoginPage />} />
-              <Route path="/signup" element={<Signup />} />
-              <Route path="/login-success" element={<LoginSuccess />} />
-              {/* <Route path="/otpverify" element={<OtpVerificationPage />} /> */}
-              <Route path="/signupform" element={<SignupForm />} />
-              <Route path="/blog" element={<Blog />} />
-              <Route path="/about" element={<About />} />
-              <Route path="/contact" element={<ContactUs />} />
-              <Route path="/partners" element={<OurPartners />} />
-              <Route path="/sellersignup" element={<SellerSignupPage />} />
-              <Route path="/saffronpackaging" element={<SaffronPackaging />} />
-              <Route path="/precioussaffron" element={<SaffronComponent />} />
-              <Route path="/naturalsaffron" element={<SaffronQuality />} />
-              <Route path="/aboutus" element={<About />} />
-              <Route path="/ourpartners" element={<OurPartners />} />
-              <Route
-                path="/sellerdashboard"
-                element={
-                  <SellerProtectedRoute>
-                    <SellerDashboard />
-                  </SellerProtectedRoute>
-                }
-              />
-              <Route path="/sellerlogin" element={<SellerLogin />} />
-              <Route
-                path="/productlisting"
-                element={<SaffronProductListing />}
-              />
-              <Route
-                path="/adminpanel"
-                element={
-                  <AdminRoute>
-                    <AdminProductPanel />
-                  </AdminRoute>
-                }
-              />
+      <Routes>
+        <Route
+          path="/"
+          element={
+            <>
+              <HeroSection />
+              <AllProducts />
+              <Contact />
+            </>
+          }
+        />
+        <Route path="/login" element={<LoginPage />} />
+        <Route path="/signup" element={<Signup />} />
+        <Route path="/login-success" element={<LoginSuccess />} />
+        {/* <Route path="/otpverify" element={<OtpVerificationPage />} /> */}
+        <Route path="/signupform" element={<SignupForm />} />
+        <Route path="/blog" element={<Blog />} />
+        <Route path="/about" element={<About />} />
+        <Route path="/contact" element={<ContactUs />} />
+        <Route path="/partners" element={<OurPartners />} />
+        <Route path="/sellersignup" element={<SellerSignupPage />} />
+        <Route path="/saffronpackaging" element={<SaffronPackaging />} />
+        <Route path="/precioussaffron" element={<SaffronComponent />} />
+        <Route path="/naturalsaffron" element={<SaffronQuality />} />
+        <Route path="/aboutus" element={<About />} />
+        <Route path="/ourpartners" element={<OurPartners />} />
+        <Route
+          path="/sellerdashboard"
+          element={
+            <SellerProtectedRoute>
+              <SellerDashboard />
+            </SellerProtectedRoute>
+          }
+        />
+        <Route path="/sellerlogin" element={<SellerLogin />} />
+        <Route
+          path="/productlisting"
+          element={<SaffronProductListing />}
+        />
+        <Route
+          path="/adminpanel"
+          element={
+            <AdminRoute>
+              <AdminProductPanel />
+            </AdminRoute>
+          }
+        />
 
-              {/* Profile routes with nested structure */}
-              <Route
-                path="/profile/*"
-                element={
+        {/* Profile routes with nested structure */}
+        <Route
+          path="/profile/*"
+          element={
+            <CartProvider>
+              <ProductProvider>
+                <WishlistProvider>
                   <ProtectedRoute>
                     <Profile />
                   </ProtectedRoute>
-                }
-              />
+                </WishlistProvider>
+              </ProductProvider>
+            </CartProvider>
+          }
+        />
 
-              {/* Standalone routes (these will show main navbar) */}
-              <Route
-                path="/homepage"
-                element={
-                  <ProtectedRoute>
-                    <Home />
-                  </ProtectedRoute>
-                }
-              />
-              <Route
-                path="/categories"
-                element={
-                  <ProtectedRoute>
-                    <Categories />
-                  </ProtectedRoute>
-                }
-              />
-              <Route
-                path="/cart"
-                element={<Navigate to="/profile/cart" replace />}
-              />
-              <Route
-                path="/wishlist"
-                element={
-                  <ProtectedRoute>
-                    <Wishlist />
-                  </ProtectedRoute>
-                }
-              />
-              <Route
-                path="/account"
-                element={
-                  <ProtectedRoute>
-                    <Account />
-                  </ProtectedRoute>
-                }
-              />
-              <Route path="/reset-password" element={<ResetPassword />} />
-            </Routes>
-          </WishlistProvider>
-        </ProductProvider>
-      </CartProvider>
+        {/* Standalone routes (these will show main navbar) */}
+        <Route
+          path="/homepage"
+          element={
+            <ProtectedRoute>
+              <Home />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/categories"
+          element={
+            <ProtectedRoute>
+              <Categories />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/cart"
+          element={<Navigate to="/profile/cart" replace />}
+        />
+        <Route
+          path="/wishlist"
+          element={
+            <ProtectedRoute>
+              <Wishlist />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/account"
+          element={
+            <ProtectedRoute>
+              <Account />
+            </ProtectedRoute>
+          }
+        />
+        <Route path="/reset-password" element={<ResetPassword />} />
+      </Routes>
     </AuthProvider>
   );
 }

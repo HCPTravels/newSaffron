@@ -6,7 +6,7 @@ import SaffronIcon from "../assets/icons8-saffron-64 (1).png";
 import Saffron from "../assets/saffron.png";
 import { useAuth } from '../context/AuthContext';
 import { useNavigate } from "react-router-dom";
-import { toast, Toaster } from "sonner";
+import { toast } from "sonner";
 import { useLocation } from "react-router-dom";
 
 const SignupForm = () => {
@@ -89,21 +89,6 @@ const SignupForm = () => {
 
   return (
     <div className="mt-20 flex items-center justify-center p-4 md:top-0 relative overflow-hidden bg-[#ff6523] min-h-screen">
-      <Toaster 
-        richColors 
-        closeButton 
-        toastOptions={{
-          style: {
-            fontFamily: 'system-ui, -apple-system, sans-serif',
-            fontSize: '14px',
-            fontWeight: '500',
-            borderRadius: '12px',
-            padding: '16px',
-            boxShadow: '0 10px 25px rgba(0, 0, 0, 0.1), 0 4px 6px rgba(0, 0, 0, 0.05)',
-            backdropFilter: 'blur(8px)',
-          },
-        }}
-      />
 
       <div className="hidden sm:flex absolute inset-0 justify-center items-center z-0">
         <img 

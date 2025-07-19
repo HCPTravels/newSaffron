@@ -108,8 +108,6 @@ const PaymentGateway = ({ totalPrice, onClose }) => {
               console.log("🎯 verifyResponse.data:", verifyResponse.data);
 
               if (verifyResponse.data.success) {
-                alert("✅ Payment verified successfully!");
-
                 console.log("Clearing cart now...");
 
                 await axios.delete(`${backendUrl}/api/cart/clear`, {

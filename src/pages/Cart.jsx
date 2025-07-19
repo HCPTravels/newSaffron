@@ -339,7 +339,7 @@ const Cart = () => {
               </div>
 
               <button
-                className="w-full mt-6 py-3 bg-gradient-to-r from-orange-500 to-orange-600 hover:from-orange-600 hover:to-orange-700 text-white font-bold rounded-full shadow-md hover:shadow-lg transition-all flex items-center justify-center gap-2 text-lg"
+                className="w-full mt-6 py-3 bg-[#ff6523] hover:from-orange-600 hover:to-orange-700 text-white font-bold rounded-xl shadow-md hover:shadow-lg transition-all flex items-center justify-center gap-2 text-lg"
                 onClick={() => setShowPayment(true)}
               >
                 Proceed to Checkout

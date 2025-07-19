@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from "react";
-import { Routes, Route, useLocation, useNavigate } from "react-router-dom";
+import { Routes, Route, useLocation, useNavigate, useParams } from "react-router-dom";
 import {
   Home,
   Grid,
@@ -159,6 +159,44 @@ function ProfileNavbar({
   );
 }
 
+// --- ProductDetailsWrapper component - Fixed with proper dependency handling ---
+function ProductDetailsWrapper() {
+  const { id } = useParams();
+  const navigate = useNavigate();
+  const location = useLocation();
+  
+  // Add key to force remount when ID changes
+  const componentKey = `product-${id}`;
+  
+  // Validate ID format (assuming MongoDB ObjectId format)
+  const isValidId = id && /^[0-9a-fA-F]{24}$/.test(id);
+  
+  if (!isValidId) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="text-center">
+          <h2 className="text-2xl font-bold text-red-600 mb-4">Invalid Product ID</h2>
+          <p className="text-gray-600 mb-4">The product ID format is invalid.</p>
+          <button
+            onClick={() => navigate("/profile")}
+            className="px-4 py-2 bg-[#ff6523] text-white rounded hover:bg-[#e55a1d] transition-colors"
+          >
+            Go Back to Home
+          </button>
+        </div>
+      </div>
+    );
+  }
+  
+  return (
+    <ProductDetails 
+      key={componentKey}
+      id={id} 
+      onBack={() => navigate("/profile")} 
+    />
+  );
+}
+
 // --- Main Profile component ---
 const NAVBAR_HEIGHT = 88; // px, adjust if needed (py-4 + logo height)
 
@@ -179,11 +217,12 @@ const Profile = () => {
   const profileButtonRef = useRef(null);
   const currencyRef = useRef(null);
   const { user } = useAuth();
-  const [selectedProductId, setSelectedProductId] = useState(null);
 
-  // Handle route redirects for standalone routes
+  // Handle route redirects for standalone routes - Improved with better path matching
   useEffect(() => {
     const path = location.pathname;
+    
+    // Only redirect if we're on the exact standalone paths
     if (path === '/cart') {
       navigate('/profile/cart', { replace: true });
     } else if (path === '/homepage') {
@@ -199,7 +238,7 @@ const Profile = () => {
     }
   }, [location.pathname, navigate]);
 
-  // Get current tab based on URL
+  // Get current tab based on URL - Improved with better path detection
   const getCurrentTab = () => {
     const path = location.pathname;
     if (path.includes("/profile/cart")) return "Cart";
@@ -207,6 +246,7 @@ const Profile = () => {
     if (path.includes("/profile/account")) return "Profile";
     if (path.includes("/profile/wishlist")) return "Wishlist";
     if (path.includes("/profile/orders")) return "Orders";
+    if (path.includes("/profile/product/")) return "Home"; // Product details shows Home as active
     return "Home"; // Default to Home
   };
 
@@ -321,6 +361,7 @@ const Profile = () => {
   const isCartRoute = location.pathname.includes("/profile/cart");
   const isWishlistRoute = location.pathname.includes("/profile/wishlist");
   const isOrdersRoute = location.pathname.includes("/profile/orders");
+  const isProductRoute = location.pathname.includes("/profile/product/");
 
   return (
     <>
@@ -347,46 +388,44 @@ const Profile = () => {
         navigate={navigate}
         currencies={currencies}
       />
+      
+      {/* Decorative images - Only show on non-product pages to avoid conflicts */}
+      {!isProductRoute && (
+        <>
+          <img
+            src={SaffronHome}
+            alt="Saffron Home"
+            className="absolute left-full fixed opacity-30
+                       w-[200px] h-[200px] xs:w-[250px] xs:h-[250px]
+                       sm:w-[300px] sm:h-[300px]
+                       md:w-[400px] md:h-[400px]
+                       lg:w-[500px] lg:h-[500px]
+                       xl:w-[550px] xl:h-[550px]
+                       2xl:w-[767px] 2xl:h-[767px]
+                       object-cover z-11 transition-transform duration-700 ease-out pointer-events-none"
+            style={{ transform: `translateX(-50%) translateY(${scrollY * 0.3}px)` }}
+          />
+          <img
+            src={SaffronHome}
+            alt="Decorative Saffron"
+            className="fixed bottom-[-75px] left-[-75px] w-[150px] h-[150px]
+                   md:top-[586px] md:left-[-154px] md:w-[375px] md:h-[375px]
+                   object-cover pointer-events-none opacity-30 z-11 transition-transform duration-700 ease-out"
+            style={{
+              transform: `translateY(${scrollY * -0.2}px) rotate(${scrollY * 0.1}deg)`,
+            }}
+          />
+        </>
+      )}
+      
       {/* Add top padding to push content below the fixed navbar */}
-      <div style={{ paddingTop: `${NAVBAR_HEIGHT}px` }}>
-        {/* Decorative images always visible on all profile subpages */}
-        <img
-          src={SaffronHome}
-          alt="Saffron Home"
-          className="absolute left-full fixed opacity-30
-                     w-[200px] h-[200px] xs:w-[250px] xs:h-[250px]
-                     sm:w-[300px] sm:h-[300px]
-                     md:w-[400px] md:h-[400px]
-                     lg:w-[500px] lg:h-[500px]
-                     xl:w-[550px] xl:h-[550px]
-                     2xl:w-[767px] 2xl:h-[767px]
-                     object-cover z-11 transition-transform duration-700 ease-out pointer-events-none"
-          style={{ transform: `translateX(-50%) translateY(${scrollY * 0.3}px)` }}
-        />
-        <img
-          src={SaffronHome}
-          alt="Decorative Saffron"
-          className="fixed bottom-[-75px] left-[-75px] w-[150px] h-[150px]
-                 md:top-[586px] md:left-[-154px] md:w-[375px] md:h-[375px]
-                 object-cover pointer-events-none opacity-30 z-11 transition-transform duration-700 ease-out"
-          style={{
-            transform: `translateY(${scrollY * -0.2}px) rotate(${scrollY * 0.1}deg)`,
-          }}
-        />
-        {/* Main Page Content */}
+      <div style={{ paddingTop: NAVBAR_HEIGHT }} className="min-h-screen">
         <div className={`min-h-screen pt-4 pb-24 px-4 relative z-10`}>
-          <Routes location={location} key={location.pathname}>
+          <Routes>
             <Route
               path="/"
               element={
-                selectedProductId ? (
-                  <ProductDetails
-                    id={selectedProductId}
-                    onBack={() => setSelectedProductId(null)}
-                  />
-                ) : (
-                  <HomePage onSelectProduct={setSelectedProductId} />
-                )
+                <HomePage onSelectProduct={(id) => navigate(`/profile/product/${id}`)} />
               }
             />
             <Route path="/categories" element={<Categories />} />
@@ -402,88 +441,91 @@ const Profile = () => {
             } />
             <Route path="/orders" element={<Order />} />
             <Route path="/account" element={<Account isVisible={true} />} />
+            <Route path="/product/:id" element={<ProductDetailsWrapper />} />
           </Routes>
         </div>
       </div>
-
-      {/* Mobile Bottom Tab */}
-      <div className="md:hidden fixed inset-x-0 bottom-0 z-50 px-4 pb-6 pt-2">
-        <div className="flex relative bg-gradient-to-r from-white/95 via-white/90 to-white/95 backdrop-blur-xl rounded-2xl shadow-2xl overflow-hidden">
-          <div
-            className="absolute top-2 bottom-2 bg-gradient-to-r from-[#ff6523]/20 to-[#ff6523]/30 rounded-xl transition-all duration-500 ease-out"
-            style={{
-              left: `${
-                mobileTabs.findIndex((tab) => tab.label === activeTab) * 20 + 2
-              }%`,
-              width: "16%",
-              transform: `translateY(${Math.sin(Date.now() * 0.001) * 1}px)`,
-            }}
-          />
-
-          {mobileTabs.map((tab, index) => (
-            <button
-              key={index}
-              onClick={() => handleTabClick(tab)}
-              className={`flex-1 py-4 flex flex-col items-center justify-center transition-all duration-300 relative group ${
-                activeTab === tab.label
-                  ? "text-[#ff6523] scale-105"
-                  : "text-gray-600 hover:text-gray-800"
-              }`}
+      
+      {/* Mobile Bottom Tab - Hide on product pages for better UX */}
+      {!isProductRoute && (
+        <div className="md:hidden fixed inset-x-0 bottom-0 z-50 px-4 pb-6 pt-2">
+          <div className="flex relative bg-gradient-to-r from-white/95 via-white/90 to-white/95 backdrop-blur-xl rounded-2xl shadow-2xl overflow-hidden">
+            <div
+              className="absolute top-2 bottom-2 bg-gradient-to-r from-[#ff6523]/20 to-[#ff6523]/30 rounded-xl transition-all duration-500 ease-out"
               style={{
-                transform:
-                  activeTab === tab.label
-                    ? `translateY(-2px) scale(1.05)`
-                    : "translateY(0px) scale(1)",
+                left: `${
+                  mobileTabs.findIndex((tab) => tab.label === activeTab) * 20 + 2
+                }%`,
+                width: "16%",
+                transform: `translateY(${Math.sin(Date.now() * 0.001) * 1}px)`,
               }}
-            >
-              <div
-                className={`relative transition-all duration-300 ${
-                  activeTab === tab.label ? "mb-1" : "mb-0.5"
-                }`}
-              >
-                <tab.icon
-                  className={`w-6 h-6 transition-all duration-300 ${
-                    activeTab === tab.label
-                      ? "scale-110 drop-shadow-sm"
-                      : "scale-100 group-hover:scale-105"
-                  }`}
-                />
+            />
 
-                {activeTab === tab.label && (
-                  <>
-                    <div className="absolute -inset-2 bg-[#ff6523]/10 rounded-full animate-ping opacity-75" />
-                    <div className="absolute -bottom-3 left-1/2 transform -translate-x-1/2 w-2 h-0.5 bg-gradient-to-r from-[#ff6523] to-[#ff8547] rounded-full shadow-lg" />
-                  </>
-                )}
-
-                {tab.label === "Cart" && (
-                  <span className="absolute -top-2 -right-2 text-white bg-gradient-to-r from-[#ff6523] to-[#ff8547] text-[10px] rounded-full h-4 w-4 flex items-center justify-center font-bold shadow-md animate-bounce">
-                    {cartItems.length}
-                  </span>
-                )}
-
-                {tab.label === "Wishlist" && (
-                  <span className="absolute -top-2 -right-2 text-white bg-gradient-to-r from-[#ff6523] to-[#ff8547] text-[10px] rounded-full h-4 w-4 flex items-center justify-center font-bold shadow-md">
-                  {wishlist?.length}
-                  </span>
-                )}
-              </div>
-              <span
-                className={`text-[10px] tracking-wide transition-all duration-300 ${
+            {mobileTabs.map((tab, index) => (
+              <button
+                key={index}
+                onClick={() => handleTabClick(tab)}
+                className={`flex-1 py-4 flex flex-col items-center justify-center transition-all duration-300 relative group ${
                   activeTab === tab.label
-                    ? "font-bold opacity-100 scale-105 text-[#ff6523]"
-                    : "font-medium opacity-80 scale-100 group-hover:opacity-100"
+                    ? "text-[#ff6523] scale-105"
+                    : "text-gray-600 hover:text-gray-800"
                 }`}
+                style={{
+                  transform:
+                    activeTab === tab.label
+                      ? `translateY(-2px) scale(1.05)`
+                      : "translateY(0px) scale(1)",
+                }}
               >
-                {tab.label}
-              </span>
-              <div className="absolute inset-0 rounded-xl bg-[#ff6523]/5 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
-            </button>
-          ))}
+                <div
+                  className={`relative transition-all duration-300 ${
+                    activeTab === tab.label ? "mb-1" : "mb-0.5"
+                  }`}
+                >
+                  <tab.icon
+                    className={`w-6 h-6 transition-all duration-300 ${
+                      activeTab === tab.label
+                        ? "scale-110 drop-shadow-sm"
+                        : "scale-100 group-hover:scale-105"
+                    }`}
+                  />
 
-          <div className="absolute bottom-0 left-1/2 transform -translate-x-1/2 w-12 h-0.5 bg-gradient-to-r from-transparent via-[#ff6523]/30 to-transparent rounded-full" />
+                  {activeTab === tab.label && (
+                    <>
+                      <div className="absolute -inset-2 bg-[#ff6523]/10 rounded-full animate-ping opacity-75" />
+                      <div className="absolute -bottom-3 left-1/2 transform -translate-x-1/2 w-2 h-0.5 bg-gradient-to-r from-[#ff6523] to-[#ff8547] rounded-full shadow-lg" />
+                    </>
+                  )}
+
+                  {tab.label === "Cart" && (
+                    <span className="absolute -top-2 -right-2 text-white bg-gradient-to-r from-[#ff6523] to-[#ff8547] text-[10px] rounded-full h-4 w-4 flex items-center justify-center font-bold shadow-md animate-bounce">
+                      {cartItems.length}
+                    </span>
+                  )}
+
+                  {tab.label === "Wishlist" && (
+                    <span className="absolute -top-2 -right-2 text-white bg-gradient-to-r from-[#ff6523] to-[#ff8547] text-[10px] rounded-full h-4 w-4 flex items-center justify-center font-bold shadow-md">
+                    {wishlist?.length}
+                    </span>
+                  )}
+                </div>
+                <span
+                  className={`text-[10px] tracking-wide transition-all duration-300 ${
+                    activeTab === tab.label
+                      ? "font-bold opacity-100 scale-105 text-[#ff6523]"
+                      : "font-medium opacity-80 scale-100 group-hover:opacity-100"
+                  }`}
+                >
+                  {tab.label}
+                </span>
+                <div className="absolute inset-0 rounded-xl bg-[#ff6523]/5 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+              </button>
+            ))}
+
+            <div className="absolute bottom-0 left-1/2 transform -translate-x-1/2 w-12 h-0.5 bg-gradient-to-r from-transparent via-[#ff6523]/30 to-transparent rounded-full" />
+          </div>
         </div>
-      </div>
+      )}
     </>
   );
 };

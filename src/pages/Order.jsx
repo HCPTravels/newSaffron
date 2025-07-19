@@ -3,7 +3,7 @@ import { useAuth } from "../context/AuthContext";
 import { Loader2, Package, AlertCircle, ChevronDown, ChevronUp } from "lucide-react";
 import axios from "axios";
 import { motion } from "framer-motion";
-import { toast, Toaster } from "sonner";
+import { toast } from "sonner";
 import SaffronIcon from "../assets/icons8-saffron-64 (1).png";
 
 const Order = () => {
@@ -107,7 +107,7 @@ const Order = () => {
           <h3 className="text-xl font-bold text-gray-900 mb-2">No orders found</h3>
           <p className="text-gray-600 mb-6">You haven't placed any orders yet.</p>
           <button 
-            onClick={() => window.location.href = "/products"}
+            onClick={() => window.location.href = "/profile"}
             className="px-4 py-2 bg-gradient-to-r from-[#fe6522] to-[#e55a1d] text-white rounded-lg hover:shadow-md transition-all"
           >
             Browse Products
@@ -119,7 +119,6 @@ const Order = () => {
 
   return (
     <div className="min-h-screen flex flex-col">
-      <Toaster position="top-right" richColors />
       {/* Header */}
       <div className="w-full px-4 sm:px-8 mt-0 sm:mt-4 mb-2 sm:mb-4 flex flex-col items-center text-center flex-shrink-0">
         <div className="flex items-center justify-center gap-2 sm:gap-3 mb-2">

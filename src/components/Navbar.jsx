@@ -94,7 +94,7 @@ const Navbar = () => {
         <div className="w-full max-w-7xl mx-auto flex justify-between items-center">
           <div className="flex items-center">
             <img 
-              onClick={() => navigate('/')}
+              onClick={() => user ? navigate('/profile') : navigate('/')}
               style={{ cursor: 'pointer' }}
               src={Subtract} 
               alt="Logo" 

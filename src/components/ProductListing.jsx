@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { ImagePlus, Trash2, Loader2, Save, ChevronDown, Plus } from "lucide-react";
-import { toast, Toaster } from "sonner";
+import { toast } from "sonner";
 import axios from "axios";
 
 const SaffronProductListing = () => {
@@ -118,7 +118,6 @@ const SaffronProductListing = () => {
 
   return (
     <div className="min-h-screen bg-gray-50">
-      <Toaster richColors closeButton position="top-center" />
       
       {/* Modern Header */}
       <div className="bg-white shadow-sm">

@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
 import { LogIn, CheckCircle, Mail, AlertCircle } from "lucide-react";
 import { FcGoogle } from "react-icons/fc";
-import { toast, Toaster } from "sonner";
+import { toast } from "sonner";
 import Saffron from "../assets/newsaffron.png";
 import SaffronIcon from "../assets/icons8-saffron-64 (1).png";
 import { useAuth } from '../context/AuthContext';
@@ -251,21 +251,6 @@ const Signup = () => {
       initial="hidden"
       animate="visible"
     >
-      <Toaster
-        richColors
-        closeButton
-        toastOptions={{
-          style: {
-            fontFamily: 'system-ui, -apple-system, sans-serif',
-            fontSize: '14px',
-            fontWeight: '500',
-            borderRadius: '12px',
-            padding: '16px',
-            boxShadow: '0 10px 25px rgba(0, 0, 0, 0.1), 0 4px 6px rgba(0, 0, 0, 0.05)',
-            backdropFilter: 'blur(8px)',
-          },
-        }}
-      />
 
       <motion.div
         variants={cardVariants}

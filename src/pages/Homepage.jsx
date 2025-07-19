@@ -4,7 +4,7 @@ import {
   Loader2,
 } from "lucide-react";
 import { motion } from "framer-motion";
-import { toast, Toaster } from "sonner";
+import { toast } from "sonner";
 import { useAuth } from "../context/AuthContext";
 import { useCart } from "../context/CartContext";
 import { useWishlist } from "../context/WishlistContext";
@@ -88,7 +88,6 @@ const Home = ({ onSelectProduct }) => {
   if (isProductsLoading && products.length === 0) {
     return (
       <div className="min-h-screen relative">
-        <Toaster richColors closeButton />
         <LoadingState />
       </div>
     );
@@ -96,7 +95,6 @@ const Home = ({ onSelectProduct }) => {
 
   return (
     <div className="min-h-screen relative">
-      <Toaster richColors closeButton />
       {/* Hero Section */}
       <div className="relative pt-24 pb-16 px-4 overflow-hidden">
         <motion.div

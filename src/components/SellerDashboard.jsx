@@ -17,7 +17,7 @@ import {
   Menu,
   X as CloseIcon
 } from "lucide-react";
-import { toast, Toaster } from "sonner";
+import { toast } from "sonner";
 import { useAuth } from '../context/AuthContext';
 import axios from "axios";
 
@@ -84,17 +84,7 @@ const SellerDashboard = () => {
 
   return (
     <div className="flex h-screen bg-gray-50">
-      <Toaster
-        richColors
-        closeButton
-        position="top-center"
-        toastOptions={{
-          style: {
-            borderRadius: '12px',
-            backdropFilter: 'blur(8px)',
-          },
-        }}
-      />
+      
 
       {/* Desktop Sidebar */}
       <div className="hidden md:flex flex-col w-64 bg-white border-r border-gray-100 shadow-sm">
