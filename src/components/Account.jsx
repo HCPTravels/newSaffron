@@ -120,7 +120,7 @@ const Account = ({ isVisible, onClose, onMouseEnter, onMouseLeave }) => {
                     key={index}
                     whileHover={{ backgroundColor: "#f97316", color: "#ffffff" }}
                     whileTap={{ scale: 0.98 }}
-                    className="flex items-center justify-between px-5 py-2.5 
+                    className="flex items-center justify-between px-5 py-2
                                transition-all cursor-pointer hover:bg-orange-50 group"
                     onClick={() => handleItemClick(item.label, item.onClick)}
                   >
