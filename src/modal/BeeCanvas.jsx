@@ -2,6 +2,7 @@ import React, { useEffect, useRef, useState } from 'react';
 import { Canvas } from '@react-three/fiber';
 import BeeModel from './BeeModel';
 import AnimatedCamera from './AnimatedCamera';
+import BeeLoadingScreen from '../components/BeeLoading.jsx';
 
 const desktopKeyframes = [
   { scroll: 1, x: 550, y: -150 },
@@ -124,6 +125,7 @@ export default function BeeCanvas() {
   const [windowScrollY, setWindowScrollY] = useState(0);
   const [isLoaded, setIsLoaded] = useState(false);
   const [canvasReady, setCanvasReady] = useState(false);
+  const [progress, setProgress] = useState(0);
   const screenSize = useScreenSize();
 
   const keyframes = screenSize.isMobile ? mobileKeyframes : desktopKeyframes;
@@ -137,8 +139,18 @@ export default function BeeCanvas() {
   // Wait for screen size and canvas to be ready
   useEffect(() => {
     if (screenSize.width > 0 && screenSize.height > 0) {
-      setIsLoaded(true);
-      setCanvasReady(true);
+      // Simulate loading progress for loader animation
+      let prog = 0;
+      const interval = setInterval(() => {
+        prog += 10;
+        setProgress((prev) => Math.min(prev + 10, 100));
+        if (prog >= 100) {
+          clearInterval(interval);
+          setIsLoaded(true);
+          setCanvasReady(true);
+        }
+      }, 40); // 400ms total
+      return () => clearInterval(interval);
     }
   }, [screenSize.width, screenSize.height]);
 
@@ -219,7 +231,7 @@ export default function BeeCanvas() {
 
   // Don't render until everything is loaded and ready
   if (!isLoaded || !canvasReady || screenSize.width === 0) {
-    return null;
+    return <BeeLoadingScreen isLoaded={isLoaded && canvasReady} progress={progress} onLoaded={() => {}} />;
   }
 
   return (
