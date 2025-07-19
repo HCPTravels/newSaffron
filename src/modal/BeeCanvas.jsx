@@ -137,12 +137,8 @@ export default function BeeCanvas() {
   // Wait for screen size and canvas to be ready
   useEffect(() => {
     if (screenSize.width > 0 && screenSize.height > 0) {
-      const timer = setTimeout(() => {
-        setIsLoaded(true);
-        // Additional delay for canvas to fully initialize
-        setTimeout(() => setCanvasReady(true), 200);
-      }, 150);
-      return () => clearTimeout(timer);
+      setIsLoaded(true);
+      setCanvasReady(true);
     }
   }, [screenSize.width, screenSize.height]);
 
@@ -234,18 +230,17 @@ export default function BeeCanvas() {
         left: `${finalX}px`,
         width: `${canvasWidth}px`,
         height: `${canvasHeight}px`,
-        pointerEvents: 'none', // This ensures the entire div doesn't capture clicks
-        zIndex: 20, // Keep original z-index
+        pointerEvents: 'none',
+        zIndex: 20,
         background: 'transparent',
         backgroundColor: 'transparent',
         opacity: canvasReady ? 1 : 0,
-        transition: 'opacity 0.5s ease-in-out',
+        transition: 'opacity 0s', // Make opacity transition instant
         overflow: 'hidden',
-        // Remove the red border for production
-        // border: '4px solid red'
       }}
     >
       <Canvas
+        style={{ pointerEvents: 'none' }} // Ensures the canvas itself is also click-through
         gl={{ 
           alpha: true, 
           antialias: true, 
@@ -253,14 +248,6 @@ export default function BeeCanvas() {
           preserveDrawingBuffer: false,
           premultipliedAlpha: false,
           clearColor: [0, 0, 0, 0],
-        }}
-        style={{ 
-          background: 'transparent',
-          backgroundColor: 'transparent', 
-          width: '100%', 
-          height: '100%',
-          pointerEvents: 'none', // Also disable pointer events on canvas
-          opacity: 'inherit',
         }}
         camera={{
           position: [0, 0, 5],
