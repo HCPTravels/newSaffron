@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
 import { LogIn, CheckCircle, Eye, EyeOff } from "lucide-react";
@@ -11,6 +11,12 @@ import loaderimage from "../assets/loader1.png";
 import Modal from "../components/Modal";
 
 const LoginPage = () => {
+  useEffect(() => {
+    document.body.style.overflow = 'hidden';
+    return () => {
+      document.body.style.overflow = '';
+    };
+  }, []);
   const { logIn, forgotSendOtp, verifyForgotOtp } = useAuth();
   const navigate = useNavigate();
   const [email, setEmail] = useState("");
@@ -115,7 +121,7 @@ const LoginPage = () => {
 
   return (
     <motion.div
-      className="min-h-[calc(100vh-85px)] flex items-center justify-center p-4"
+      className="h-screen flex items-center justify-center p-4 overflow-hidden"
       variants={containerVariants}
       initial="hidden"
       animate="visible"

@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
 import { LogIn, CheckCircle, Store } from "lucide-react";
@@ -9,6 +9,12 @@ import SaffronIcon from "../assets/icons8-saffron-64 (1).png";
 import { useAuth } from '../context/AuthContext';
 
 const SellerLogin = () => {
+  useEffect(() => {
+    document.body.style.overflow = 'hidden';
+    return () => {
+      document.body.style.overflow = '';
+    };
+  }, []);
   const { sellerLogin } = useAuth();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -141,7 +147,7 @@ const SellerLogin = () => {
 
   return (
     <motion.div 
-      className="min-h-[calc(100vh-85px)] flex items-center justify-center p-4"
+      className="h-screen flex items-center justify-center p-4 overflow-hidden"
       variants={containerVariants}
       initial="hidden"
       animate="visible"
