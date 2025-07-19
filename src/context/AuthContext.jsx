@@ -228,11 +228,17 @@ export const AuthProvider = ({ children }) => {
     setToken(jwt);
 
     const payload = JSON.parse(atob(jwt.split(".")[1]));
-    setUser({
+    const userObj = {
       id: payload.id,
+      firstName: payload.firstName,
+      lastName: payload.lastName,
       email: payload.email,
+      contactNumber: payload.contactNumber,
       username: payload.username,
-    });
+      role: payload.role,
+    };
+    setUser(userObj);
+    localStorage.setItem("user", JSON.stringify(userObj)); // ✅ Save it
 
     return Promise.resolve(true);
   };
@@ -333,7 +339,9 @@ export const AuthProvider = ({ children }) => {
 
   const forgotSendOtp = async (email) => {
     try {
-      const res = await axios.post(`${backendUrl}/api/forget/send-forget-otp`, { email });
+      const res = await axios.post(`${backendUrl}/api/forget/send-forget-otp`, {
+        email,
+      });
       return res.data;
     } catch (error) {
       console.error("Forgot password failed:", error);
@@ -342,9 +350,11 @@ export const AuthProvider = ({ children }) => {
   };
 
   const verifyForgotOtp = async ({ email, otp }) => {
-
     try {
-      const res = await axios.post(`${backendUrl}/api/forget/verify-forget-otp`, { email, otp });
+      const res = await axios.post(
+        `${backendUrl}/api/forget/verify-forget-otp`,
+        { email, otp }
+      );
       return res.data;
     } catch (error) {
       console.error("Forgot password failed:", error);
@@ -372,7 +382,7 @@ export const AuthProvider = ({ children }) => {
         email,
         setEmail,
         forgotSendOtp,
-        verifyForgotOtp
+        verifyForgotOtp,
       }}
     >
       {children}
