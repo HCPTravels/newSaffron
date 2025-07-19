@@ -301,7 +301,6 @@ const Profile = () => {
     { icon: Heart, label: "Wishlist", path: "/profile/wishlist" },
     { icon: ShoppingCart, label: "Cart", path: "/profile/cart" },
     { icon: Package, label: "Orders", path: "/profile/orders" },
-    { icon: MapPin, label: "Addresses", path: "/profile/useraddresses" },
     { icon: User, label: "Profile", path: "/profile/account" },
   ];
 
