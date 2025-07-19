@@ -39,7 +39,11 @@ const Account = ({ isVisible, onClose, onMouseEnter, onMouseLeave }) => {
       },
       { icon: <Tag size={20} />, label: "Coupons" },
       { icon: <HelpCircle size={20} />, label: "Help Center" },
-      { icon: <MapPin size={20} />, label: "Addresses" },
+      { icon: <MapPin size={20} />, label: "Addresses", onClick: () => {
+          navigate("/profile/useraddresses");
+          if (typeof onClose === "function") onClose();
+        }
+      },
       { icon: <Star size={20} />, label: "Reviews" },
       { icon: <Settings size={20} />, label: "Settings" },
     ],

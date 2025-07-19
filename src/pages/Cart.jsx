@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import { useEffect } from "react";
 import {
   ShoppingCart,
@@ -166,6 +166,27 @@ const Cart = () => {
   if (cartItems.length === 0) {
     return <EmptyCart />;
   }
+
+  const [checkingAddresses, setCheckingAddresses] = useState(false);
+
+  const handleProceedToCheckout = async () => {
+    setCheckingAddresses(true);
+    try {
+      const res = await fetch(`${import.meta.env.VITE_BACKEND_URL}/api/user/useraddress`, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      const addresses = await res.json();
+      if (Array.isArray(addresses) && addresses.length > 0) {
+        navigate("/profile/selectaddress", { state: { addresses } });
+      } else {
+        navigate("/profile/address");
+      }
+    } catch (err) {
+      navigate("/profile/address");
+    } finally {
+      setCheckingAddresses(false);
+    }
+  };
 
   return (
     <div className="min-h-screen pt-20 bg-white rounded-xl">
@@ -341,7 +362,7 @@ const Cart = () => {
 
               <button
                 className="w-full mt-6 py-3 bg-[#ff6523] hover:from-orange-600 hover:to-orange-700 text-white font-bold rounded-xl shadow-md hover:shadow-lg transition-all flex items-center justify-center gap-2 text-lg"
-                onClick={() => navigate("/profile/address")}
+                onClick={handleProceedToCheckout}
               >
                 Proceed to Checkout
                 <ArrowRight className="w-5 h-5" />
@@ -369,6 +390,12 @@ const Cart = () => {
           </div>
         </div>
       </div>
+      {checkingAddresses && (
+        <div className="fixed inset-0 z-50 flex flex-col items-center justify-center bg-white/80">
+          <Loader2 className="w-10 h-10 text-[#ff6523] animate-spin" />
+          <p className="mt-6 text-lg text-gray-900 font-semibold">Checking addresses...</p>
+        </div>
+      )}
     </div>
   );
 };

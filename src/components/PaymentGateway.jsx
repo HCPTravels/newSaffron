@@ -1,7 +1,9 @@
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import axios from "axios";
 import { useAuth } from "../context/AuthContext";
 import { useCart } from "../context/CartContext";
+import { useNavigate } from "react-router-dom";
+import { Loader2 } from "lucide-react";
 
 /**
  * @param {Object} props
@@ -9,10 +11,12 @@ import { useCart } from "../context/CartContext";
  * @param {function} props.onClose
  * @param {Object} [props.shippingAddress] - Optional shipping address data to send with payment
  */
-const PaymentGateway = ({ totalPrice, onClose, shippingAddress }) => {
+const PaymentGateway = ({ totalPrice, onClose, shippingAddress, onRazorpayReady }) => {
   const backendUrl = import.meta.env.VITE_BACKEND_URL;
   const { token, user } = useAuth();
   const { cartItems } = useCart();
+  const navigate = useNavigate();
+  const [redirecting, setRedirecting] = useState(false);
   
   // Use ref to prevent multiple executions
   const hasInitialized = useRef(false);
@@ -149,14 +153,19 @@ const PaymentGateway = ({ totalPrice, onClose, shippingAddress }) => {
           modal: {
             ondismiss: function () {
               isProcessing.current = false;
-              if (onClose) onClose();
+              setRedirecting(true);
+              setTimeout(() => {
+                navigate("/profile/cart", { replace: true });
+              }, 800);
             },
           },
         };
 
         const razorpay = new window.Razorpay(options);
+        if (typeof onRazorpayReady === 'function') {
+          onRazorpayReady();
+        }
         razorpay.open();
-        
         isProcessing.current = false;
       } catch (error) {
         console.error("Error in loadRazorpay:", error);
@@ -173,6 +182,15 @@ const PaymentGateway = ({ totalPrice, onClose, shippingAddress }) => {
       isProcessing.current = false;
     };
   }, []); // Empty dependency array to run only once
+
+  if (redirecting) {
+    return (
+      <div className="fixed inset-0 z-50 flex flex-col items-center justify-center bg-white">
+        <Loader2 className="w-10 h-10 text-[#ff6523] animate-spin" />
+        <p className="mt-6 text-lg text-gray-900 font-semibold">Returning to Cart...</p>
+      </div>
+    );
+  }
 
   return null;
 };

@@ -10,6 +10,7 @@ import {
   ChevronDown,
   Globe,
   Package,
+  MapPin,
 } from "lucide-react";
 import { useAuth } from "../context/AuthContext";
 import saffronLogo from "../assets/saffron logo.png";
@@ -24,6 +25,8 @@ import { useCart } from "../context/CartContext";
 import { useWishlist } from '../context/WishlistContext';
 import Order from "../pages/Order";
 import Address from "../pages/Address";
+import UserAddresses from "../pages/UserAddresses";
+import SelectAddress from "../pages/SelectAddress";
 
 // --- ProfileNavbar component ---
 function ProfileNavbar({
@@ -298,6 +301,7 @@ const Profile = () => {
     { icon: Heart, label: "Wishlist", path: "/profile/wishlist" },
     { icon: ShoppingCart, label: "Cart", path: "/profile/cart" },
     { icon: Package, label: "Orders", path: "/profile/orders" },
+    { icon: MapPin, label: "Addresses", path: "/profile/useraddresses" },
     { icon: User, label: "Profile", path: "/profile/account" },
   ];
 
@@ -442,8 +446,10 @@ const Profile = () => {
             } />
             <Route path="/orders" element={<Order />} />
             <Route path="/account" element={<Account isVisible={true} />} />
+            <Route path="/useraddresses" element={<UserAddresses />} />
             <Route path="/product/:id" element={<ProductDetailsWrapper />} />
             <Route path="/address" element={<Address />} />
+            <Route path="/selectaddress" element={<SelectAddress />} />
           </Routes>
         </div>
       </div>
