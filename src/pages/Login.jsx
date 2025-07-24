@@ -49,7 +49,7 @@ const LoginPage = () => {
         icon: <CheckCircle className="h-5 w-5 text-green-500" />,
       });
       setTimeout(() => {
-        navigate(response.user.role === "admin" ? "/adminpanel" : "/profile", {
+        navigate(response.user.role === "admin" ? "/adminpanel" : "/dashboard", {
           replace: true,
         });
       }, 1500);

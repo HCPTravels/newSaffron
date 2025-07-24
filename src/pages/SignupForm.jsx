@@ -52,7 +52,7 @@ const SignupForm = () => {
       });
 
       setTimeout(() => {
-        navigate("/profile");
+        navigate("/dashboard");
       }, 1500);
       
       console.log("Signup successful:", response, user);

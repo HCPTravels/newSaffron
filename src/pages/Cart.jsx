@@ -28,9 +28,10 @@ import SaffronIcon from "../assets/icons8-saffron-64 (1).png";
 const Cart = () => {
   const location = useLocation();
   const navigate = useNavigate();
+  
   // Redirect if accessed directly via /cart
   if (location.pathname === "/cart") {
-    return <Navigate to="/profile/cart" replace />;
+    return <Navigate to="/dashboard/cart" replace />;
   }
 
   const {
@@ -54,9 +55,21 @@ const Cart = () => {
     getTotalItems,
   } = useCart();
 
+  const [checkingAddresses, setCheckingAddresses] = useState(false);
+  const [hasTriedAutoRedirect, setHasTriedAutoRedirect] = useState(false); // Add this state
+
   useEffect(() => {
     fetchCartItems(); // Safe and idempotent, only triggers if needed
   }, [location.pathname]);
+
+  // Add this useEffect to prevent auto-redirect after payment completion
+  useEffect(() => {
+    // If we're on the cart page and cart becomes empty (after payment), 
+    // don't automatically redirect to addresses
+    if (location.pathname === "/dashboard/cart" && cartItems.length === 0 && !isLoading) {
+      setHasTriedAutoRedirect(true);
+    }
+  }, [cartItems.length, isLoading, location.pathname]);
 
   const { token } = useAuth();
 
@@ -131,7 +144,7 @@ const Cart = () => {
         <p className="text-gray-500 mb-6">Looks like you haven't added anything yet.</p>
         <button
           className="px-6 py-2 bg-[#ff6523] text-white font-semibold rounded-lg"
-          onClick={() => (window.location.href = "/profile")}
+          onClick={() => (window.location.href = "/dashboard")}
         >
           Start Shopping
         </button>
@@ -167,9 +180,13 @@ const Cart = () => {
     return <EmptyCart />;
   }
 
-  const [checkingAddresses, setCheckingAddresses] = useState(false);
-
   const handleProceedToCheckout = async () => {
+    // Prevent auto-redirect if we just came from a payment completion
+    if (hasTriedAutoRedirect) {
+      setHasTriedAutoRedirect(false); // Reset for future use
+      return;
+    }
+
     setCheckingAddresses(true);
     try {
       const res = await fetch(`${import.meta.env.VITE_BACKEND_URL}/api/user/useraddress`, {
@@ -177,12 +194,12 @@ const Cart = () => {
       });
       const addresses = await res.json();
       if (Array.isArray(addresses) && addresses.length > 0) {
-        navigate("/profile/selectaddress", { state: { addresses } });
+        navigate("/dashboard/selectaddress", { state: { addresses } });
       } else {
-        navigate("/profile/address");
+        navigate("/dashboard/address");
       }
     } catch (err) {
-      navigate("/profile/address");
+      navigate("/dashboard/address");
     } finally {
       setCheckingAddresses(false);
     }

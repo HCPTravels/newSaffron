@@ -33,7 +33,7 @@ export const AuthProvider = ({ children }) => {
         if (userData.role === "admin") {
           navigate("/adminpanel", { replace: true });
         } else if (window.location.pathname === "/login") {
-          navigate("/profile", { replace: true });
+          navigate("/dashboard", { replace: true });
         }
       }
     }
@@ -129,7 +129,7 @@ export const AuthProvider = ({ children }) => {
         localStorage.setItem("user", JSON.stringify(user));
 
         // ✅ Use replace to avoid going back to signup
-        navigate("/profile", { replace: true });
+        navigate("/dashboard", { replace: true });
       }
       return res.data;
     } catch (error) {
@@ -170,7 +170,7 @@ export const AuthProvider = ({ children }) => {
         if (user.role === "admin") {
           navigate("/adminpanel", { replace: true });
         } else {
-          navigate("/profile", { replace: true });
+          navigate("/dashboard", { replace: true });
         }
       }
 

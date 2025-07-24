@@ -61,7 +61,7 @@ const BottomNavLayout = () => {
               className="p-2 text-gray-600 hover:text-[#ff6523] transition-colors"
               onClick={() => {
                 setActiveTab("Profile");
-                navigate("/profile");
+                navigate("/dashboard");
               }}
             >
               <User className="h-5 w-5" />

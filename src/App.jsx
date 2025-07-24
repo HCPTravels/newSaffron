@@ -1,5 +1,5 @@
 import React from "react";
-import { Routes, Route, useLocation, Navigate } from "react-router-dom";
+import { Routes, Route, useLocation, Navigate, useNavigate } from "react-router-dom";
 import LoginSuccess from "./pages/LoginSuccess";
 import { AuthProvider } from "./context/AuthContext";
 import { CartProvider } from "./context/CartContext";
@@ -37,9 +37,19 @@ import { WishlistProvider } from "./context/WishlistContext";
 import ResetPassword from "./pages/ResetPassword";
 import { Toaster } from "sonner";
 import { useEffect, useState } from "react";
+import Coupons from "./components/Coupons";
+import HelpCenter from "./components/HelpCenter";
+import Reviews from "./components/Reviews";
+import Settings from "./components/Settings";
+import Order from "./pages/Order";
+import Address from "./pages/Address";
+import UserAddresses from "./pages/UserAddresses";
+import SelectAddress from "./pages/SelectAddress";
+import ProductDetailsWrapper from "./components/ProductDetailsWrapper";
 
 function App() {
   const location = useLocation();
+  const navigate = useNavigate();
   const [toastPosition, setToastPosition] = useState("top-right");
 
   useEffect(() => {
@@ -56,7 +66,7 @@ function App() {
   }, []);
 
   const hideNavbarRoutes = [
-    "/profile",
+    "/dashboard",
     "/adminpanel",
     "/sellerdashboard",
     "/productlisting",
@@ -118,9 +128,9 @@ function App() {
           }
         />
 
-        {/* Profile routes with nested structure */}
+        {/* Protected Dashboard Routes - All require authentication */}
         <Route
-          path="/profile/*"
+          path="/dashboard"
           element={
             <CartProvider>
               <ProductProvider>
@@ -132,45 +142,39 @@ function App() {
               </ProductProvider>
             </CartProvider>
           }
-        />
+        >
+          {/* Nested routes within Dashboard */}
+          <Route index element={<Home onSelectProduct={(id) => {
+            console.log("Navigating to product:", id);
+            navigate(`/dashboard/product/${id}`);
+          }} />} />
+          <Route path="categories" element={<Categories />} />
+          <Route path="cart" element={<Cart />} />
+          <Route path="wishlist" element={<Wishlist />} />
+          <Route path="orders" element={<Order />} />
+          <Route path="account" element={<Account isVisible={true} />} />
+          <Route path="useraddresses" element={<UserAddresses />} />
+          <Route path="address" element={<Address />} />
+          <Route path="selectaddress" element={<SelectAddress />} />
+          <Route path="coupons" element={<Coupons />} />
+          <Route path="help-center" element={<HelpCenter />} />
+          <Route path="reviews" element={<Reviews />} />
+          <Route path="settings" element={<Settings />} />
+          <Route path="product/:id" element={<ProductDetailsWrapper />} />
+        </Route>
 
-        {/* Standalone routes (these will show main navbar) */}
-        <Route
-          path="/homepage"
-          element={
-            <ProtectedRoute>
-              <Home />
-            </ProtectedRoute>
-          }
-        />
-        <Route
-          path="/categories"
-          element={
-            <ProtectedRoute>
-              <Categories />
-            </ProtectedRoute>
-          }
-        />
-        <Route
-          path="/cart"
-          element={<Navigate to="/profile/cart" replace />}
-        />
-        <Route
-          path="/wishlist"
-          element={
-            <ProtectedRoute>
-              <Wishlist />
-            </ProtectedRoute>
-          }
-        />
-        <Route
-          path="/account"
-          element={
-            <ProtectedRoute>
-              <Account />
-            </ProtectedRoute>
-          }
-        />
+        {/* Redirect standalone routes to dashboard routes */}
+        <Route path="/homepage" element={<Navigate to="/dashboard" replace />} />
+        <Route path="/categories" element={<Navigate to="/dashboard/categories" replace />} />
+        <Route path="/cart" element={<Navigate to="/dashboard/cart" replace />} />
+        <Route path="/wishlist" element={<Navigate to="/dashboard/wishlist" replace />} />
+        <Route path="/orders" element={<Navigate to="/dashboard/orders" replace />} />
+        <Route path="/account" element={<Navigate to="/dashboard/account" replace />} />
+        <Route path="/coupons" element={<Navigate to="/dashboard/coupons" replace />} />
+        <Route path="/help-center" element={<Navigate to="/dashboard/help-center" replace />} />
+        <Route path="/reviews" element={<Navigate to="/dashboard/reviews" replace />} />
+        <Route path="/settings" element={<Navigate to="/dashboard/settings" replace />} />
+        
         <Route path="/reset-password" element={<ResetPassword />} />
       </Routes>
     </AuthProvider>
