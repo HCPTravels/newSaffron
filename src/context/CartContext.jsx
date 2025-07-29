@@ -194,7 +194,7 @@ export const CartProvider = ({ children }) => {
     }
   };
 
-  // Clear entire cart
+  // Clear entire cart (backend call)
   const clearCart = async () => {
     try {
       const response = await axios.delete(`${backendUrl}/api/cart/clear`, {
@@ -204,6 +204,9 @@ export const CartProvider = ({ children }) => {
 
       if (response.data?.success) {
         setCartItems([]);
+        setPromoCode("");
+        setPromoApplied(false);
+        setDiscount(0);
         toast.success("Cart cleared successfully");
       } else {
         throw new Error("Server returned unsuccessful response");
@@ -212,6 +215,18 @@ export const CartProvider = ({ children }) => {
       console.error("Clear cart error:", error);
       toast.error("Failed to clear cart");
     }
+  };
+
+  // Clear cart locally (immediate UI update without backend call)
+  const clearCartLocal = () => {
+    console.log("Clearing cart locally...");
+    setCartItems([]);
+    setPromoCode("");
+    setPromoApplied(false);
+    setDiscount(0);
+    setUpdatingItem(null);
+    setRemovingItem(null);
+    setShowPayment(false);
   };
 
   // Calculate total price
@@ -279,6 +294,7 @@ export const CartProvider = ({ children }) => {
     removeFromCart,
     addToCart,
     clearCart,
+    clearCartLocal, // Added this method
     applyPromoCode,
     removePromoCode,
 

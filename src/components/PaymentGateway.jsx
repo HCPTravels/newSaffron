@@ -3,7 +3,7 @@ import axios from "axios";
 import { useAuth } from "../context/AuthContext";
 import { useCart } from "../context/CartContext";
 import { useNavigate } from "react-router-dom";
-import { Loader2 } from "lucide-react";
+import { Loader2, CheckCircle } from "lucide-react";
 
 /**
  * @param {Object} props
@@ -19,9 +19,10 @@ const PaymentGateway = ({
 }) => {
   const backendUrl = import.meta.env.VITE_BACKEND_URL;
   const { token, user } = useAuth();
-  const { cartItems } = useCart();
+  const { cartItems, clearCartLocal } = useCart(); // Add clearCartLocal method
   const navigate = useNavigate();
   const [redirecting, setRedirecting] = useState(false);
+  const [paymentSuccess, setPaymentSuccess] = useState(false);
 
   // Use ref to prevent multiple executions
   const hasInitialized = useRef(false);
@@ -106,8 +107,8 @@ const PaymentGateway = ({
                 razorpay_payment_id: response.razorpay_payment_id,
                 razorpay_order_id: response.razorpay_order_id,
                 razorpay_signature: response.razorpay_signature,
-                items: cartItems, // <-- send cart items to backend
-                shippingAddress, // <-- send shipping address to backend if provided
+                items: cartItems,
+                shippingAddress,
               };
 
               console.log("🧾 Sending for verification...", verifyPaymentBody);
@@ -127,27 +128,48 @@ const PaymentGateway = ({
               console.log("🎯 verifyResponse.data:", verifyResponse.data);
 
               if (verifyResponse.data.success) {
-                console.log("Clearing cart now...");
+                console.log("Payment verified successfully");
+                
+                // Show success message first
+                setPaymentSuccess(true);
+                
+                // Wait a moment to show success, then clear cart locally and backend
+                setTimeout(async () => {
+                  try {
+                    // Clear cart locally first for immediate UI update
+                    if (clearCartLocal) {
+                      clearCartLocal();
+                    }
 
-                await axios.delete(`${backendUrl}/api/cart/clear`, {
-                  headers: {
-                    Authorization: `Bearer ${token}`,
-                  },
-                });
+                    // Then clear on backend
+                    await axios.delete(`${backendUrl}/api/cart/clear`, {
+                      headers: {
+                        Authorization: `Bearer ${token}`,
+                      },
+                    });
 
-                console.log("🧹 Cart clear request sent");
-                window.location.href = "/profile/cart";
+                    console.log("🧹 Cart cleared successfully");
+                    
+                    // Navigate to cart page after clearing
+                    window.location.href = "/dashboard/cart";
+                  } catch (error) {
+                    console.error("Error clearing cart:", error);
+                    // Even if backend clear fails, navigate to cart
+                    window.location.href = "/dashboard/cart";
+                  }
+                }, 1500);
               } else {
                 alert("❌ Payment verification failed. Please try again.");
+                setRedirecting(false);
               }
             } catch (error) {
               console.error(
-                "❌ Error during payment verification or cart clear:",
+                "❌ Error during payment verification:",
                 error
               );
               alert("❌ Something went wrong. Try again later.");
-            } finally {
               setRedirecting(false);
+            } finally {
               if (onClose) onClose();
             }
           },
@@ -167,7 +189,7 @@ const PaymentGateway = ({
               isProcessing.current = false;
               setRedirecting(true);
               setTimeout(() => {
-                navigate("/profile/cart", { replace: true });
+                navigate("/dashboard/cart", { replace: true });
               }, 800);
             },
           },
@@ -198,10 +220,26 @@ const PaymentGateway = ({
   if (redirecting) {
     return (
       <div className="fixed inset-0 z-50 flex flex-col items-center justify-center bg-white">
-        <Loader2 className="w-10 h-10 text-[#ff6523] animate-spin" />
-        <p className="mt-6 text-lg text-gray-900 font-semibold">
-          Returning to Cart...
-        </p>
+        {paymentSuccess ? (
+          <>
+            <div className="w-16 h-16 bg-green-500 rounded-full flex items-center justify-center mb-4">
+              <CheckCircle className="w-10 h-10 text-white" />
+            </div>
+            <p className="text-xl text-green-600 font-semibold mb-2">
+              Payment Successful!
+            </p>
+            <p className="text-lg text-gray-600">
+              Preparing your cart...
+            </p>
+          </>
+        ) : (
+          <>
+            <Loader2 className="w-10 h-10 text-[#ff6523] animate-spin" />
+            <p className="mt-6 text-lg text-gray-900 font-semibold">
+              Returning to Cart...
+            </p>
+          </>
+        )}
       </div>
     );
   }

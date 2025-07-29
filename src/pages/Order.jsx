@@ -107,7 +107,7 @@ const Order = () => {
           <h3 className="text-xl font-bold text-gray-900 mb-2">No orders found</h3>
           <p className="text-gray-600 mb-6">You haven't placed any orders yet.</p>
           <button 
-            onClick={() => window.location.href = "/profile"}
+            onClick={() => window.location.href = "/dashboard"}
             className="px-4 py-2 bg-gradient-to-r from-[#fe6522] to-[#e55a1d] text-white rounded-lg hover:shadow-md transition-all"
           >
             Browse Products

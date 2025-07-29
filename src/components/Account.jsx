@@ -24,7 +24,7 @@ const Account = ({ isVisible, onClose, onMouseEnter, onMouseLeave }) => {
     () => [
       { icon: <ShoppingBag size={20} />, label: "Orders",
       onClick: () => {
-        navigate("/profile/orders");
+        navigate("/dashboard/orders");
         if (typeof onClose === "function") onClose();
       },
     },
@@ -33,19 +33,50 @@ const Account = ({ isVisible, onClose, onMouseEnter, onMouseLeave }) => {
         label: "Wishlist",
         count: wishlist?.length ?? "0",
         onClick: () => {
-          navigate("/profile/wishlist");
+          navigate("/dashboard/wishlist");
           if (typeof onClose === "function") onClose();
         },
       },
-      { icon: <Tag size={20} />, label: "Coupons" },
-      { icon: <HelpCircle size={20} />, label: "Help Center" },
-      { icon: <MapPin size={20} />, label: "Addresses", onClick: () => {
-          navigate("/profile/useraddresses");
+      { 
+        icon: <Tag size={20} />, 
+        label: "Coupons",
+        onClick: () => {
+          navigate("/dashboard/coupons");
           if (typeof onClose === "function") onClose();
         }
       },
-      { icon: <Star size={20} />, label: "Reviews" },
-      { icon: <Settings size={20} />, label: "Settings" },
+      { 
+        icon: <HelpCircle size={20} />, 
+        label: "Help Center",
+        onClick: () => {
+          navigate("/dashboard/help-center");
+          if (typeof onClose === "function") onClose();
+        }
+      },
+      { 
+        icon: <MapPin size={20} />, 
+        label: "Addresses", 
+        onClick: () => {
+          navigate("/dashboard/useraddresses");
+          if (typeof onClose === "function") onClose();
+        }
+      },
+      { 
+        icon: <Star size={20} />, 
+        label: "Reviews",
+        onClick: () => {
+          navigate("/dashboard/reviews");
+          if (typeof onClose === "function") onClose();
+        }
+      },
+      { 
+        icon: <Settings size={20} />, 
+        label: "Settings",
+        onClick: () => {
+          navigate("/dashboard/settings");
+          if (typeof onClose === "function") onClose();
+        }
+      },
     ],
     [wishlist, navigate, onClose]
   );

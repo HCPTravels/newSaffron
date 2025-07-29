@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { motion } from "framer-motion";
 import { toast } from "sonner";
+import { useNavigate } from "react-router-dom";
 import {
   ImagePlus,
   Heart,
@@ -18,6 +19,7 @@ const ProductCard = ({
   loadingProductId = null,
   className = "",
 }) => {
+  const navigate = useNavigate();
   const [imageError, setImageError] = useState(false);
   const [wishlistActionLoading, setWishlistActionLoading] = useState(false);
 
@@ -75,9 +77,19 @@ const ProductCard = ({
       : "bg-gray-100 text-gray-800";
   };
 
+  const handleCardClick = () => {
+    console.log("Product card clicked:", product._id);
+    if (onSelectProduct) {
+      onSelectProduct(product._id);
+    } else {
+      // Fallback navigation
+      navigate(`/dashboard/product/${product._id}`);
+    }
+  };
+
   return (
     <motion.div
-      onClick={() => onSelectProduct(product._id)}
+      onClick={handleCardClick}
       className={`group bg-white rounded-xl overflow-hidden shadow-sm hover:shadow-md transition-all border border-gray-200 cursor-pointer ${className}`}
       whileHover={{ y: -5 }}
       initial={{ opacity: 0, y: 20 }}

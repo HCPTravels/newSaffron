@@ -35,7 +35,7 @@ const scaleIn = {
 const About = () => {
   const socialLinks = [
     { icon: Instagram, url: "https://www.instagram.com/kisansaffron/", label: "Instagram" },
-    { icon: Facebook, url: "https://www.facebook.com/profile.php?id=61577939271423", label: "Facebook" },
+    { icon: Facebook, url: "https://www.facebook.com/dashboard.php?id=61577939271423", label: "Facebook" },
     { icon: Twitter, url: "https://x.com/kisan_saffron", label: "Twitter" },
     { icon: Pin, url: "https://in.pinterest.com/kisansaffron/", label: "Pinterest" }
   ];

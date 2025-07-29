@@ -367,7 +367,7 @@ const SellerDashboard = () => {
                     transition={{ duration: 0.2 }}
                   >
                     <Link
-                      to="/seller/profile"
+                      to="/seller/dashboard"
                       className="block px-4 py-2 text-sm text-gray-700 hover:bg-[#ff6523]/10 hover:text-[#ff6523] transition-colors"
                     >
                       Your Profile

@@ -17,7 +17,7 @@ const LoginSuccess = () => {
         try {
           await loginWithGoogle(token);
           toast.success("Logged in successfully!");
-          navigate("/profile", { replace: true });
+          navigate("/dashboard", { replace: true });
         } catch (error) {
           toast.error("Login failed");
           navigate("/login", { replace: true });

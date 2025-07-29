@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from "react";
-import { Routes, Route, useLocation, useNavigate, useParams } from "react-router-dom";
+import { useLocation, useNavigate, Outlet } from "react-router-dom";
 import {
   Home,
   Grid,
@@ -14,19 +14,10 @@ import {
 } from "lucide-react";
 import { useAuth } from "../context/AuthContext";
 import saffronLogo from "../assets/saffron logo.png";
-import HomePage from "../pages/Homepage";
-import Cart from "../pages/Cart";
-import Account from "./Account";
-import Categories from "../pages/Categories";
-import Wishlist from "./Wishlisht";
 import SaffronHome from "../assets/saffronHome.png";
-import ProductDetails from "./ProductDetails";
 import { useCart } from "../context/CartContext";
 import { useWishlist } from '../context/WishlistContext';
-import Order from "../pages/Order";
-import Address from "../pages/Address";
-import UserAddresses from "../pages/UserAddresses";
-import SelectAddress from "../pages/SelectAddress";
+import Account from "./Account";
 
 // --- ProfileNavbar component ---
 function ProfileNavbar({
@@ -59,7 +50,7 @@ function ProfileNavbar({
         <div className="flex items-center space-x-6">
           <div
             className="text-2xl font-bold text-black cursor-pointer whitespace-nowrap"
-            onClick={() => navigate("/profile")}
+            onClick={() => navigate("/dashboard")}
           >
             <img
               src={saffronLogo}
@@ -111,7 +102,7 @@ function ProfileNavbar({
           {/* Wishlist */}
           <button
             className="p-2 text-black transition-colors relative group"
-            onClick={() => navigate("/profile/wishlist")}
+            onClick={() => navigate("/dashboard/wishlist")}
           >
             <Heart className="h-6 w-6 transition-colors" />
             <span className="absolute -top-1 -right-1 text-white bg-[#ff6523] text-xs rounded-full h-5 w-5 flex items-center justify-center">
@@ -121,7 +112,7 @@ function ProfileNavbar({
           {/* Cart */}
           <button
             className="p-2 text-black transition-colors relative"
-            onClick={() => navigate("/profile/cart")}
+            onClick={() => navigate("/dashboard/cart")}
           >
             <ShoppingCart className="h-6 w-6" />
             <span className="absolute -top-1 -right-1 text-white bg-[#ff6523] text-xs rounded-full h-5 w-5 flex items-center justify-center">
@@ -163,44 +154,6 @@ function ProfileNavbar({
   );
 }
 
-// --- ProductDetailsWrapper component - Fixed with proper dependency handling ---
-function ProductDetailsWrapper() {
-  const { id } = useParams();
-  const navigate = useNavigate();
-  const location = useLocation();
-  
-  // Add key to force remount when ID changes
-  const componentKey = `product-${id}`;
-  
-  // Validate ID format (assuming MongoDB ObjectId format)
-  const isValidId = id && /^[0-9a-fA-F]{24}$/.test(id);
-  
-  if (!isValidId) {
-    return (
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="text-center">
-          <h2 className="text-2xl font-bold text-red-600 mb-4">Invalid Product ID</h2>
-          <p className="text-gray-600 mb-4">The product ID format is invalid.</p>
-          <button
-            onClick={() => navigate("/profile")}
-            className="px-4 py-2 bg-[#ff6523] text-white rounded hover:bg-[#e55a1d] transition-colors"
-          >
-            Go Back to Home
-          </button>
-        </div>
-      </div>
-    );
-  }
-  
-  return (
-    <ProductDetails 
-      key={componentKey}
-      id={id} 
-      onBack={() => navigate("/profile")} 
-    />
-  );
-}
-
 // --- Main Profile component ---
 const NAVBAR_HEIGHT = 88; // px, adjust if needed (py-4 + logo height)
 
@@ -209,7 +162,6 @@ const Profile = () => {
   const {wishlist, getWishlistCount} = useWishlist()
   const { cartItems, getTotalItems } = useCart();
   const navigate = useNavigate();
-  const passedEmail = location.state?.email || "";
   const [scrollY, setScrollY] = useState(0);
   const [isProfileVisible, setIsProfileVisible] = useState(false);
   const [isMobile, setIsMobile] = useState(false);
@@ -222,35 +174,19 @@ const Profile = () => {
   const currencyRef = useRef(null);
   const { user } = useAuth();
 
-  // Handle route redirects for standalone routes - Improved with better path matching
-  useEffect(() => {
-    const path = location.pathname;
-    
-    // Only redirect if we're on the exact standalone paths
-    if (path === '/cart') {
-      navigate('/profile/cart', { replace: true });
-    } else if (path === '/homepage') {
-      navigate('/profile', { replace: true });
-    } else if (path === '/categories') {
-      navigate('/profile/categories', { replace: true });
-    } else if (path === '/account') {
-      navigate('/profile/account', { replace: true });
-    } else if (path === '/wishlist') {
-      navigate('/profile/wishlist', { replace: true });
-    } else if (path === '/orders') {
-      navigate('/profile/orders', { replace: true });
-    }
-  }, [location.pathname, navigate]);
-
-  // Get current tab based on URL - Improved with better path detection
+  // Get current tab based on URL - Simplified for nested routing
   const getCurrentTab = () => {
     const path = location.pathname;
-    if (path.includes("/profile/cart")) return "Cart";
-    if (path.includes("/profile/categories")) return "Browse";
-    if (path.includes("/profile/account")) return "Profile";
-    if (path.includes("/profile/wishlist")) return "Wishlist";
-    if (path.includes("/profile/orders")) return "Orders";
-    if (path.includes("/profile/product/")) return "Home"; // Product details shows Home as active
+    if (path.includes("/dashboard/cart")) return "Cart";
+    if (path.includes("/dashboard/categories")) return "Browse";
+    if (path.includes("/dashboard/account") || 
+        path.includes("/dashboard/coupons") || 
+        path.includes("/dashboard/help-center") || 
+        path.includes("/dashboard/reviews") || 
+        path.includes("/dashboard/settings")) return "Account";
+    if (path.includes("/dashboard/wishlist")) return "Wishlist";
+    if (path.includes("/dashboard/orders")) return "Orders";
+    if (path.includes("/dashboard/product/")) return "Home"; // Product details shows Home as active
     return "Home"; // Default to Home
   };
 
@@ -296,12 +232,12 @@ const Profile = () => {
   }, [isProfileVisible, isMobile, isCurrencyOpen]);
 
   const mobileTabs = [
-    { icon: Home, label: "Home", path: "/profile" },
-    // { icon: Grid, label: "Browse", path: "/profile/categories" }, // Browse tab commented out
-    { icon: Heart, label: "Wishlist", path: "/profile/wishlist" },
-    { icon: ShoppingCart, label: "Cart", path: "/profile/cart" },
-    { icon: Package, label: "Orders", path: "/profile/orders" },
-    { icon: User, label: "Profile", path: "/profile/account" },
+    { icon: Home, label: "Home", path: "/dashboard" },
+    // { icon: Grid, label: "Browse", path: "/dashboard/categories" }, // Browse tab commented out
+    { icon: Heart, label: "Wishlist", path: "/dashboard/wishlist" },
+    { icon: ShoppingCart, label: "Cart", path: "/dashboard/cart" },
+    { icon: Package, label: "Orders", path: "/dashboard/orders" },
+    { icon: User, label: "Account", path: "/dashboard/account" },
   ];
 
   const currencies = [
@@ -311,7 +247,7 @@ const Profile = () => {
 
   const handleProfileClick = () => {
     if (isMobile) {
-      navigate("/profile/account");
+      navigate("/dashboard/account");
     } else {
       setIsProfileVisible(!isProfileVisible);
     }
@@ -362,10 +298,15 @@ const Profile = () => {
   };
 
   // Check if current route is cart or wishlist
-  const isCartRoute = location.pathname.includes("/profile/cart");
-  const isWishlistRoute = location.pathname.includes("/profile/wishlist");
-  const isOrdersRoute = location.pathname.includes("/profile/orders");
-  const isProductRoute = location.pathname.includes("/profile/product/");
+  const isCartRoute = location.pathname.includes("/dashboard/cart");
+  const isWishlistRoute = location.pathname.includes("/dashboard/wishlist");
+  const isOrdersRoute = location.pathname.includes("/dashboard/orders");
+  const isProductRoute = location.pathname.includes("/dashboard/product/");
+  const isAccountRoute = location.pathname.includes("/dashboard/account") || 
+                        location.pathname.includes("/dashboard/coupons") || 
+                        location.pathname.includes("/dashboard/help-center") || 
+                        location.pathname.includes("/dashboard/reviews") || 
+                        location.pathname.includes("/dashboard/settings");
 
   return (
     <>
@@ -393,8 +334,8 @@ const Profile = () => {
         currencies={currencies}
       />
       
-      {/* Decorative images - Only show on non-product pages to avoid conflicts */}
-      {!isProductRoute && (
+      {/* Decorative images - Only show on non-product and non-account pages to avoid conflicts */}
+      {!isProductRoute && !isAccountRoute && (
         <>
           <img
             src={SaffronHome}
@@ -425,36 +366,13 @@ const Profile = () => {
       {/* Add top padding to push content below the fixed navbar */}
       <div style={{ paddingTop: NAVBAR_HEIGHT }} className="min-h-screen">
         <div className={`min-h-screen pt-4 pb-24 px-4 relative z-10`}>
-          <Routes>
-            <Route
-              path="/"
-              element={
-                <HomePage onSelectProduct={(id) => navigate(`/profile/product/${id}`)} />
-              }
-            />
-            <Route path="/categories" element={<Categories />} />
-            <Route path="/cart" element={
-              <div className="max-w-7xl mx-auto">
-                <Cart />
-              </div>
-            } />
-            <Route path="/wishlist" element={
-              <div className="max-w-7xl mx-auto">
-                <Wishlist />
-              </div>
-            } />
-            <Route path="/orders" element={<Order />} />
-            <Route path="/account" element={<Account isVisible={true} />} />
-            <Route path="/useraddresses" element={<UserAddresses />} />
-            <Route path="/product/:id" element={<ProductDetailsWrapper />} />
-            <Route path="/address" element={<Address />} />
-            <Route path="/selectaddress" element={<SelectAddress />} />
-          </Routes>
+          {/* Use Outlet to render nested routes */}
+          <Outlet />
         </div>
       </div>
       
-      {/* Mobile Bottom Tab - Hide on product pages for better UX */}
-      {!isProductRoute && (
+      {/* Mobile Bottom Tab - Hide on product pages and account pages for better UX */}
+      {!isProductRoute && !isAccountRoute && (
         <div className="md:hidden fixed inset-x-0 bottom-0 z-50 px-4 pb-6 pt-2">
           <div className="flex relative bg-gradient-to-r from-white/95 via-white/90 to-white/95 backdrop-blur-xl rounded-2xl shadow-2xl overflow-hidden">
             <div
